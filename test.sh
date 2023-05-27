@@ -3,7 +3,9 @@
 echo "Running tests..."
 
 # Run Java tests
-mvn clean test
+mvn build
+mvn clean install
+
 
 # Check if Java tests failed
 if [ $? -ne 0 ]; then
