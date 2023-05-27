@@ -1,0 +1,38 @@
+.profil-container {
+    margin-top: 20px;
+  }
+  
+  .profil-card {
+    margin-bottom: 20px;
+  }
+  
+  .profil-card-image {
+    width: 100%;
+    height: auto;
+  }
+  
+  .profil-card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .profil-card-text {
+    font-size: 1rem;
+  }
+  
+  .button-ubah-profil {
+    margin-top: 10px;
+  }
+  
+  .informasi-pribadi-card {
+    margin-bottom: 20px;
+  }
+  
+  .alamat-pengiriman-card {
+    margin-bottom: 20px;
+  }
+  
+  .button-ubah-alamat {
+    margin-top: 10px;
+  }
+  
