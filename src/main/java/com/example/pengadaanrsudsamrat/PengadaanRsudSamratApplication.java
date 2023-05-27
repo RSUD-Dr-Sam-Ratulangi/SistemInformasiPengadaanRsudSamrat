@@ -21,7 +21,7 @@ public class PengadaanRsudSamratApplication {
     public static void main(String[] args) {
 
         SpringApplication.run(PengadaanRsudSamratApplication.class, args);
-        Logger.getLogger("com.example").info("!");
+        Logger.getLogger("com.example").info("darkzill");
 
     }
 
