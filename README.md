@@ -41,7 +41,7 @@
     <td><a href="https://github.com/KorompisZusana"><img src="https://avatars.githubusercontent.com/KorompisZusana" alt="KorompisZusana's Avatar" width="50" height="50"></a></td>
   </tr>
   <tr>
-    <td>dgitevaliel</td>
+    <td>devaliel</td>
     <td>Lead Backend Developer</td>
     <td><a href="https://github.com/Devaliel"><img src="https://avatars.githubusercontent.com/Devaliel" alt="Devaliel's Avatar" width="50" height="50"></a></td>
   </tr>
