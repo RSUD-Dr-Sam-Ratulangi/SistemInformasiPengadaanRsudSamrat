@@ -20,8 +20,20 @@
     <li>Commit dan push perubahan ke repositori Anda di GitHub.</li>
     <li>Buka pull request ke repositori utama.</li>
     <li>Tunggu tinjauan dan persetujuan dari tim pengembang.</li>
+<table>
+  <tr>
+    <td>Code Reviewer 1</td>
+    <td>Devaliel</td>
+    <td><a href="https://github.com/Devaliel"><img src="https://avatars.githubusercontent.com/reviewer1" alt="Reviewer 1's Avatar" width="50" height="50"></a></td>
+  </tr>
+  <tr>
+    <td>Code Reviewer 2</td>
+    <td>po3rdlp</td>
+    <td><a href="https://github.com/po3rdlp"><img src="https://avatars.githubusercontent.com/reviewer2" alt="Reviewer 2's Avatar" width="50" height="50"></a></td>
+  </tr>
+<table>
     <li>Jika perubahan Anda telah diterima, akan digabungkan ke repositori utama.</li>
-  </ol>
+  
 
 <h2>Tim Pengembang</h2>
 <table>
@@ -41,7 +53,7 @@
     <td><a href="https://github.com/KorompisZusana"><img src="https://avatars.githubusercontent.com/KorompisZusana" alt="KorompisZusana's Avatar" width="50" height="50"></a></td>
   </tr>
   <tr>
-    <td>Devaliel</td>
+    <td>devaliel</td>
     <td>Lead Backend Developer</td>
     <td><a href="https://github.com/Devaliel"><img src="https://avatars.githubusercontent.com/Devaliel" alt="Devaliel's Avatar" width="50" height="50"></a></td>
   </tr>
