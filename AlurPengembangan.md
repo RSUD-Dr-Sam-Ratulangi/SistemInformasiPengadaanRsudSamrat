@@ -4,7 +4,7 @@
   <title>Panduan Kontributor Tim</title>
 </head>
 <body>
-  <h1>Panduan Kontributor Tim</h1>
+  <h1>Panduan Pengembagan Tim</h1>
 
 <h2>Tujuan Dokumen Ini</h2>
   <p>Dokumen ini bertujuan untuk memberikan panduan kepada anggota tim dalam berkontribusi pada proyek kami. Kami menghargai kerjasama dan upaya kontribusi dari setiap anggota tim untuk mencapai tujuan bersama.</p>
