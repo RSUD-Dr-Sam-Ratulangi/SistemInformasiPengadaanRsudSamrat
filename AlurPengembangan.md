@@ -12,7 +12,7 @@
 <h2> Proyek</h2>
   <p>Tim proyek terdiri dari anggota-anggota yang bekerja sama dalam pengembangan proyek ini. Setiap anggota tim memiliki peran dan tanggung jawab masing-masing.</p>
 
-<h2>Alur Kontribusi</h2>
+<h2>Alur Pengembangan</h2>
   <ol>
     <li>Fork Repository
       <ul>
