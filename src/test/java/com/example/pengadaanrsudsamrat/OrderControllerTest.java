@@ -64,13 +64,8 @@ class OrderControllerTest {
 
         // Check the response
         assertNotNull(actualResponseDTO);
-
-        // Modify the assertion to make it fail
-        // Change the expected response to a different value
-        OrderResponseDTO differentResponseDTO = new OrderResponseDTO();
-        assertNotEquals(differentResponseDTO, actualResponseDTO);
+        assertEquals(expectedResponseDTO, actualResponseDTO);
     }
-
 
     @Test
     void updateOrder() {
