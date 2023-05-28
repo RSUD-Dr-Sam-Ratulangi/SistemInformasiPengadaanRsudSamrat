@@ -3,43 +3,15 @@
 
 <head>
   <title>Sistem Informasi Pengadaan RSUD Samrat</title>
+
+   
 </head>
 
 <body>
   <h1>Sistem Informasi Pengadaan RSUD Samrat</h1>
 
-<h2>Deskripsi</h2>
-  <p>Repositori ini berisi kode sumber untuk proyek Sistem Informasi Pengadaan RSUD Samrat.</p>
-
-<h2>Fitur</h2>
-  <ul>
-    <li>Manajemen Vendor: Menambah, mengubah, dan menghapus informasi vendor.</li>
-    <li>Manajemen Permintaan Pengadaan: Membuat, meninjau, dan menyetujui permintaan pengadaan.</li>
-    <li>Alur Kerja Pengadaan: Mendefinisikan alur kerja dan proses persetujuan yang kustom untuk aktivitas pengadaan.</li>
-    <li>Laporan: Menghasilkan laporan dan analisis terkait aktivitas pengadaan.</li>
-  </ul>
-
-<h2>Teknologi yang Digunakan</h2>
-  <ul>
-    <li>Java (Spring Boot) untuk pengembangan backend.</li>
-    <li>Database MySQL untuk penyimpanan data.</li>
-    <li>HTML, CSS, dan JavaScript untuk pengembangan frontend.</li>
-    <li>Framework Bootstrap untuk desain antarmuka pengguna yang responsif dan modern.</li>
-    <li>Jenkins untuk integrasi berkelanjutan dan penyebaran.</li>
-    <li>Docker untuk kontainerisasi aplikasi.</li>
-  </ul>
-
-<h2>Memulai</h2>
-  <p>Untuk memulai menggunakan aplikasi ini, ikuti langkah-langkah berikut:</p>
-  <ol>
-    <li>Clone repositori ini ke mesin lokal Anda.</li>
-    <li>Instal semua dependensi yang diperlukan.</li>
-    <li>Konfigurasi pengaturan aplikasi, seperti koneksi database.</li>
-    <li>Jalankan aplikasi menggunakan perintah `npm start`.</li>
-  </ol>
-
-<h2>Kontribusi</h2>
-  <p>Kami terbuka untuk kontribusi dari siapa saja! Jika Anda ingin berkontribusi pada proyek ini, silakan ikuti langkah-langkah berikut:</p>
+<h2>Tim Pengembang</h2>
+  <p>Tim pengembang menyambut kontribusi dari anggota tim untuk memperbaiki dan mengembangkan proyek ini. Berikut adalah langkah-langkah untuk berkontribusi:</p>
   <ol>
     <li>Fork repositori ini ke akun GitHub Anda.</li>
     <li>Clone repositori yang telah Anda fork ke mesin lokal Anda.</li>
@@ -47,12 +19,58 @@
     <li>Kode dan lakukan perubahan yang diperlukan.</li>
     <li>Commit dan push perubahan ke repositori Anda di GitHub.</li>
     <li>Buka pull request ke repositori utama.</li>
-    <li>Tunggu tinjauan dan persetujuan dari pemilik repositori.</li>
+    <li>Tunggu tinjauan dan persetujuan dari tim pengembang.</li>
+<table>
+  <tr>
+    <td>Code Reviewer 1</td>
+    <td>Devaliel</td>
+    <td><a href="https://github.com/Devaliel"><img src="https://avatars.githubusercontent.com/reviewer1" alt="Reviewer 1's Avatar" width="50" height="50"></a></td>
+  </tr>
+  <tr>
+    <td>Code Reviewer 2</td>
+    <td>po3rdlp</td>
+    <td><a href="https://github.com/po3rdlp"><img src="https://avatars.githubusercontent.com/reviewer2" alt="Reviewer 2's Avatar" width="50" height="50"></a></td>
+  </tr>
+<table>
     <li>Jika perubahan Anda telah diterima, akan digabungkan ke repositori utama.</li>
-  </ol>
+  
 
-<h2>Lisensi</h2>
-  <p>Proyek ini dilisensikan di bawah Lisensi MIT. Silakan lihat berkas LICENSE untuk informasi lebih lanjut.</p>
+<h2>Tim Pengembang</h2>
+<table>
+  <tr>
+    <th>Nama</th>
+    <th>Jabatan</th>
+    <th>Username GitHub</th>
+  </tr>
+  <tr>
+    <td>Victor R Maukar</td>
+    <td>Kepala UPTIRS</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>KorompisZusana</td>
+    <td>Data Analyst/Designer</td>
+    <td><a href="https://github.com/KorompisZusana"><img src="https://avatars.githubusercontent.com/KorompisZusana" alt="KorompisZusana's Avatar" width="50" height="50"></a></td>
+  </tr>
+  <tr>
+    <td>devaliel</td>
+    <td>Lead Backend Developer</td>
+    <td><a href="https://github.com/Devaliel"><img src="https://avatars.githubusercontent.com/Devaliel" alt="Devaliel's Avatar" width="50" height="50"></a></td>
+  </tr>
+  <tr>
+    <td>po3rdlp</td>
+    <td>Lead Frontend Developer</td>
+    <td><a href="https://github.com/po3rdlp"><img src="https://avatars.githubusercontent.com/po3rdlp" alt="po3rdlp's Avatar" width="50" height="50"></a></td>
+  </tr>
+
+  <tr>
+    <td>narivay</td>
+    <td>Programmer</td>
+    <td><a href="https://github.com/orgs/RSUD-Dr-Sam-Ratulangi/people/narivay"><img src="https://avatars.githubusercontent.com/narivay" alt="narivay's Avatar" width="50" height="50"></a></td>
+  </tr>
+</table>
+
+
 </body>
 
 </html>
