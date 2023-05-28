@@ -3,6 +3,7 @@
     <h1>WELCOME {{ username }}</h1>
     {{ message }}
     {{ vendoruuid }}
+    <p>test</p>
   </div>
 </template>
 
