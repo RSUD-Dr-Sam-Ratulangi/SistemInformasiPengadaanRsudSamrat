@@ -4,15 +4,15 @@
   <title>Panduan Kontributor Tim</title>
 </head>
 <body>
-  <h1>Panduan Kontributor Tim</h1>
+  <h1>Panduan Pengembagan Tim</h1>
 
 <h2>Tujuan Dokumen Ini</h2>
   <p>Dokumen ini bertujuan untuk memberikan panduan kepada anggota tim dalam berkontribusi pada proyek kami. Kami menghargai kerjasama dan upaya kontribusi dari setiap anggota tim untuk mencapai tujuan bersama.</p>
 
-<h2>Tim Proyek</h2>
+<h2> Proyek</h2>
   <p>Tim proyek terdiri dari anggota-anggota yang bekerja sama dalam pengembangan proyek ini. Setiap anggota tim memiliki peran dan tanggung jawab masing-masing.</p>
 
-<h2>Alur Kontribusi</h2>
+<h2>Alur Pengembangan</h2>
   <ol>
     <li>Fork Repository
       <ul>

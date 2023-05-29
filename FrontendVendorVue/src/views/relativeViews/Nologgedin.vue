@@ -1,26 +1,19 @@
 <template>
-  <h3>LOGIN TO ACCESSES CONTENT!!!</h3>
+  <div class="container">
+      <h1>SMART PROCUREMENT</h1>
+  </div>
+
+  <div>
+    <h3>Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum</h3>
+    <h3>DR RSUD SAMRATULANGI TONDANO</h3>
+  </div>
+
 </template>
 
-<style>
-h3 {
-  font-size: 50px;
-  font-family: monospace;
-  color: red;
-  animation-name: blink;
-  animation-duration: 1s;
-  animation-iteration-count: infinite;
+<style scoped>
+
+h1 {
+  font-size: 20px;
 }
 
-@keyframes blink {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.1;
-  }
-  100% {
-    opacity: 1;
-  }
-}
 </style>

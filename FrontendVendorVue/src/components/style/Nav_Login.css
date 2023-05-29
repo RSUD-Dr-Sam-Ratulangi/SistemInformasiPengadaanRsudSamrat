@@ -1,5 +1,5 @@
-nav {
-  background-color: #c53333;
+/* nav {
+  background-color: #d4d4d4;
   color: #1a5276;
   border-bottom: px solid #929292;
   position: fixed;
@@ -23,7 +23,46 @@ nav h1 {
   text-decoration: none;
   margin: 0 10px;
   font-size: 16px;
+} */
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f0f0f0;
+  padding: 10px 20px;
 }
+
+.logo img {
+  height: 40px;
+}
+
+.titleNav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.mainTitle {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.subTitle {
+  font-size: 12px;
+  color: #888;
+}
+
+.login button {
+  padding: 8px 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
 
 /* Modals */
 
