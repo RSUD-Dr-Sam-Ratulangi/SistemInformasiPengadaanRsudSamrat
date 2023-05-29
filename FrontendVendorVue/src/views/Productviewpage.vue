@@ -1,35 +1,16 @@
 <template>
-  <div>
-    <div class="containerCard">
-      <h1>{{ username }} Products</h1>
-      <LoadingBar v-if="isLoading" />
-      <div v-for="product in products" :key="product.id">
-        <div class="card">
-          <img src="../components/img/user-interface.png" alt="Card image" />
-          <div class="card-content">
-            <h1>{{ product.name }}</h1>
-            <p>{{ product.productuuid }}</p>
-            <p>{{ product.quantity }}</p>
-            <p>{{ product.price }}</p>
-            <p>{{ product.description }}</p>
-            <div style="margin-left: 50%">
-              <button
-                class="button is-danger"
-                @click="deleteProduct(product.productuuid, product.name)"
-              >
-                Delete
-              </button>
-              <button class="button is-primary" @click="selectProduct(product)">
-                Edit
-              </button>
-            </div>
+
+  <div class="boxSearch">  
+    <h1>Search Your Products</h1>
+    <div class="container">
+      <div>
+        <div class="field has-addons">
+          <div class="control">
+            <input class="input" type="text" placeholder="Search Products" v-model="searchInput">
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div v-if="connectionFailed && products == null" class="failedconnect">
-    <h1>KONEKSI GAGAL</h1>
   </div>
 
   <!-- Modals edit Product -->
@@ -110,8 +91,26 @@ export default {
 };
 </script>
 
-<style>
-.card {
+<style scoped>
+.boxSearch {
+  margin-top: 5%;
+  padding-bottom: 5px;
+  width: 100%;
+  align-items: center;
+  text-align: center;
+  height: auto;
+  background-color: rgb(255, 255, 255);
+  border: #555;
+}
+.container {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+}
+
+/* .card {
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -157,5 +156,5 @@ export default {
 
 .failedconnect {
   margin-top: 20%;
-}
+} */
 </style>
