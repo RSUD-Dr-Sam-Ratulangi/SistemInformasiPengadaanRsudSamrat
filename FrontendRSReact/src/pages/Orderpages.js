@@ -3,7 +3,6 @@ import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import "../assets/vendorpages.css";
 
-
 const Orderpages = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +16,8 @@ const Orderpages = () => {
   const [selectedOrderItem, setSelectedOrderItem] = useState(null);
   const [bidPrice, setBidPrice] = useState("");
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
+  const [isOfferAccepted, setIsOfferAccepted] = useState(false);
+  const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
   const navigate = useNavigate();
 
   const calculatePayoutAmount = (orderItems) => {
@@ -108,17 +109,6 @@ const Orderpages = () => {
   };
 
   const handleOfferSubmit = () => {
-    // // Prepare the request payload
-    // const payload = {
-    //   orderId: selectedOrder.id, // Get the orderId from the selected order
-    //   orderItems: [
-    //     {
-    //       orderItemId: selectedOrderItem.id,
-    //       status: "OFFER",
-    //       bidPrice: parseFloat(bidPrice),
-    //     },
-    //   ],
-    // };
     const status = "OFFER";
     // Make the API call to update the order item
     axios
@@ -131,11 +121,34 @@ const Orderpages = () => {
         console.log("Offer updated:", response.data);
         // Close the offer modal
         setShowOfferModal(false);
-        // You may want to update the order details in the UI after a successful update
+        // Update the state to show the success modal
+        setIsOfferSubmitted(true);
       })
       .catch((error) => {
         // Handle any error that occurred during the API call
         console.error("Error updating offer:", error);
+      });
+  };
+
+  const handleOfferAccepted = () => {
+    const status = "ACCEPTED";
+    // Make the API call to update the order item
+    axios
+      .put(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/items/${selectedOrderItem.id}`,
+        { orderItemId: selectedOrderItem.id, status: status }
+      )
+      .then((response) => {
+        // Handle the response
+        console.log("Offer accepted:", response.data);
+        // Close the offer modal
+        setShowOfferModal(false);
+        // Update the state to show the success modal
+        setIsOfferAccepted(true);
+      })
+      .catch((error) => {
+        // Handle any error that occurred during the API call
+        console.error("Error accepting offer:", error);
       });
   };
 
@@ -500,6 +513,13 @@ const Orderpages = () => {
                     <button
                       type="button"
                       className="btn btn-success"
+                      onClick={handleOfferAccepted}
+                    >
+                      Accepted
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-info"
                       onClick={handleOfferSubmit}
                     >
                       Submit Offer
@@ -509,6 +529,51 @@ const Orderpages = () => {
               </div>
             </div>
           )}
+
+          {isOfferSubmitted && (
+            <div className="modal modal-background" style={{ display: "block" }}>
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h3 className="modal-title">Offer Submitted</h3>
+                    <button
+                      type="button"
+                      className="close"
+                      onClick={() => setIsOfferSubmitted(false)}
+                    >
+                      <span>&times;</span>
+                    </button>
+                  </div>
+                  <div className="modal-body">
+                    <p>Your offer for the product {selectedOrderItem.product.name} has been successfully submitted.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isOfferAccepted && (
+            <div className="modal modal-background" style={{ display: "block" }}>
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h3 className="modal-title">Offer Accepted</h3>
+                    <button
+                      type="button"
+                      className="close"
+                      onClick={() => setIsOfferAccepted(false)}
+                    >
+                      <span>&times;</span>
+                    </button>
+                  </div>
+                  <div className="modal-body">
+                    <p>Your offer for the product {selectedOrderItem.product.name} has been accepted.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
 
           {selectedOrderItem && (
             <div
