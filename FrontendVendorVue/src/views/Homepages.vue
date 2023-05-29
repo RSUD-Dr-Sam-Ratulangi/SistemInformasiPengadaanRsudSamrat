@@ -13,7 +13,7 @@
   </div>
 
   <div class="contentProduct">
-    <div class="card" v-for="order in filteredProducts" :key="order.id">
+    <div class="card" v-for="order in filteredOrders" :key="order.id">
       <div class="card-content">
         <div class="media">
           <div class="media-content">
@@ -45,7 +45,7 @@ export default {
 
   computed: {
     ...mapGetters(["message", "username", "vendoruuid", "vendorid"]),
-    filteredProducts() {
+    filteredOrders() {
       if (this.searchInput === '') {
         null
       } else {

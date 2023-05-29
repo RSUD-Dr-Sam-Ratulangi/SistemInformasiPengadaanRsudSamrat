@@ -1,71 +1,6 @@
 <template>
-  <!-- <div>
-    <div class="container">
-      <div class="box1">
-        <div class="box2">
-          <form @submit.prevent="Submitform">
-            <label for="name">Product Name:</label>
-            <input
-              type="text"
-              v-model="product.name"
-              placeholder="Product Name"
-              id="Productname"
-              class="input is-small"
-              required
-            />
-            <label for="price">Price:</label>
-            <input
-              type="number"
-              v-model="product.price"
-              placeholder="Price"
-              class="input is-small"
-              required
-            />
-            <label for="quantity">Quantity:</label>
-            <input
-              type="number"
-              v-model="product.quantity"
-              placeholder="Quantity"
-              class="input is-small"
-              required
-            />
-            <label for="description">Description:</label>
-            <input
-              type="text"
-              v-model="product.description"
-              placeholder="Description"
-              class="input is-small"
-            />
-            <button
-              class="button is-success"
-              v-if="!isLoading"
-              type="submit"
-              style="margin-top: 10px"
-            >
-              Submit
-            </button>
-            <button
-              class="button is-success"
-              v-if="isLoading"
-              type="button"
-              disabled
-              style="margin-top: 10px"
-            >
-              <span class="icon">
-                <i class="fas fa-spinner fa-spin"></i>
-              </span>
-              <span>Loading...</span>
-            </button>
-          </form>
-        </div>
-        <p>{{ message }}</p>
-        <LoadingBar v-if="isLoading" />
-      </div>
-    </div>
-  </div> -->
-
   <div class="containerProduct">
-    <form class="box">
+    <form class="box" @submit.prevent="Submitform">
       <div class="form-left">
         <div class="field">
           <label class="label">Product Name</label>
@@ -90,11 +25,20 @@
           <div class="control">
             <input class="input is-large" type="text" placeholder="Description" v-model="product.description">
           </div>
+          <p>Categories</p>
+          <label class="checkbox">
+            <input type="checkbox" v-model="product.categoryIds" :value="1">
+            Komputer 
+          </label>
+          <label class="checkbox" >
+            <input type="checkbox" v-model="product.categoryIds" :value="2">
+            Elektronik
+          </label>
         </div>
-        <button class="button is-primary">Submit</button>
+        <button class="button is-primary" type="submit">Submit</button>
       </div>
       <div class="form-right">
-        <div class="file has-name is-boxed">
+        <!-- <div class="file has-name is-boxed">
           <label class="file-label">
             <input class="file-input" type="file" name="resume">
             <span class="file-cta">
@@ -109,7 +53,8 @@
               <FontAwesomeIcon icon="fa-solid fa-upload" />
             </span>
           </label>
-        </div>
+        </div> -->
+        <input class="input" placeholder="Isi URL" v-model="product.imageUrl" />
       </div>
     </form>
   </div>
@@ -132,6 +77,8 @@ export default {
         price: "",
         quantity: "",
         description: "",
+        imageUrl: "",
+        categoryIds: [],
       },
       message: "",
     };
@@ -153,6 +100,7 @@ export default {
           this.product.price = "";
           this.product.quantity = "";
           this.product.description = "";
+          alert(`Product dengan nama : ${this.product.name} berhasil ditambahkan`)
           console.log(
             `Berhasil ditambahkan, Deskripsi: ${this.product.description}`
           );
