@@ -1,6 +1,16 @@
-.container {
-  margin-top: 50px;
+.Productpages {
+  padding: 20px;
+  position: fixed;
+  top: 50px; /* Adjust the top value as needed to align with your header */
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background-color: #fff;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  height: calc(100vh - 50px); /* Adjust the height based on your needs */
+  overflow-y: auto;
 }
+
 
 .my-4 {
   margin-top: 20px;
@@ -52,9 +62,6 @@
   color: #666;
 }
 
-.d-flex {
-  display: flex;
-}
 
 .justify-content-between {
   justify-content: space-between;

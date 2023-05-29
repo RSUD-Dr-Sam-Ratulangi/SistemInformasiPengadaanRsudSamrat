@@ -122,6 +122,8 @@ const filteredProducts = products.filter((product) => {
 
 
   return (
+      <div className="page-container">
+        <div className="Productpages">
     <div className="container mt-5">
     <p>Products</p>
     <div className="my-4">
@@ -214,6 +216,8 @@ const filteredProducts = products.filter((product) => {
         </button>
       </div>
     </div>
+        </div>
+      </div>
   );
 };
 
