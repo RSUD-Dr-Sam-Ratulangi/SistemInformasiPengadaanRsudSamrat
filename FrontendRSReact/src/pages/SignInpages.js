@@ -150,10 +150,10 @@ const SignInpages = () => {
               </Link>
             </Grid>
             <Grid item>
-              Don't have an account?{" "}
-              <Link href="#" variant="body2" sx={{ color: "black" }}>
+              {/* Don't have an account?{" "} */}
+              {/* <Link href="#" variant="body2" sx={{ color: "black" }}>
                 Sign Up
-              </Link>
+              </Link> */}
             </Grid>
           </Grid>
           </Box>

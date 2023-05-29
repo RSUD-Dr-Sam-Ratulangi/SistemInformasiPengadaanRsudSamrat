@@ -26,7 +26,7 @@ const Dashboard = () => {
       )}
       {!isLoggedIn && (
         <div>
-          <p>Please Log in</p>
+          <p>Please Login</p>
         </div>
       )}
       <Footer />
