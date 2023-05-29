@@ -1,8 +1,8 @@
 /* Nav styles */
 nav {
-    background-color: #333;
+    background-color: #CDE0C9;
     overflow: hidden;
-    position: fixed;
+    position: sticky;
     top: 0;
     width: 100%;
   }
@@ -19,14 +19,14 @@ nav {
   
   nav li a {
     display: block;
-    color: white;
+    color: black;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
   }
   
   nav li a:hover {
-    background-color: #111;
+    background-color: white;
   }
   
   nav .active {
@@ -40,7 +40,7 @@ nav {
     position: absolute;
     top: 10px;
     font-size: 18px;
-    color: white;
+    color: black;
     cursor: pointer;
     padding: 2px 5px;
     border-radius: 50%;
