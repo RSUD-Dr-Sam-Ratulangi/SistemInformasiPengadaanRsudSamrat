@@ -1,36 +1,40 @@
 <template>
-  <div>
-    <div class="containerCard">
-      <h1>{{ username }} Products</h1>
-      <LoadingBar v-if="isLoading" />
-      <div v-for="product in products" :key="product.id">
-        <div class="card">
-          <img src="../components/img/user-interface.png" alt="Card image" />
-          <div class="card-content">
-            <h1>{{ product.name }}</h1>
-            <p>{{ product.productuuid }}</p>
-            <p>{{ product.quantity }}</p>
-            <p>{{ product.price }}</p>
-            <p>{{ product.description }}</p>
-            <div style="margin-left: 50%">
-              <button
-                class="button is-danger"
-                @click="deleteProduct(product.productuuid, product.name)"
-              >
-                Delete
-              </button>
-              <button class="button is-primary" @click="selectProduct(product)">
-                Edit
-              </button>
-            </div>
+
+  <div class="boxSearch">  
+    <h1>Search Your Products</h1>
+    <div class="container">
+      <div>
+        <div class="field has-addons">
+          <div class="control">
+            <input class="input" type="text" placeholder="Search Products" v-model="searchInput">
+            <button style="margin-top: 5px;">Add Product</button>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div v-if="connectionFailed && products == null" class="failedconnect">
-    <h1>KONEKSI GAGAL</h1>
+
+  <div class="contentProduct">
+    <div class="card" v-for="product in filteredProducts" :key="product.id">
+      <div class="card-content">
+        <div class="media">
+          <div class="media-content">
+            <img :src="product.imageUrl"/>
+            <p class="title is-4">Product Name: {{ product.name }}</p>
+          </div>
+        </div>
+        <div class="content">
+          <p>Price: {{ product.price }}</p>
+          <p>Quantity: {{ product.quantity }}</p>
+          <p>Description: {{ product.description }}</p>
+          <p>Category: {{ product.categoryIds }}</p>
+          <button class="button is-danger" @click="deleteProduct(product.productuuid, product.name)">Delete</button>
+          <button class="button is-primary" style="margin-left: 10px;" @click="selectProduct(product)">Edit</button>
+        </div>
+      </div>
+    </div>
   </div>
+
 
   <!-- Modals edit Product -->
   <Teleport to="body">
@@ -48,6 +52,7 @@ import axios from "axios";
 import modal from "../components/modals/Editproduct.vue";
 import LoadingBar from "../components/molecules/LoadingBar.vue";
 import { mapGetters } from "vuex";
+import { ref } from "vue";
 
 export default {
   name: "Productpagesview",
@@ -56,8 +61,9 @@ export default {
   data() {
     return {
       products: [],
-
+      searchInput: ref(""),
       connectionFailed: false,
+      showModalAddProduct: false,
       showmodaleditProduct: false,
       selectedProduct: null,
       selectedUser: null,
@@ -66,6 +72,15 @@ export default {
   },
   computed: {
     ...mapGetters(["vendoruuid", "username"]),
+    filteredProducts() {
+      if (this.searchInput === '') {
+        return this.products
+      } else {
+        // Filter products based on search input
+        const searchTerm = this.searchInput.toLowerCase();
+        return this.products.filter(product => product.name.toLowerCase().includes(searchTerm))
+      }
+    }
   },
   created() {
     this.isLoading = true;
@@ -84,12 +99,12 @@ export default {
       });
   },
   methods: {
-    deleteProduct(idproduk, namaproduk) {
+    deleteProduct(uuidproduk, namaproduk) {
       /* hapus produk berdasaarkan produkuuid */
       if (confirm(`Are you sure want to delete "${namaproduk}"`)) {
         axios
           .delete(
-            `http://rsudsamrat.site:8080/pengadaan/dev/v1/products/${idproduk}`
+            `http://rsudsamrat.site:8080/pengadaan/dev/v1/products/${uuidproduk}`
           )
           .then((response) => {
             console.log(response.data);
@@ -110,52 +125,55 @@ export default {
 };
 </script>
 
-<style>
-.card {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin: 20px;
-  overflow: hidden;
+<style scoped>
+.boxSearch {
+  margin-top: 5%;
+  padding-bottom: 5px;
+  width: 100%;
+  align-items: center;
+  text-align: center;
+  height: auto;
+  background-color: rgb(255, 255, 255);
+  border: #555;
+}
+.container {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
 }
 
-.card img {
-  width: 50%;
-  height: 300px;
+.card {
+  width: 300px;
+  margin: 10px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.media-content img {
+  height: 150px;
+  width: 150px;
 }
 
 .card-content {
-  padding: 16px;
+  margin-top: 10px;
 }
 
-.card-content h2 {
-  margin: 0;
-  font-size: 24px;
+.title {
+  margin-bottom: 5px;
 }
 
-.card-content p {
-  margin: 16px 0;
+.content {
+  font-size: 14px;
+  color: #555;
 }
 
-.containerCard {
-  padding: 350px;
-  margin-top: -350px;
+.contentProduct {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.button {
-  display: inline-block;
-  background-color: #007bff;
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 4px;
-  text-decoration: none;
-}
-
-.button:hover {
-  background-color: #0069d9;
-}
-
-.failedconnect {
-  margin-top: 20%;
-}
 </style>

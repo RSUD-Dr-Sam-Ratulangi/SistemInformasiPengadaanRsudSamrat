@@ -120,6 +120,8 @@ const nextPage = () => {
   });
 
   return (
+      <div className="page-container">
+        <div className="Productpages">
     <div className="container mt-5">
       <p>Products</p>
       <div className="my-4">
@@ -210,6 +212,8 @@ const nextPage = () => {
         </button>
       </div>
     </div>
+        </div>
+      </div>
   );
 };
 

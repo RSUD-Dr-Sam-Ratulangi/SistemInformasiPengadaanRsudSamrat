@@ -1,67 +1,62 @@
 <template>
-  <div>
-    <div class="container">
-      <div class="box1">
-        <div class="box2">
-          <form @submit.prevent="Submitform">
-            <label for="name">Product Name:</label>
-            <input
-              type="text"
-              v-model="product.name"
-              placeholder="Product Name"
-              id="Productname"
-              class="input is-small"
-              required
-            />
-            <label for="price">Price:</label>
-            <input
-              type="number"
-              v-model="product.price"
-              placeholder="Price"
-              class="input is-small"
-              required
-            />
-            <label for="quantity">Quantity:</label>
-            <input
-              type="number"
-              v-model="product.quantity"
-              placeholder="Quantity"
-              class="input is-small"
-              required
-            />
-            <label for="description">Description:</label>
-            <input
-              type="text"
-              v-model="product.description"
-              placeholder="Description"
-              class="input is-small"
-            />
-            <button
-              class="button is-success"
-              v-if="!isLoading"
-              type="submit"
-              style="margin-top: 10px"
-            >
-              Submit
-            </button>
-            <button
-              class="button is-success"
-              v-if="isLoading"
-              type="button"
-              disabled
-              style="margin-top: 10px"
-            >
-              <span class="icon">
-                <i class="fas fa-spinner fa-spin"></i>
-              </span>
-              <span>Loading...</span>
-            </button>
-          </form>
+  <div class="containerProduct">
+    <form class="box" @submit.prevent="Submitform">
+      <div class="form-left">
+        <div class="field">
+          <label class="label">Product Name</label>
+          <div class="control">
+            <input class="input" type="text" placeholder="Product Name" v-model="product.name">
+          </div>
         </div>
-        <p>{{ message }}</p>
-        <LoadingBar v-if="isLoading" />
+        <div class="field">
+          <label class="label">Price</label>
+          <div class="control">
+            <input class="input" type="number" placeholder="Price" v-model="product.price">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Quantity</label>
+          <div class="control">
+            <input class="input" type="number" placeholder="Quantity" v-model="product.quantity">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Description</label>
+          <div class="control">
+            <input class="input is-large" type="text" placeholder="Description" v-model="product.description">
+          </div>
+          <p>Categories</p>
+          <label class="checkbox">
+            <input type="checkbox" v-model="product.categoryIds" :value="1">
+            Komputer 
+          </label>
+          <label class="checkbox" >
+            <input type="checkbox" v-model="product.categoryIds" :value="2">
+            Elektronik
+          </label>
+        </div>
+        <button class="button is-primary" type="submit">Submit</button>
       </div>
-    </div>
+      <div class="form-right">
+        <!-- <div class="file has-name is-boxed">
+          <label class="file-label">
+            <input class="file-input" type="file" name="resume">
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                Upload Image
+              </span>
+            </span>
+            <span class="file-name">
+              <FontAwesomeIcon icon="fa-solid fa-upload" />
+            </span>
+          </label>
+        </div> -->
+        <input class="input" placeholder="Isi URL" v-model="product.imageUrl" />
+      </div>
+    </form>
   </div>
 </template>
 
@@ -69,10 +64,11 @@
 import axios from "axios";
 import LoadingBar from "../components/molecules/LoadingBar.vue";
 import { mapGetters, Store } from "vuex";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "Productpages",
-  components: { LoadingBar },
+  components: { LoadingBar, FontAwesomeIcon },
   data() {
     return {
       isLoading: false,
@@ -81,6 +77,8 @@ export default {
         price: "",
         quantity: "",
         description: "",
+        imageUrl: "",
+        categoryIds: [],
       },
       message: "",
     };
@@ -102,6 +100,7 @@ export default {
           this.product.price = "";
           this.product.quantity = "";
           this.product.description = "";
+          alert(`Product dengan nama : ${this.product.name} berhasil ditambahkan`)
           console.log(
             `Berhasil ditambahkan, Deskripsi: ${this.product.description}`
           );
@@ -117,28 +116,27 @@ export default {
 };
 </script>
 
-<style>
-.container {
+<style scoped>
+.containerProduct {
   display: flex;
+  justify-content: center;
+  padding-top: 50px
+}
 
+.box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-left {
+  display: grid;
+  gap: 20px;
+}
+
+.form-right {
+  display: flex;
   justify-content: center;
   align-items: center;
-  height: auto;
-}
-.box1 {
-  padding: 10px;
-
-  height: 100%;
-}
-.box2 {
-  background-color: rgb(176, 176, 176);
-  padding: 10px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-input {
-  width: 5%;
 }
 </style>
