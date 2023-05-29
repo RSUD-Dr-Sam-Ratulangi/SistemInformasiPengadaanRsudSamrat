@@ -1,7 +1,7 @@
 .nav-link {
     color: black;
     text-decoration: none;
-    padding: 14px 16px;
+    padding: 2px 5px;
   }
   
   .nav-link:hover {
@@ -10,5 +10,12 @@
   
   .nav-link.active {
     background-color: #ff2121;
+  }
+  
+  nav.sticky {
+    position: sticky;
+    top: 0;
+    background-color: #ffffff; /* Ganti dengan warna latar belakang yang diinginkan */
+    z-index: 999;
   }
   
