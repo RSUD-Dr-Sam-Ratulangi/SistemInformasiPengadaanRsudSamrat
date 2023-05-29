@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import "../assets/vendorpages.css";
 
+
 const Orderpages = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -176,8 +177,7 @@ const Orderpages = () => {
 
   // Function to handle printing the order item to PDF
   const handlePrintOrderItem = () => {
-    // Generate PDF for the selected order item with price
-    // ...
+  
   };
 
   // Function to open the submit modal
@@ -213,7 +213,6 @@ const Orderpages = () => {
                 <th>Order ID</th>
                 <th>Order Date</th>
                 <th>Status</th>
-
                 <th>Operations</th>
               </tr>
             </thead>
@@ -246,8 +245,9 @@ const Orderpages = () => {
                       type="button"
                       className="close"
                       onClick={closeModal}
+                      aria-label="Close"
                     >
-                      <span>&times;</span>
+                      <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
                   <div className="modal-body">
@@ -320,26 +320,24 @@ const Orderpages = () => {
                               >
                                 Detail
                               </button>
-                              <td>
+                            </td>
+                            <td>
+                              <button
+                                className="btn btn-sm btn-warning"
+                                onClick={() => handleOffer(orderItem.id)}
+                              >
+                                Offer
+                              </button>
+                            </td>
+                            <td>
+                              {orderItem.status === "ACCEPTED" && (
                                 <button
-                                  className="btn btn-sm btn-warning"
-                                  onClick={() => handleOffer(orderItem.id)}
-                                >
-                                  Offer
-                                </button>
-                              </td>
-                              <td>
-                                {orderItem.status === "ACCEPTED" && (
-                                  <button
-                                    className="btn btn-sm btn-success"
-                                    onClick={() =>
-                                      handleOpenSubmitModal(orderItem)
-                                    }
+                                  className="btn btn-sm btn-success"
+                                  onClick={() => handleOpenSubmitModal(orderItem)}
                                   >
                                     Submit
-                                  </button>
-                                )}
-                              </td>
+                                </button>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -458,12 +456,12 @@ const Orderpages = () => {
                   <div className="modal-footer">
                     <button
                       type="button"
-                      className="btn btn-primary"
+                      className="btn btn-danger"
                       onClick={() => setPayoutDetails(null)}
                     >
                       Close
                     </button>
-                    <button type="button" className="btn btn-primary">
+                    <button type="button" className="btn btn-info">
                       Print
                     </button>
                   </div>
@@ -501,7 +499,7 @@ const Orderpages = () => {
                   <div className="modal-footer">
                     <button
                       type="button"
-                      className="btn btn-primary"
+                      className="btn btn-success"
                       onClick={handleOfferSubmit}
                     >
                       Submit Offer
