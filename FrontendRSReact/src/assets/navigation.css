@@ -72,3 +72,40 @@ nav {
     width: 100%;
   }
   
+  .logo {
+    width: 30px; /* Sesuaikan ukuran kecil */
+    height: 30px; /* Sesuaikan ukuran kecil */
+  }
+  
+  @media (min-width: 768px) {
+    .logo {
+      width: 50px; /* Sesuaikan ukuran standar */
+      height: 50px; /* Sesuaikan ukuran standar */
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    .logo {
+      width: 70px; /* Sesuaikan ukuran besar */
+      height: 70px; /* Sesuaikan ukuran besar */
+    }
+  }
+/* 
+  nav.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+  }
+  */
+/*   
+  .logo-text-right {
+    font-size: 14px;
+    margin-left: 10px;
+  }
+  
+  .logo-subtitle {
+    font-size: 12px;
+  }
+   */
+  

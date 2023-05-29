@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,7 +11,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../config/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import "../assets/navigation.css";
-import TabsNav from "./TabsNav";
+import TabsNav from "./TabsNav"; // Tambahkan impor TabsNav
 
 // Import logo JPG
 import logo from "../assets/logo.jpg";
@@ -19,6 +19,7 @@ import logo from "../assets/logo.jpg";
 const Navigation = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [isSticky, setIsSticky] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -40,27 +41,46 @@ const Navigation = () => {
 
   const isSignInPage = location.pathname === "/signIn";
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const sticky = window.pageYOffset > 0;
+      setIsSticky(sticky);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <div>
-      <nav>
+      <nav className={isSticky ? "sticky" : ""}>
         {/* Tambahkan logo */}
-        <img src={logo} alt="Logo" className="logo" />
+        <div className="logo-container">
+          <img src={logo} alt="Logo" className="logo" />
+          <div className="logo-text">
+            <span>Smart Samrat Procurement</span>
+            <span>RSUD DR SAM RATULANGI TONDANO</span>
+          </div>
+        </div>
 
         {isSignInPage ? null : (
           <ul>
             <li>
-              <Link to="/">Dashboard</Link>
+              {/* <Link to="/">Dashboard</Link> */}
             </li>
             {isLoggedIn && (
               <div>
                 <li>
-                  <Link to="/vendor">Analyst Dashboard</Link>
+                  {/* <Link to="/vendor">Analyst Dashboard</Link> */}
                 </li>
                 <li>
-                  <Link to="/products">Products</Link>
+                  {/* <Link to="/products">Products</Link> */}
                 </li>
                 <li>
-                  <Link to="/orders">Orders</Link>
+                  {/* <Link to="/orders">Orders</Link> */}
                 </li>
               </div>
             )}
@@ -90,6 +110,7 @@ const Navigation = () => {
                   <FontAwesomeIcon icon={faUser} />
                 </Link>
                 <Link
+
                   to="/signIn"
                   className="logout-icon"
                   onClick={handleLogoutClick}
