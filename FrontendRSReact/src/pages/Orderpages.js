@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import "../assets/vendorpages.css";
 
 const Orderpages = () => {
@@ -69,12 +69,12 @@ const Orderpages = () => {
     setSelectedOrder(null);
   };
 
-  const handleQuantityChange = (orderItemId, newQuantity) => { };
+  const handleQuantityChange = (orderItemId, newQuantity) => {};
 
-  const handleDeleteOrderItem = (orderItemId) => { };
+  const handleDeleteOrderItem = (orderItemId) => {};
 
-  const handleAddProduct = () => { 
-    navigate('/products');
+  const handleAddProduct = () => {
+    navigate("/products");
   };
 
   const handleDetailProduct = async (productUuid) => {
@@ -114,7 +114,11 @@ const Orderpages = () => {
     axios
       .put(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/items/${selectedOrderItem.id}`,
-        {orderItemId: selectedOrderItem.id, bidPrice: parseFloat(bidPrice), status: status}
+        {
+          orderItemId: selectedOrderItem.id,
+          bidPrice: parseFloat(bidPrice),
+          status: status,
+        }
       )
       .then((response) => {
         // Handle the response
@@ -157,41 +161,39 @@ const Orderpages = () => {
     setSubmitModalOpen(false);
   };
 
-
   const handleSubmitOrderItem = async () => {
     try {
       // PUT request to update payment using Axios
       const response = await axios.put(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/${selectedOrderItem.id}/payment`
       );
-  
+
       // Handle the response as needed
       // ...
-  
+
       // Extract the order items from the response
       const { orderItems } = response.data;
-  
+
       // Create the message to display in the alert
-      const orderItemsMessage = orderItems.map(
-        (orderItem) => `Order Item: ${orderItem.quantity}`
-      ).join(", ");
-  
+      const orderItemsMessage = orderItems
+        .map((orderItem) => `Order Item: ${orderItem.quantity}`)
+        .join(", ");
+
       // Display a success alert with the order items data
-      alert(`Payment submitted to the vendor successfully!\nOrder Items: ${orderItemsMessage}`);
+      alert(
+        `Payment submitted to the vendor successfully!\nOrder Items: ${orderItemsMessage}`
+      );
     } catch (error) {
       // Handle any errors
       // ...
-  
+
       // Display an error alert
       alert("Failed to submit payment to the vendor. Please try again.");
     }
   };
-  
 
   // Function to handle printing the order item to PDF
-  const handlePrintOrderItem = () => {
-  
-  };
+  const handlePrintOrderItem = () => {};
 
   // Function to open the submit modal
   const handleOpenSubmitModal = (orderItem) => {
@@ -249,7 +251,10 @@ const Orderpages = () => {
           </table>
 
           {selectedOrder && (
-            <div className="modal modal-background" style={{ display: "block" }}>
+            <div
+              className="modal modal-background"
+              style={{ display: "block" }}
+            >
               <div className="modal-dialog modal-dialog-centered modal-xl">
                 <div className="modal-content">
                   <div className="modal-header">
@@ -280,81 +285,111 @@ const Orderpages = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {selectedOrder.orderItems.map((orderItem) => (
-                          <tr key={orderItem.id}>
-                            <td>{orderItem.id}</td>
-                            <td>{orderItem.product.productuuid}</td>
-                            <td>{orderItem.product.vendor.name}</td>
-                            <td>{orderItem.product.name}</td>
-                            <td>{orderItem.product.price}</td>
-                            <td>{orderItem.bidPrice}</td>
-                            <td>{orderItem.status}</td>
-                            <td>
-                              <button
-                                className="btn btn-sm btn-secondary"
-                                onClick={() =>
-                                  handleQuantityChange(
-                                    orderItem.id,
-                                    orderItem.quantity - 1
-                                  )
-                                }
-                              >
-                                -
-                              </button>
-                              {orderItem.quantity}
-                              <button
-                                className="btn btn-sm btn-secondary"
-                                onClick={() =>
-                                  handleQuantityChange(
-                                    orderItem.id,
-                                    orderItem.quantity + 1
-                                  )
-                                }
-                              >
-                                +
-                              </button>
-                            </td>
-                            <td>
-                              <button
-                                className="btn btn-sm btn-danger"
-                                onClick={() =>
-                                  handleDeleteOrderItem(orderItem.id)
-                                }
-                              >
-                                Delete
-                              </button>
-                              <button
-                                className="btn btn-sm btn-info"
-                                onClick={() =>
-                                  handleDetailProduct(
-                                    orderItem.product.productuuid
-                                  )
-                                }
-                              >
-                                Detail
-                              </button>
-                            </td>
-                            <td>
-                              <button
-                                className="btn btn-sm btn-warning"
-                                onClick={() => handleOffer(orderItem.id)}
-                              >
-                                Offer
-                              </button>
-                            </td>
-                            <td>
-                              {orderItem.status === "ACCEPTED" && (
-                                <button
-                                  className="btn btn-sm btn-success"
-                                  onClick={() => handleOpenSubmitModal(orderItem)}
-                                  >
-                                    Submit
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
+  {(() => {
+  const vendorItemsMap = new Map();
+
+  selectedOrder.orderItems.forEach((orderItem) => {
+    const vendorName = orderItem.product.vendor.name;
+
+    if (vendorItemsMap.has(vendorName)) {
+      vendorItemsMap.get(vendorName).push(orderItem);
+    } else {
+      vendorItemsMap.set(vendorName, [orderItem]);
+    }
+  });
+
+  const allItemsAccepted = [...vendorItemsMap].every(([vendorName, orderItems]) =>
+    orderItems.every((orderItem) => orderItem.status === "ACCEPTED")
+  );
+
+    return [...vendorItemsMap].map(([vendorName, orderItems]) => (
+      <React.Fragment key={vendorName}>
+        <tr>
+          <td colSpan="9">
+            <strong>{vendorName}</strong>
+          </td>
+        </tr>
+        {orderItems.map((orderItem) => (
+          <tr key={orderItem.id}>
+            <td>{orderItem.id}</td>
+            <td>{orderItem.product.productuuid}</td>
+            <td>{vendorName}</td>
+            <td>{orderItem.product.name}</td>
+            <td>{orderItem.product.price}</td>
+            <td>{orderItem.bidPrice}</td>
+            <td>{orderItem.status}</td>
+            <td>
+              <button
+                className="btn btn-sm btn-secondary"
+                onClick={() =>
+                  handleQuantityChange(orderItem.id, orderItem.quantity - 1)
+                }
+              >
+                -
+              </button>
+              {orderItem.quantity}
+              <button
+                className="btn btn-sm btn-secondary"
+                onClick={() =>
+                  handleQuantityChange(orderItem.id, orderItem.quantity + 1)
+                }
+              >
+                +
+              </button>
+            </td>
+            <td>
+              <button
+                className="btn btn-sm btn-danger"
+                onClick={() => handleDeleteOrderItem(orderItem.id)}
+              >
+                Delete
+              </button>
+              <button
+                className="btn btn-sm btn-info"
+                onClick={() =>
+                  handleDetailProduct(orderItem.product.productuuid)
+                }
+              >
+                Detail
+              </button>
+            </td>
+            <td>
+              <button
+                className="btn btn-sm btn-warning"
+                onClick={() => handleOffer(orderItem.id)}
+              >
+                Offer
+              </button>
+            </td>
+            <td>
+              {orderItem.status === "ACCEPTED" && (
+                <button
+                  className="btn btn-sm btn-success"
+                  onClick={() => handleOpenSubmitModal(orderItem)}
+                >
+                  Submit
+                </button>
+              )}
+            </td>
+          </tr>
+        ))}
+        {orderItems.some((orderItem) => orderItem.status === "ACCEPTED") && (
+          <tr>
+            <td colSpan="9">
+              <button
+                className="btn btn-sm btn-success"
+                
+              >
+                Submit All
+              </button>
+            </td>
+          </tr>
+        )}
+      </React.Fragment>
+    ));
+  })()}
+</tbody>
+
                     </table>
                     <div>
                       <button
@@ -383,7 +418,10 @@ const Orderpages = () => {
           )}
 
           {showProductDetailModal && selectedProduct && (
-            <div className="modal modal-background" style={{ display: "block" }}>
+            <div
+              className="modal modal-background"
+              style={{ display: "block" }}
+            >
               <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                   <div className="modal-header">
@@ -422,7 +460,10 @@ const Orderpages = () => {
           )}
 
           {payoutDetails && (
-            <div className="modal modal-background" style={{ display: "block" }}>
+            <div
+              className="modal modal-background"
+              style={{ display: "block" }}
+            >
               <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                   <div className="modal-header">
@@ -484,7 +525,10 @@ const Orderpages = () => {
           )}
 
           {showOfferModal && selectedOrderItem && (
-            <div className="modal modal-background" style={{ display: "block" }}>
+            <div
+              className="modal modal-background"
+              style={{ display: "block" }}
+            >
               <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                   <div className="modal-header">
@@ -531,7 +575,10 @@ const Orderpages = () => {
           )}
 
           {isOfferSubmitted && (
-            <div className="modal modal-background" style={{ display: "block" }}>
+            <div
+              className="modal modal-background"
+              style={{ display: "block" }}
+            >
               <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                   <div className="modal-header">
@@ -545,7 +592,11 @@ const Orderpages = () => {
                     </button>
                   </div>
                   <div className="modal-body">
-                    <p>Your offer for the product {selectedOrderItem.product.name} has been successfully submitted.</p>
+                    <p>
+                      Your offer for the product{" "}
+                      {selectedOrderItem.product.name} has been successfully
+                      submitted.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -553,7 +604,10 @@ const Orderpages = () => {
           )}
 
           {isOfferAccepted && (
-            <div className="modal modal-background" style={{ display: "block" }}>
+            <div
+              className="modal modal-background"
+              style={{ display: "block" }}
+            >
               <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                   <div className="modal-header">
@@ -567,20 +621,21 @@ const Orderpages = () => {
                     </button>
                   </div>
                   <div className="modal-body">
-                    <p>Your offer for the product {selectedOrderItem.product.name} has been accepted.</p>
+                    <p>
+                      Your offer for the product{" "}
+                      {selectedOrderItem.product.name} has been accepted.
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-
           {selectedOrderItem && (
             <div
               className="modal modal-background"
               style={{ display: submitModalOpen ? "block" : "none" }}
             >
-            
               <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                   <div className="modal-header">
@@ -597,7 +652,10 @@ const Orderpages = () => {
                     <p>Status: {selectedOrderItem.status}</p>
                     <p>Bid Price: {selectedOrderItem.bidPrice}</p>
                     <p>Order Item: {selectedOrderItem.quantity}</p>
-                    <p>Total Price: {selectedOrderItem.bidPrice * selectedOrderItem.quantity}</p>
+                    <p>
+                      Total Price:{" "}
+                      {selectedOrderItem.bidPrice * selectedOrderItem.quantity}
+                    </p>
                   </div>
                   <div className="modal-footer">
                     <button
