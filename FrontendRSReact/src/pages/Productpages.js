@@ -12,9 +12,10 @@ const Productpages = () => {
   const [totalPages, setTotalPages] = useState(0);
   const quantity = 1;
   const [showConfirmation, setShowConfirmation] = useState(false);
-  
+  const [showNotAvailableModal, setShowNotAvailableModal] = useState(false);
 
   const handleConfirmationClose = () => setShowConfirmation(false);
+  const handleNotAvailableModalClose = () => setShowNotAvailableModal(false);
 
   useEffect(() => {
     axios
@@ -37,8 +38,12 @@ const handleSearch = (event) => {
 };
 
 const showOrderConfirmation = (product) => {
-  setSelectedProduct(product);
-  setShowConfirmation(true);
+  if (product.quantity > 0) {
+    setSelectedProduct(product);
+    setShowConfirmation(true);
+  } else {
+    setShowNotAvailableModal(true);
+  }
 };
 
   const handleOrderConfirmation = () => {
@@ -154,6 +159,19 @@ const nextPage = () => {
             </Card>
           </div>
         ))}
+<Modal show={showNotAvailableModal} onHide={handleNotAvailableModalClose}>
+  <Modal.Header closeButton>
+    <Modal.Title>Product Unavailable</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <p>Maaf, produk ini sudah tidak tersedia.</p>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="primary" onClick={handleNotAvailableModalClose}>
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
 
 <Modal show={showConfirmation} onHide={handleConfirmationClose}>
       <Modal.Header closeButton>
@@ -165,6 +183,9 @@ const nextPage = () => {
             Apakah Anda yakin ingin melakukan pemesanan produk{" "}
             <strong>{selectedProduct.name}</strong>?
           </p>
+        )}
+        {selectedProduct && selectedProduct.quantity === 0 && (
+          <p>Maaf, produk ini sudah tidak tersedia.</p> // Tampilkan pesan bahwa produk sudah tidak tersedia
         )}
       </Modal.Body>
       <Modal.Footer>
