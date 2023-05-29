@@ -31,6 +31,11 @@ nav {
   justify-content: space-between;
   background-color: #f0f0f0;
   padding: 10px 20px;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
 }
 
 .logo img {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <!-- <div>
     <div class="container">
       <div class="box1">
         <div class="box2">
@@ -62,6 +62,56 @@
         <LoadingBar v-if="isLoading" />
       </div>
     </div>
+  </div> -->
+
+  <div class="containerProduct">
+    <form class="box">
+      <div class="form-left">
+        <div class="field">
+          <label class="label">Product Name</label>
+          <div class="control">
+            <input class="input" type="text" placeholder="Product Name" v-model="product.name">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Price</label>
+          <div class="control">
+            <input class="input" type="number" placeholder="Price" v-model="product.price">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Quantity</label>
+          <div class="control">
+            <input class="input" type="number" placeholder="Quantity" v-model="product.quantity">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Description</label>
+          <div class="control">
+            <input class="input is-large" type="text" placeholder="Description" v-model="product.description">
+          </div>
+        </div>
+        <button class="button is-primary">Submit</button>
+      </div>
+      <div class="form-right">
+        <div class="file has-name is-boxed">
+          <label class="file-label">
+            <input class="file-input" type="file" name="resume">
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                Upload Image
+              </span>
+            </span>
+            <span class="file-name">
+              <FontAwesomeIcon icon="fa-solid fa-upload" />
+            </span>
+          </label>
+        </div>
+      </div>
+    </form>
   </div>
 </template>
 
@@ -69,10 +119,11 @@
 import axios from "axios";
 import LoadingBar from "../components/molecules/LoadingBar.vue";
 import { mapGetters, Store } from "vuex";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "Productpages",
-  components: { LoadingBar },
+  components: { LoadingBar, FontAwesomeIcon },
   data() {
     return {
       isLoading: false,
@@ -117,28 +168,27 @@ export default {
 };
 </script>
 
-<style>
-.container {
+<style scoped>
+.containerProduct {
   display: flex;
+  justify-content: center;
+  padding-top: 50px
+}
 
+.box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-left {
+  display: grid;
+  gap: 20px;
+}
+
+.form-right {
+  display: flex;
   justify-content: center;
   align-items: center;
-  height: auto;
-}
-.box1 {
-  padding: 10px;
-
-  height: 100%;
-}
-.box2 {
-  background-color: rgb(176, 176, 176);
-  padding: 10px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-input {
-  width: 5%;
 }
 </style>
