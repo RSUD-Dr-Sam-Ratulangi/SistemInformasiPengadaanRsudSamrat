@@ -118,7 +118,7 @@ export default {
       this.selectedItem = orderItem;
     },
     acceptBid() {
-      axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem}`, {
+      axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
         orderItemId: this.selectedItem.id,
         status: this.accepted
       })
