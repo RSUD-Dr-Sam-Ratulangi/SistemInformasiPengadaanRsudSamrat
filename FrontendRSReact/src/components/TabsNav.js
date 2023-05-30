@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import "../assets/tabsnav.css";
 
+
 const TabsNav = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.pathname);
