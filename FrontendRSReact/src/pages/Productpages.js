@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, Badge, Modal, Button} from "react-bootstrap";
 import "../assets/productpages.css";
-
+import Footer from "../components/Footer";
+import Vendorpages from "./Vendorpages";
+import { FaPlus } from 'react-icons/fa';
 
 const Productpages = () => {
   const [products, setProducts] = useState([]);
@@ -37,6 +39,14 @@ const Productpages = () => {
 const handleSearch = (event) => {
   setSearchTerm(event.target.value);
 };
+
+const handleShowModal = () => {
+  // Add your logic to show the modal here
+};
+
+// Rest of the code
+
+
 
 const showOrderConfirmation = (product) => {
   if (product.quantity > 0) {
@@ -122,10 +132,16 @@ const filteredProducts = products.filter((product) => {
 
 
   return (
+    
       <div className="page-container">
+        
         <div className="Productpages">
     <div className="container mt-5">
-    <p>Products</p>
+      
+    {/* <p>Products</p> */}
+    {/* <Button variant="primary" onClick={handleShowModal} style={{ backgroundColor: '#ccc', border: 'none' }}>
+        <FaPlus style={{ fontSize: '15px', color: '#000' }} />
+      </Button> */}
     <div className="my-4">
       <input
         type="text"
@@ -217,6 +233,7 @@ const filteredProducts = products.filter((product) => {
       </div>
     </div>
         </div>
+        {/* <Vendorpages /> */}
       </div>
   );
 };
