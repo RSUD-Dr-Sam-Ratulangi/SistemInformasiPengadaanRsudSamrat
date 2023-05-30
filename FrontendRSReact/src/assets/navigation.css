@@ -1,111 +1,99 @@
-/* Nav styles */
-nav {
-    background-color: #CDE0C9;
-    overflow: hidden;
-    position: sticky;
-    top: 0;
-    width: 100%;
-  }
-  
-  nav ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-  }
-  
+.nav {
+  background-color: #CDE0C9;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  width: 100%;
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+nav li {
+  float: left;
+}
+
+nav li a {
+  display: block;
+  color: black;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+nav li a:hover {
+  background-color: white;
+}
+
+nav .active {
+  background-color: #100f0f;
+}
+
+/* Icon styles */
+.notification-icon,
+.profile-icon,
+.logout-icon {
+  position: absolute;
+  top: 10px;
+  font-size: 18px;
+  color: black;
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 50%;
+}
+
+.notification-icon {
+  right: 105px;
+}
+
+.profile-icon {
+  right: 60px;
+}
+
+.logout-icon {
+  right: 15px;
+}
+
+/* Logo styles */
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  padding-left: 10px;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.logo-text span:first-child {
+  font-weight: bold;
+  font-size: 16px; /* Penyesuaian ukuran tulisan */
+}
+
+/* Responsive styles */
+@media screen and (max-width: 600px) {
   nav li {
-    float: left;
+    float: none;
   }
-  
-  nav li a {
-    display: block;
-    color: black;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
+
+  .logo-text {
+    display: none;
   }
-  
-  nav li a:hover {
-    background-color: white;
-  }
-  
-  nav .active {
-    background-color: #ff2121;
-  }
-  
-  /* Icon styles */
-  .notification-icon,
-  .profile-icon,
-  .logout-icon {
+
+  .navigation-icons {
     position: absolute;
     top: 10px;
-    font-size: 18px;
-    color: black;
-    cursor: pointer;
-    padding: 2px 5px;
-    border-radius: 50%;
+    right: 10px;
   }
-  
-  .notification-icon {
-    right: 105px;
-  }
-  
-  .profile-icon {
-    right: 60px;
-  }
-  
-  .logout-icon {
-    right: 15px;
-  }
-  
-  /* Dashboard styles */
-  .dashboard {
-    padding-top: 64px; /* tinggi navigation + jarak dari atas */
-    height: calc(100vh - 64px); /* tinggi layar - tinggi navigation */
-    /* overflow-y: scroll; */
-  }
-  
-  /* Footer styles */
-  .footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-  }
-  
-  .logo {
-    width: 30px; /* Sesuaikan ukuran kecil */
-    height: 30px; /* Sesuaikan ukuran kecil */
-  }
-  
-  @media (min-width: 768px) {
-    .logo {
-      width: 50px; /* Sesuaikan ukuran standar */
-      height: 50px; /* Sesuaikan ukuran standar */
-    }
-  }
-  
-  @media (min-width: 1200px) {
-    .logo {
-      width: 70px; /* Sesuaikan ukuran besar */
-      height: 70px; /* Sesuaikan ukuran besar */
-    }
-  }
-/* 
-  nav.sticky {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 999;
-  }
-  */
-/*   
-  .logo-text-right {
-    font-size: 14px;
-    margin-left: 10px;
-  }
-  
-  .logo-subtitle {
-    font-size: 12px;
-  }
-   */
-  
+}

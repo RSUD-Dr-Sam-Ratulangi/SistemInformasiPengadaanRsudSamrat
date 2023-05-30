@@ -11,36 +11,50 @@ const TabsNav = () => {
   };
 
   return (
-    <nav className="nav nav-pills nav-fill sticky">
-      <Link
-        to="/"
-        className={`nav-link ${activeTab === "/" ? "active" : ""}`}
-        onClick={() => handleTabClick("/")}
-      >
-        Dashboard
-      </Link>
-      <Link
-        to="/vendor"
-        className={`nav-link ${activeTab === "/vendor" ? "active" : ""}`}
-        onClick={() => handleTabClick("/vendor")}
-      >
-        Analyst Dashboard
-      </Link>
-      <Link
-        to="/products"
-        className={`nav-link ${activeTab === "/products" ? "active" : ""}`}
-        onClick={() => handleTabClick("/products")}
-      >
-        Products
-      </Link>
-      <Link
-        to="/orders"
-        className={`nav-link ${activeTab === "/orders" ? "active" : ""}`}
-        onClick={() => handleTabClick("/orders")}
-      >
-        Orders
-      </Link>
-    </nav>
+    <div>
+      <ul className="nav nav-pills sticky">
+        <li className="nav-item">
+          <Link
+            to="/"
+            className={`nav-link ${activeTab === "/" ? "active" : ""}`}
+            onClick={() => handleTabClick("/")}
+          >
+            Dashboard
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link
+            to="/vendor"
+            className={`nav-link ${activeTab === "/vendor" ? "active" : ""}`}
+            onClick={() => handleTabClick("/vendor")}
+          >
+            Analyst Dashboard
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link
+            to="/products"
+            className={`nav-link ${activeTab === "/products" ? "active" : ""}`}
+            onClick={() => handleTabClick("/products")}
+          >
+            Products
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link
+            to="/orders"
+            className={`nav-link ${activeTab === "/orders" ? "active" : ""}`}
+            onClick={() => handleTabClick("/orders")}
+          >
+            Orders
+          </Link>
+        </li>
+      </ul>
+
+      <div className="content">
+        {/* Konten halaman utama */}
+      </div>
+    </div>
   );
 };
 
