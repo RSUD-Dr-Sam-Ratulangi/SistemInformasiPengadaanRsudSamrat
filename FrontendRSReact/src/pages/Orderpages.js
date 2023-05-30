@@ -298,9 +298,13 @@ const Orderpages = () => {
     }
   });
 
-  const allItemsAccepted = [...vendorItemsMap].every(([vendorName, orderItems]) =>
-    orderItems.every((orderItem) => orderItem.status === "ACCEPTED")
-  );
+
+  const handleSubmitAll = (vendorName) => {
+    const orderItems = vendorItemsMap.get(vendorName);
+    // Lakukan operasi yang diperlukan saat "Submit All" diklik untuk setiap vendor
+    // Contoh: Kirim permintaan ke server, perbarui status semua orderItem, dll.
+    console.log(`Submitting all order items for vendor: ${vendorName}`, orderItems);
+  };
 
     return [...vendorItemsMap].map(([vendorName, orderItems]) => (
       <React.Fragment key={vendorName}>
@@ -361,7 +365,7 @@ const Orderpages = () => {
                 Offer
               </button>
             </td>
-            <td>
+            {/* <td>
               {orderItem.status === "ACCEPTED" && (
                 <button
                   className="btn btn-sm btn-success"
@@ -370,7 +374,7 @@ const Orderpages = () => {
                   Submit
                 </button>
               )}
-            </td>
+            </td> */}
           </tr>
         ))}
         {orderItems.some((orderItem) => orderItem.status === "ACCEPTED") && (
@@ -378,9 +382,9 @@ const Orderpages = () => {
             <td colSpan="9">
               <button
                 className="btn btn-sm btn-success"
-                
+                onClick={() => handleSubmitAll(vendorName)}
               >
-                Submit All
+                Submit Alls
               </button>
             </td>
           </tr>

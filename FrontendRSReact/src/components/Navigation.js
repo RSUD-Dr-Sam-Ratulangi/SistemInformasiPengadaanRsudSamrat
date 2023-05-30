@@ -14,6 +14,7 @@ import "../assets/navigation.css";
 import TabsNav from "./TabsNav";
 import logo from "../assets/logo.jpg";
 
+
 const Navigation = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [notificationCount, setNotificationCount] = useState(0);
@@ -21,6 +22,7 @@ const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  
 
   const handleNotificationClick = () => {
     setNotificationCount(0);
@@ -33,7 +35,11 @@ const Navigation = () => {
   const handleLogoutClick = () => {
     // Tambahkan fungsi yang ingin dilakukan saat ikon logout diklik
     dispatch(logout());
+    localStorage.removeItem('isLoggedIn');
     console.log("Berhasil Logout");
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
     navigate("/signIn");
   };
 
