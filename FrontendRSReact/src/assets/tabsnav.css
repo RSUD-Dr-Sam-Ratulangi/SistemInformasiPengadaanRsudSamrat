@@ -1,21 +1,27 @@
-.nav-link {
-    color: black;
-    text-decoration: none;
-    padding: 2px 5px;
-  }
-  
-  .nav-link:hover {
-    background-color: white;
-  }
-  
-  .nav-link.active {
-    background-color: #ff2121;
-  }
-  
-  nav.sticky {
-    position: sticky;
+.nav-pills {
+    background-color: #fff;
+    font-size: smaller;
     top: 0;
-    background-color: #ffffff; /* Ganti dengan warna latar belakang yang diinginkan */
     z-index: 999;
+    position: sticky;
+    display: flex;
+    justify-content: center;
+    gap: 200px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Perbarui efek box-shadow */
+  }
+  
+  .nav-pills .nav-link {
+    color: black;
+  }
+  
+  .nav-pills .nav-link.active {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  /* Efek bayangan pada konten halaman */
+  .content {
+    background-color: #f9f9f9;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Perbarui efek box-shadow */
   }
   

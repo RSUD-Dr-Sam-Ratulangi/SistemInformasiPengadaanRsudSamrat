@@ -11,9 +11,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../config/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import "../assets/navigation.css";
-import TabsNav from "./TabsNav"; // Tambahkan impor TabsNav
-
-// Import logo JPG
+import TabsNav from "./TabsNav";
 import logo from "../assets/logo.jpg";
 
 const Navigation = () => {
@@ -57,7 +55,6 @@ const Navigation = () => {
   return (
     <div>
       <nav className={isSticky ? "sticky" : ""}>
-        {/* Tambahkan logo */}
         <div className="logo-container">
           <img src={logo} alt="Logo" className="logo" />
           <div className="logo-text">
@@ -66,26 +63,6 @@ const Navigation = () => {
           </div>
         </div>
 
-        {isSignInPage ? null : (
-          <ul>
-            <li>
-              {/* <Link to="/">Dashboard</Link> */}
-            </li>
-            {isLoggedIn && (
-              <div>
-                <li>
-                  {/* <Link to="/vendor">Analyst Dashboard</Link> */}
-                </li>
-                <li>
-                  {/* <Link to="/products">Products</Link> */}
-                </li>
-                <li>
-                  {/* <Link to="/orders">Orders</Link> */}
-                </li>
-              </div>
-            )}
-          </ul>
-        )}
         {!isSignInPage && (
           <div className="navigation-icons">
             {isLoggedIn ? (
@@ -110,7 +87,6 @@ const Navigation = () => {
                   <FontAwesomeIcon icon={faUser} />
                 </Link>
                 <Link
-
                   to="/signIn"
                   className="logout-icon"
                   onClick={handleLogoutClick}
@@ -124,10 +100,10 @@ const Navigation = () => {
                 Login
               </Link>
             )}
+            <TabsNav />
           </div>
         )}
       </nav>
-      <TabsNav />
     </div>
   );
 };
