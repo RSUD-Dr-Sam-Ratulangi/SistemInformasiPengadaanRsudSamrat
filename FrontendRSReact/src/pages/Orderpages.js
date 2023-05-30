@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../assets/vendorpages.css";
+// import "../assets/vendorpages.css";
+import { FaTrash, FaInfoCircle, FaHandshake, FaCheck, FaPrint } from 'react-icons/fa';
 
 const Orderpages = () => {
   const [data, setData] = useState([]);
@@ -205,7 +206,7 @@ const Orderpages = () => {
 
   return (
     <div className="container">
-      <h2>Order Table</h2>
+      {/* <h2>Order Table</h2> */}
       {loading ? (
         <div>Loading...</div>
       ) : (
@@ -298,9 +299,9 @@ const Orderpages = () => {
     }
   });
 
-  const allItemsAccepted = [...vendorItemsMap].every(([vendorName, orderItems]) =>
-    orderItems.every((orderItem) => orderItem.status === "ACCEPTED")
-  );
+  // const allItemsAccepted = [...vendorItemsMap].every(([vendorName, orderItems]) =>
+  //   orderItems.every((orderItem) => orderItem.status === "ACCEPTED")
+  // );
 
     return [...vendorItemsMap].map(([vendorName, orderItems]) => (
       <React.Fragment key={vendorName}>
@@ -338,36 +339,45 @@ const Orderpages = () => {
               </button>
             </td>
             <td>
+            <button
+              className="btn btn-sm btn-clear text-danger"
+              onClick={() => handleDeleteOrderItem(orderItem.id)}
+            >
+              <FaTrash />
+            </button>
               <button
-                className="btn btn-sm btn-danger"
-                onClick={() => handleDeleteOrderItem(orderItem.id)}
-              >
-                Delete
-              </button>
-              <button
-                className="btn btn-sm btn-info"
+                className="btn btn-sm btn-clear text-primary"
                 onClick={() =>
                   handleDetailProduct(orderItem.product.productuuid)
                 }
               >
-                Detail
+                <FaInfoCircle />
               </button>
             </td>
             <td>
               <button
-                className="btn btn-sm btn-warning"
+                className="btn btn-sm btn-clear text-success"
                 onClick={() => handleOffer(orderItem.id)}
               >
-                Offer
+                <FaHandshake />
               </button>
             </td>
+            {orderItem.status === 'ACCEPTED' && (
+              
+              <button
+                className="btn btn-sm btn-clear text-success"
+                onClick={() => handleOpenSubmitModal(orderItem)}
+              >
+                <FaPrint />
+              </button>
+            )}
             <td>
               {orderItem.status === "ACCEPTED" && (
                 <button
-                  className="btn btn-sm btn-success"
+                className="btn btn-sm btn-clear text-success"
                   onClick={() => handleOpenSubmitModal(orderItem)}
                 >
-                  Submit
+                  <FaCheck />
                 </button>
               )}
             </td>
