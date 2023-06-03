@@ -1,5 +1,4 @@
 <template>
-
   <div class="boxSearch">  
     <h1>Search Your Products</h1>
     <div class="container">
@@ -7,7 +6,7 @@
         <div class="field has-addons">
           <div class="control">
             <input class="input" type="text" placeholder="Search Products" v-model="searchInput">
-            <button style="margin-top: 5px;">Add Product</button>
+            <button class="button is-small" style="margin-top: 5px;" @click="addProductModal()">Add Product</button>
           </div>
         </div>
       </div>
@@ -45,18 +44,30 @@
       @close="showmodaleditProduct = false"
     />
   </Teleport>
+
+    <!-- Modals Add Product -->
+    <Teleport to="body">
+    <!-- pakai komponen modal, passing ke prop(lihat Editproduct.vue) -->
+    <modalAddProduct
+      :show = "showModalAddProduct"
+      @close="showModalAddProduct = false"
+    />
+  </Teleport>
+
+
 </template>
 
 <script>
 import axios from "axios";
 import modal from "../components/modals/Editproduct.vue";
+import modalAddProduct from "../components/modals/AddProduct.vue"
 import LoadingBar from "../components/molecules/LoadingBar.vue";
 import { mapGetters } from "vuex";
 import { ref } from "vue";
 
 export default {
   name: "Productpagesview",
-  components: { modal, LoadingBar },
+  components: { modal, LoadingBar, modalAddProduct },
 
   data() {
     return {
@@ -121,6 +132,10 @@ export default {
       this.showmodaleditProduct = true;
       this.selectedProduct = produk;
     },
+    addProductModal() {
+      this.showModalAddProduct = true;
+      console.log("ok")
+    }
   },
 };
 </script>

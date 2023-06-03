@@ -39,33 +39,26 @@
         </div>
 
         <div class="buttons" v-if="selectedItem !== null">
+<<<<<<< HEAD
 
           <div v-if="selectedItem.status === 'OFFER' ">
           <button class="button is-primary" @click.prevent="acceptBid">Accept</button>
           <button class="button is-danger" @click="showModalRejected">Reject</button>
 
+=======
+          <div v-if="selectedItem.status === 'OFFER'">
+            <button class="button is-primary" @click.prevent="acceptBid">Accept</button>
+            <button class="button is-danger" @click="showModalRejected">Reject</button>
+            <button class="button is-info">See Details</button>
+            <button @click="showModalHistory"> See History </button>
+>>>>>>> 4fe6a4ac2debfdd3ba57e6c3f5168e22c7954baf
           </div>
 
-          <div v-if="selectedItem.status === 'PENDING' || selectedItem.status === 'REJECTED' || selectedItem.status === 'ACCEPTED' ">
+          <div
+            v-if="selectedItem.status === 'PENDING' || selectedItem.status === 'REJECTED' || selectedItem.status === 'ACCEPTED'">
             <button class="button is-info">See Details</button>
+            <button @click="showModalHistory()" class="button is-primary"> See History </button>
           </div>
-          <!-- <div class="file has-name is-fullwidth">
-            <label class="file-label">
-              <input class="file-input" type="file" name="resume" @change="uploadFaktur"
-                accept="application/pdf, .doc, .docx">
-              <span class="file-cta">
-                <span class="file-icon">
-                  <i class="fas fa-upload"></i>
-                </span>
-                <span class="file-label">
-                  Upload Faktur (PDF/DOCX)
-                </span>
-              </span>
-              <span class="file-name">
-                {{ fileName }}
-              </span>
-            </label>
-          </div> -->
         </div>
         <button style="display: flex; justify-content: flex-end; margin-top: 10px" class="button is-warning"
           @click="closeModal">
@@ -81,7 +74,7 @@
     <div v-if="showRejectModal" class="modal-mask" style="overflow: auto;">
       <div class="modal-container">
         <!-- Konten modal penolakan -->
-        <h1 style="font-weight: bold;">Tolak Penawaran</h1>
+        <h1 style="font-weight: bold;">History</h1>
         <p>Apakah Anda yakin ingin menolak penawaran BARANG {{ selectedItem.product.name }}</p>
         <div class="control">
           <input class="input is-hovered" type="number" placeholder="Harga" v-model="rejectBidInputBid" required>
@@ -89,6 +82,47 @@
         <div class="buttons">
           <button class="button is-danger" :disabled="!rejectBidInputBid" @click="rejectBid">Tolak</button>
           <button class="button is-primary" @click="closeRejectModal">Batal</button>
+        </div>
+      </div>
+    </div>
+  </Transition>
+
+  <!-- Modal History -->
+  <Transition name="modal">
+    <div v-if="showHistoryModal" class="modal-mask" style="overflow: auto;">
+      <div class="modal-container">
+        <!-- Konten modal penolakan -->
+        <h1 style="font-weight: bold;">Tolak Penawaran</h1>
+        <p>{{ orders.id }}</p>
+        <div class="control">
+          <div v-if="history">
+            <table class="table">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>Original Price</th>
+                <th>bidPrice</th>
+                <th>bidPriceChange</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="histori in history" :key="histori.id">
+                <th>{{ histori.productName }}</th>
+                <th>{{ histori.originalPrice }}</th>
+                <th>{{ histori.bidPrice }}</th>
+                <th>{{ histori.bidPriceChange }}</th>
+                <th>{{ histori.status }}</th>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+          <div v-else>
+            <p>null</p>
+          </div>
+        </div>
+        <div class="buttons">
+          <button class="button is-primary" @click="closeHistoryModal">Close</button>
         </div>
       </div>
     </div>
@@ -107,10 +141,12 @@ export default {
 
   data() {
     return {
+      history: [],
       selectedItem: null,
       accepted: "ACCEPTED",
       rejected: "REJECTED",
       showRejectModal: false,
+      showHistoryModal: false,
       fileName: "",
       rejectBidInputBid: "",
     };
@@ -119,6 +155,13 @@ export default {
   methods: {
     selectItem(orderItem) {
       this.selectedItem = orderItem;
+      axios.get(`http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${this.orders.id}/${this.selectedItem.id}`)
+        .then((res) => {
+          this.history = res.data;
+          console.log(this.history);
+        }).catch((err) => {
+          console.log(err)
+        })
     },
     acceptBid() {
       axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
@@ -134,9 +177,15 @@ export default {
     showModalRejected() {
       this.showRejectModal = true
     },
+    showModalHistory() {
+      this.showHistoryModal = true;
+    },
     closeRejectModal() {
       this.showRejectModal = false;
       this.selectedItem = null;
+    },
+    closeHistoryModal() {
+      this.showHistoryModal = false;
     },
     rejectBid() {
       axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {

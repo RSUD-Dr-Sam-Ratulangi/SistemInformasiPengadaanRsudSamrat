@@ -6,7 +6,6 @@
     z-index: 999;
     background-color: #fff;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    height: calc(100vh - 50px); /* Adjust the height based on your needs */
 
 }
 
@@ -114,12 +113,12 @@
     border-color: #0062cc;
 }
 
-.footer {
+/* .footer {
     background-color: #f8f9fa;
     padding: 10px;
     text-align: center;
-    margin-top: 50px; /* Adjust the margin-top value as per your preference */
-}
+    margin-top: 50px; 
+} */
 
 .navigation {
     background-color: #f8f9fa;
