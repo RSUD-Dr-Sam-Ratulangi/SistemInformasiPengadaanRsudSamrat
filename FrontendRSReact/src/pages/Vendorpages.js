@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Table, Pagination, Button, Modal, Form } from 'react-bootstrap';
 import "../assets/vendorpages.css";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { FaPlus } from 'react-icons/fa';
 
 const Vendorpages = () => {
   const [productList, setProductList] = useState([]);
-  const username = useSelector((state) => state.auth.user?.username);
+  // const username = useSelector((state) => state.auth.user?.username);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(20);

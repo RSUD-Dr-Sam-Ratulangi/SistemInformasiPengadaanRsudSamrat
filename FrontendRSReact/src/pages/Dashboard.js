@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
-import Footer from "../components/Footer";
+// import Footer from "../components/Footer";
 import "../assets/navigation.css";
 import "../assets/dashboard.css"
 import { useSelector } from "react-redux";
 // import { Dashboard } from "@mui/icons-material";
+
 
 const Dashboard = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -57,6 +58,7 @@ const Dashboard = () => {
   const chartInstanceRef = useRef(null);
 
   useEffect(() => {
+    
 
       if (chartInstanceRef.current) {
           // Destroy previous chart instance
@@ -93,6 +95,7 @@ const Dashboard = () => {
       chartInstanceRef.current = newChartInstance;
   }, [weeklyExpenses]);
 
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredVendors, setFilteredVendors] = useState(topVendors);
   const [filteredProducts, setFilteredProducts] = useState(topProducts);
@@ -125,7 +128,7 @@ const Dashboard = () => {
                           <div className="card bg-primary text-white mb-4">
                               <div className="card-body">
                                   <h5 className="card-title">Total Vendors</h5>
-                                  <p className="card-text">{topVendors.length}</p>
+                                  <p className="card-text text-black">{topVendors.length}</p>
                               </div>
                           </div>
                       </div>
@@ -133,15 +136,15 @@ const Dashboard = () => {
                           <div className="card bg-success text-white mb-4">
                               <div className="card-body">
                                   <h5 className="card-title">Total Products</h5>
-                                  <p className="card-text">{topProducts.length}</p>
+                                  <p className="card-text text-black">{topProducts.length}</p>
                               </div>
                           </div>
                       </div>
                       <div className="col-md-3">
-                          <div className="card bg-warning text-dark mb-4">
+                          <div className="card bg-secondary text-white mb-4">
                               <div className="card-body">
                                   <h5 className="card-title">Total Orders</h5>
-                                  <p className="card-text">{orderHistory.length}</p>
+                                  <p className="card-text text-black">{orderHistory.length}</p>
                               </div>
                           </div>
                       </div>
@@ -149,7 +152,7 @@ const Dashboard = () => {
                           <div className="card bg-danger text-white mb-4">
                               <div className="card-body">
                                   <h5 className="card-title">Total Order Cancel</h5>
-                                  <p className="card-text">0</p>
+                                  <p className="card-text text-black">0</p>
                               </div>
                           </div>
                       </div>

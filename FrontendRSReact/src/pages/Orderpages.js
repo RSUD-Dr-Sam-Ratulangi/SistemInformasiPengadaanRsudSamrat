@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-// import "../assets/vendorpages.css";
-import { FaTrash, FaInfoCircle, FaHandshake, FaCheck, FaPrint } from 'react-icons/fa';
+import "../assets/vendorpages.css";
+import { FaTrash, FaInfoCircle, FaHandshake, FaCheck, FaPrint} from 'react-icons/fa';
 
 const Orderpages = () => {
   const [data, setData] = useState([]);
@@ -299,13 +299,6 @@ const Orderpages = () => {
     }
   });
 
-
-  const handleSubmitAll = (vendorName) => {
-    const orderItems = vendorItemsMap.get(vendorName);
-    // Lakukan operasi yang diperlukan saat "Submit All" diklik untuk setiap vendor
-    // Contoh: Kirim permintaan ke server, perbarui status semua orderItem, dll.
-    console.log(`Submitting all order items for vendor: ${vendorName}`, orderItems);
-  };
   // const allItemsAccepted = [...vendorItemsMap].every(([vendorName, orderItems]) =>
   //   orderItems.every((orderItem) => orderItem.status === "ACCEPTED")
   // );
@@ -353,42 +346,35 @@ const Orderpages = () => {
               <FaTrash />
             </button>
               <button
-                className="btn btn-sm btn-clear text-primary"
+                className="btn btn-sm btn-clear text-info"
                 onClick={() =>
                   handleDetailProduct(orderItem.product.productuuid)
                 }
               >
                 <FaInfoCircle />
               </button>
-            </td>
-            <td>
               <button
                 className="btn btn-sm btn-clear text-success"
                 onClick={() => handleOffer(orderItem.id)}
               >
                 <FaHandshake />
               </button>
-            </td>
-            {/* <td>
-            {orderItem.status === 'ACCEPTED' && (
-              
-              <button
-                className="btn btn-sm btn-clear text-success"
-                onClick={() => handleOpenSubmitModal(orderItem)}
-              >
-                <FaPrint />
-              </button>
-            )}
-            <td>
               {orderItem.status === "ACCEPTED" && (
                 <button
-                className="btn btn-sm btn-clear text-success"
+                  className="btn btn-sm btn-clear text-success"
                   onClick={() => handleOpenSubmitModal(orderItem)}
                 >
                   <FaCheck />
                 </button>
+                
               )}
-            </td> */}
+              <button
+                className="btn btn-sm btn-clear text-seacondary"
+                onClick={() => handleDeleteOrderItem(orderItem.id)}
+                >
+                <FaPrint />
+              </button>
+            </td>
           </tr>
         ))}
         {orderItems.some((orderItem) => orderItem.status === "ACCEPTED") && (
@@ -396,9 +382,9 @@ const Orderpages = () => {
             <td colSpan="9">
               <button
                 className="btn btn-sm btn-success"
-                onClick={() => handleSubmitAll(vendorName)}
+                
               >
-                Submit Alls
+                Submit All
               </button>
             </td>
           </tr>
