@@ -10,15 +10,14 @@
       </a>
     </div>
     <div class="titleNav">
-      <span class="mainTitle">SMART PROCUREMENT</span>
-      <span class="subTitle">RSUD SAMRATULANGI TONDANO</span>
+      <span class="mainTitle">SMART SAMRAT PROCUREMENT</span>
+      <span class="subTitle">RUMAH SAKIT UMUM DAERAH DR SAMRATULANGI TONDANO</span>
     </div>
     <div class="login">
-      <button class="button is-light" @click="showmodalLogin = true" v-if="!isLoggedIn">
-        <FontAwesomeIcon icon="fas fa-user" style="margin-right: 5px" />
-        Login
+      <button class="button is-info" @click="showmodalLogin = true" v-if="!isLoggedIn">
+        <FontAwesomeIcon icon="fas fa-user" />
       </button>
-      <button class="button is-light" @click="logout" v-else>Logout</button>
+      <button class="button is-danger" @click="logout" v-else><FontAwesomeIcon icon="fas fa-right-from-bracket" /></button>
     </div>
   </nav>
 
@@ -59,6 +58,7 @@ export default {
       localStorage.removeItem("vendorUuid");
       localStorage.removeItem("vendorId");
       alert("Berhasil Keluar");
+      this.toggleIsActive = false;
     },
     activeToggle() {
       this.toggleIsActive = !this.toggleIsActive
