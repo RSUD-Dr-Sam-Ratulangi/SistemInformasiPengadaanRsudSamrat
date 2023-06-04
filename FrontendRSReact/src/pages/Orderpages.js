@@ -2,8 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../assets/vendorpages.css";
-import { FaTrash, FaInfoCircle, FaHandshake, FaCheck, FaPrint} from 'react-icons/fa';
+import {
+  FaTrash,
+  FaInfoCircle,
+  FaHandshake,
+  FaCheck,
+  FaPrint,
+} from "react-icons/fa";
 import html2pdf from "html2pdf.js";
+import logo from "../assets/logo.jpg";
 
 //import { saveAs } from 'file-saver';
 //import {Document, Page, Text, PDFDownloadLink, StyleSheet, pdf} from '@react-pdf/renderer';
@@ -13,10 +20,6 @@ import html2pdf from "html2pdf.js";
 //import jsPDF from "jspdf";
 //import "jspdf-autotable";
 
-
-
-
-
 const Orderpages = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,6 +28,7 @@ const Orderpages = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showProductDetailModal, setShowProductDetailModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [payoutDetails, setPayoutDetails] = useState(null);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [selectedOrderItem, setSelectedOrderItem] = useState(null);
@@ -32,8 +36,8 @@ const Orderpages = () => {
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
   const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
+  const [history, setHistory] = useState([]);
   const navigate = useNavigate();
-
 
   const calculatePayoutAmount = (orderItems) => {
     let totalAmount = 0;
@@ -86,7 +90,44 @@ const Orderpages = () => {
 
   const handleQuantityChange = (orderItemId, newQuantity) => {};
 
-  const handleDeleteOrderItem = (orderItemId) => {};
+  const handleDeleteOrderItem = (orderItemId) => {
+    const confirmed = window.confirm(
+      "Apakah Anda yakin ingin menghapus produk ini?"
+    );
+
+    if (confirmed) {
+      fetch(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orderitems/${orderItemId}`,
+        {
+          method: "DELETE",
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            // Data berhasil dihapus, lakukan tindakan tambahan jika diperlukan
+            console.log("Data berhasil dihapus");
+          } else {
+            // Gagal menghapus data, tangani kesalahan jika diperlukan
+            console.error("Gagal menghapus data");
+          }
+        })
+        .catch((error) => {
+          // Tangani kesalahan dalam permintaan
+          console.error("Terjadi kesalahan:", error);
+        });
+    }
+  };
+
+  /* History function */
+  const handleHistory = (orderItemId) => {
+    setShowHistoryModal(true);
+    axios.get(`http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${selectedOrder.id}/${orderItemId}`)
+    .then((res) => {
+      console.log(res);
+      setHistory(res.data);
+      console.log("Berhasil");
+    }).catch(err => console.log(err));
+  };
 
   const handleAddProduct = () => {
     navigate("/products");
@@ -215,10 +256,10 @@ const Orderpages = () => {
     setSubmitModalOpen(true);
   };
 
-
   const handlePrintOrderItem = () => {
     if (selectedOrderItem) {
-      const { product, quantity, bidPrice, status, totalAmount } = selectedOrderItem;
+      const { product, quantity, bidPrice, status, totalAmount } =
+        selectedOrderItem;
 
       const taxRate = 0.11; // 11% tax rate
 
@@ -249,11 +290,23 @@ const Orderpages = () => {
           font-weight: bold;
         }
         img {
-          max-width: 200px;
+          max-width: 50px;
         }
       </style>
       <body>
-        <h2>Accepted Offer</h2>
+        <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
+          <img src=${logo} alt="Logo" className="logo" style="float: left; margin-right: 10px; height: 50px;">
+          <strong style="font-size: 16px;">PEMERINTAH KABUPATEN MINAHASA</strong>
+        </p>
+        <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
+          <strong style="font-size: 14px;">RUMAH SAKIT UMUM DAERAH DR. SAM RATULANGI TONDANO</strong>
+        </p>
+        <p style="text-align: center; font-size: 12px; line-height: 1;">
+          Jl. Suprapto Luaan Kecamatan Tondano Timur Telp. (0431) 321171 Fax. (0431) 321172
+        </p>
+        <hr style="border: none; height: 1px; background-color: #444444; opacity: 0.5; margin: 10px 0;">    
+
+        <h2 style="font-size: 20px;">Accepted Offer</h2>
         <div>
           <p>Dear ${product.vendor.name},</p>
           <p>We are pleased to inform you that your offer for the following product has been accepted:</p>
@@ -278,12 +331,12 @@ const Orderpages = () => {
             <tr>
               <th>Quantity</th>
               <th>Bid Price</th>
-              <th>Total</th>
+              
             </tr>
             <tr>
               <td>${quantity}</td>
               <td>$${bidPrice}</td>
-              <td>$${quantity * bidPrice}</td>
+              
             </tr>
           </table>
 
@@ -296,7 +349,10 @@ const Orderpages = () => {
             <tr>
               <td>$${quantity * bidPrice}</td>
               <td>$${(quantity * bidPrice * taxRate).toFixed(2)}</td>
-              <td>$${(quantity * bidPrice + quantity * bidPrice * taxRate).toFixed(2)}</td>
+              <td>$${(
+                quantity * bidPrice +
+                quantity * bidPrice * taxRate
+              ).toFixed(2)}</td>
             </tr>
           </table>
 
@@ -317,14 +373,10 @@ const Orderpages = () => {
       const options = {
         margin: [20, 20, 20, 20], // Specify margins: top, left, bottom, right
       };
-
+      // window.print(letterHtml);
       html2pdf().set(options).from(element).save();
     }
   };
-
-
-
-
 
   // Rest of your code
 
@@ -410,109 +462,129 @@ const Orderpages = () => {
                         </tr>
                       </thead>
                       <tbody>
-  {(() => {
-  const vendorItemsMap = new Map();
+                        {(() => {
+                          const vendorItemsMap = new Map();
 
-  selectedOrder.orderItems.forEach((orderItem) => {
-    const vendorName = orderItem.product.vendor.name;
+                          selectedOrder.orderItems.forEach((orderItem) => {
+                            const vendorName = orderItem.product.vendor.name;
 
-    if (vendorItemsMap.has(vendorName)) {
-      vendorItemsMap.get(vendorName).push(orderItem);
-    } else {
-      vendorItemsMap.set(vendorName, [orderItem]);
-    }
-  });
+                            if (vendorItemsMap.has(vendorName)) {
+                              vendorItemsMap.get(vendorName).push(orderItem);
+                            } else {
+                              vendorItemsMap.set(vendorName, [orderItem]);
+                            }
+                          });
 
-  const allItemsAccepted = [...vendorItemsMap].every(([vendorName, orderItems]) =>
-    orderItems.every((orderItem) => orderItem.status === "ACCEPTED")
-  );
+                          const allItemsAccepted = [...vendorItemsMap].every(
+                            ([vendorName, orderItems]) =>
+                              orderItems.every(
+                                (orderItem) => orderItem.status === "ACCEPTED"
+                              )
+                          );
 
-    return [...vendorItemsMap].map(([vendorName, orderItems]) => (
-      <React.Fragment key={vendorName}>
-        <tr>
-          <td colSpan="9">
-            <strong>{vendorName}</strong>
-          </td>
-        </tr>
-        {orderItems.map((orderItem) => (
-          <tr key={orderItem.id}>
-            <td>{orderItem.id}</td>
-            <td>{orderItem.product.productuuid}</td>
-            <td>{vendorName}</td>
-            <td>{orderItem.product.name}</td>
-            <td>{orderItem.product.price}</td>
-            <td>{orderItem.bidPrice}</td>
-            <td>{orderItem.status}</td>
-            <td>
-              <button
-                className="btn btn-sm btn-secondary"
-                onClick={() =>
-                  handleQuantityChange(orderItem.id, orderItem.quantity - 1)
-                }
-              >
-                -
-              </button>
-              {orderItem.quantity}
-              <button
-                className="btn btn-sm btn-secondary"
-                onClick={() =>
-                  handleQuantityChange(orderItem.id, orderItem.quantity + 1)
-                }
-              >
-                +
-              </button>
-            </td>
-            <td>
-            <button
-              className="btn btn-sm btn-clear text-danger"
-              onClick={() => handleDeleteOrderItem(orderItem.id)}
-            >
-              <FaTrash />
-            </button>
-              <button
-                className="btn btn-sm btn-clear text-info"
-                onClick={() =>
-                  handleDetailProduct(orderItem.product.productuuid)
-                }
-              >
-                <FaInfoCircle />
-              </button>
-              <button
-                className="btn btn-sm btn-clear text-success"
-                onClick={() => handleOffer(orderItem.id)}
-              >
-                <FaHandshake />
-              </button>
-              {orderItem.status === "ACCEPTED" && (
-                <button
-                  className="btn btn-sm btn-clear text-success"
-                  onClick={() => handleOpenSubmitModal(orderItem)}
-                >
-                  <FaCheck />
-                </button>
-                
-              )}
-
-            </td>
-          </tr>
-        ))}
-        {orderItems.some((orderItem) => orderItem.status === "ACCEPTED") && (
-          <tr>
-            <td colSpan="9">
-              <button
-                className="btn btn-sm btn-success"
-                onClick={() => console.log(allItemsAccepted)}
-              >
-                Submit All
-              </button>
-            </td>
-          </tr>
-        )}
-      </React.Fragment>
-    ));
-  })()}
-</tbody>
-
+                          return [...vendorItemsMap].map(
+                            ([vendorName, orderItems]) => (
+                              <React.Fragment key={vendorName}>
+                                <tr>
+                                  <td colSpan="9">
+                                    <strong>{vendorName}</strong>
+                                  </td>
+                                </tr>
+                                {orderItems.map((orderItem) => (
+                                  <tr key={orderItem.id}>
+                                    <td>{orderItem.id}</td>
+                                    <td>{orderItem.product.productuuid}</td>
+                                    <td>{vendorName}</td>
+                                    <td>{orderItem.product.name}</td>
+                                    <td>{orderItem.product.price}</td>
+                                    <td>{orderItem.bidPrice}</td>
+                                    <td onClick={() => handleHistory(orderItem.id)} className="history-click">{orderItem.status}</td>
+                                    <td>
+                                      <button
+                                        className="btn btn-sm btn-secondary"
+                                        onClick={() =>
+                                          handleQuantityChange(
+                                            orderItem.id,
+                                            orderItem.quantity - 1
+                                          )
+                                        }
+                                      >
+                                        -
+                                      </button>
+                                      {orderItem.quantity}
+                                      <button
+                                        className="btn btn-sm btn-secondary"
+                                        onClick={() =>
+                                          handleQuantityChange(
+                                            orderItem.id,
+                                            orderItem.quantity + 1
+                                          )
+                                        }
+                                      >
+                                        +
+                                      </button>
+                                    </td>
+                                    <td>
+                                      <button
+                                        className="btn btn-sm btn-clear text-danger"
+                                        onClick={() =>
+                                          handleDeleteOrderItem(orderItem.id)
+                                        }
+                                      >
+                                        <FaTrash />
+                                      </button>
+                                      <button
+                                        className="btn btn-sm btn-clear text-info"
+                                        onClick={() =>
+                                          handleDetailProduct(
+                                            orderItem.product.productuuid
+                                          )
+                                        }
+                                      >
+                                        <FaInfoCircle />
+                                      </button>
+                                      <button
+                                        className="btn btn-sm btn-clear text-success"
+                                        onClick={() =>
+                                          handleOffer(orderItem.id)
+                                        }
+                                      >
+                                        <FaHandshake />
+                                      </button>
+                                      {orderItem.status === "ACCEPTED" && (
+                                        <button
+                                          className="btn btn-sm btn-clear text-success"
+                                          onClick={() =>
+                                            handleOpenSubmitModal(orderItem)
+                                          }
+                                        >
+                                          <FaCheck />
+                                        </button>
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                                {orderItems.some(
+                                  (orderItem) => orderItem.status === "ACCEPTED"
+                                ) && (
+                                  <tr>
+                                    <td colSpan="9">
+                                      <button
+                                        className="btn btn-sm btn-success"
+                                        onClick={() =>
+                                          console.log(vendorItemsMap)
+                                        }
+                                      >
+                                        Submit All
+                                      </button>
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
+                            )
+                          );
+                        })()}
+                      </tbody>
                     </table>
                     <div>
                       <button
@@ -802,7 +874,55 @@ const Orderpages = () => {
                     >
                       Print
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* History Modal */}
+          {showHistoryModal && (
+            <div
+              className="modal modal-background"
+              style={{ display: "block" }}
+            >
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-header">
+                  <button
+                      type="button"
+                      className="close"
+                      onClick={() => setShowHistoryModal(null)}
+                    >
+                      <span>&times;</span>
+                    </button>
+                    <h3 className="modal-title">History</h3>
+                  </div>
+                  <div className="modal-body">
+                    <p>See your History</p>
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>Product Name</th>
+                          <th>Bid Price</th>
+                          <th>Price Change</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {history.map((e) => (
+                          <tr key={e.id}>
+                            <td>{e.productName}</td>
+                            <td>{e.bidPrice}</td>
+                            <td>{e.bidPriceChange}</td>
+                            <td>{e.status}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
 
+                  </div>
+                  <div className="modal-footer">
+                    <p>See Your history Order</p>
                   </div>
                 </div>
               </div>
