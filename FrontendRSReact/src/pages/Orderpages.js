@@ -10,6 +10,7 @@ import {
   FaPrint,
 } from "react-icons/fa";
 import html2pdf from "html2pdf.js";
+import logo from "../assets/logo.jpg";
 
 //import { saveAs } from 'file-saver';
 //import {Document, Page, Text, PDFDownloadLink, StyleSheet, pdf} from '@react-pdf/renderer';
@@ -27,6 +28,7 @@ const Orderpages = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showProductDetailModal, setShowProductDetailModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [payoutDetails, setPayoutDetails] = useState(null);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [selectedOrderItem, setSelectedOrderItem] = useState(null);
@@ -34,6 +36,7 @@ const Orderpages = () => {
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
   const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
+  const [history, setHistory] = useState([]);
   const navigate = useNavigate();
 
   const calculatePayoutAmount = (orderItems) => {
@@ -87,7 +90,44 @@ const Orderpages = () => {
 
   const handleQuantityChange = (orderItemId, newQuantity) => {};
 
-  const handleDeleteOrderItem = (orderItemId) => {};
+  const handleDeleteOrderItem = (orderItemId) => {
+    const confirmed = window.confirm(
+      "Apakah Anda yakin ingin menghapus produk ini?"
+    );
+
+    if (confirmed) {
+      fetch(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orderitems/${orderItemId}`,
+        {
+          method: "DELETE",
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            // Data berhasil dihapus, lakukan tindakan tambahan jika diperlukan
+            console.log("Data berhasil dihapus");
+          } else {
+            // Gagal menghapus data, tangani kesalahan jika diperlukan
+            console.error("Gagal menghapus data");
+          }
+        })
+        .catch((error) => {
+          // Tangani kesalahan dalam permintaan
+          console.error("Terjadi kesalahan:", error);
+        });
+    }
+  };
+
+  /* History function */
+  const handleHistory = (orderItemId) => {
+    setShowHistoryModal(true);
+    axios.get(`http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${selectedOrder.id}/${orderItemId}`)
+    .then((res) => {
+      console.log(res);
+      setHistory(res.data);
+      console.log("Berhasil");
+    }).catch(err => console.log(err));
+  };
 
   const handleAddProduct = () => {
     navigate("/products");
@@ -250,11 +290,23 @@ const Orderpages = () => {
           font-weight: bold;
         }
         img {
-          max-width: 200px;
+          max-width: 50px;
         }
       </style>
       <body>
-        <h2>Accepted Offer</h2>
+        <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
+          <img src=${logo} alt="Logo" className="logo" style="float: left; margin-right: 10px; height: 50px;">
+          <strong style="font-size: 16px;">PEMERINTAH KABUPATEN MINAHASA</strong>
+        </p>
+        <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
+          <strong style="font-size: 14px;">RUMAH SAKIT UMUM DAERAH DR. SAM RATULANGI TONDANO</strong>
+        </p>
+        <p style="text-align: center; font-size: 12px; line-height: 1;">
+          Jl. Suprapto Luaan Kecamatan Tondano Timur Telp. (0431) 321171 Fax. (0431) 321172
+        </p>
+        <hr style="border: none; height: 1px; background-color: #444444; opacity: 0.5; margin: 10px 0;">    
+
+        <h2 style="font-size: 20px;">Accepted Offer</h2>
         <div>
           <p>Dear ${product.vendor.name},</p>
           <p>We are pleased to inform you that your offer for the following product has been accepted:</p>
@@ -279,12 +331,12 @@ const Orderpages = () => {
             <tr>
               <th>Quantity</th>
               <th>Bid Price</th>
-              <th>Total</th>
+              
             </tr>
             <tr>
               <td>${quantity}</td>
               <td>$${bidPrice}</td>
-              <td>$${quantity * bidPrice}</td>
+              
             </tr>
           </table>
 
@@ -321,7 +373,7 @@ const Orderpages = () => {
       const options = {
         margin: [20, 20, 20, 20], // Specify margins: top, left, bottom, right
       };
-
+      // window.print(letterHtml);
       html2pdf().set(options).from(element).save();
     }
   };
@@ -822,6 +874,9 @@ const Orderpages = () => {
                     >
                       Print
                     </button>
+                  </div>
+                  <div className="modal-footer">
+                    <p>See Your history Order</p>
                   </div>
                 </div>
               </div>
