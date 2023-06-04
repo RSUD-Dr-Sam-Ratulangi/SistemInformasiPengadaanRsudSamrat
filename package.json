@@ -1,5 +1,10 @@
 {
   "dependencies": {
-    "fepengadaan": "file:FrontendVendorVue"
+    "fepengadaan": "file:FrontendVendorVue",
+    "file-saver": "^2.0.5",
+    "html2pdf.js": "^0.10.1",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.5.29",
+    "react-router-dom": "^6.11.2"
   }
 }
