@@ -3,6 +3,19 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../assets/vendorpages.css";
 import { FaTrash, FaInfoCircle, FaHandshake, FaCheck, FaPrint} from 'react-icons/fa';
+import html2pdf from "html2pdf.js";
+
+//import { saveAs } from 'file-saver';
+//import {Document, Page, Text, PDFDownloadLink, StyleSheet, pdf} from '@react-pdf/renderer';
+//import ProductRequestDocument from './Report/ProductRequestDocument';
+//import { PDFViewer } from "@react-pdf/renderer";
+//import ReactDOMServer from "react-dom/server";
+//import jsPDF from "jspdf";
+//import "jspdf-autotable";
+
+
+
+
 
 const Orderpages = () => {
   const [data, setData] = useState([]);
@@ -20,6 +33,7 @@ const Orderpages = () => {
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
   const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
   const navigate = useNavigate();
+
 
   const calculatePayoutAmount = (orderItems) => {
     let totalAmount = 0;
@@ -194,13 +208,123 @@ const Orderpages = () => {
   };
 
   // Function to handle printing the order item to PDF
-  const handlePrintOrderItem = () => {};
 
   // Function to open the submit modal
   const handleOpenSubmitModal = (orderItem) => {
     setSelectedOrderItem(orderItem);
     setSubmitModalOpen(true);
   };
+
+
+  const handlePrintOrderItem = () => {
+    if (selectedOrderItem) {
+      const { product, quantity, bidPrice, status, totalAmount } = selectedOrderItem;
+
+      const taxRate = 0.11; // 11% tax rate
+
+      const letterHtml = `
+      <style>
+        @page {
+          size: letter;
+          margin: 1in;
+        }
+        body {
+          font-family: Arial, sans-serif;
+        }
+        h2 {
+          text-align: center;
+        }
+        table {
+          width: 100%;
+          margin-top: 20px;
+          border-collapse: collapse;
+        }
+        table td,
+        table th {
+          padding: 8px;
+          border: 1px solid #000;
+        }
+        table th {
+          background-color: #f2f2f2;
+          font-weight: bold;
+        }
+        img {
+          max-width: 200px;
+        }
+      </style>
+      <body>
+        <h2>Accepted Offer</h2>
+        <div>
+          <p>Dear ${product.vendor.name},</p>
+          <p>We are pleased to inform you that your offer for the following product has been accepted:</p>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Price</th>
+              <th>Final Bid</th>
+              <th>Quantity</th>
+            </tr>
+            <tr>
+              <td>${product.name}</td>
+              <td>${product.description}</td>
+              <td>$${product.price}</td>
+              <td>$${bidPrice}</td>
+              <td>${quantity}</td>
+            </tr>
+          </table>
+
+          <table>
+            <tr>
+              <th>Quantity</th>
+              <th>Bid Price</th>
+              <th>Total</th>
+            </tr>
+            <tr>
+              <td>${quantity}</td>
+              <td>$${bidPrice}</td>
+              <td>$${quantity * bidPrice}</td>
+            </tr>
+          </table>
+
+          <table>
+            <tr>
+              <th>Total</th>
+              <th>11% Tax</th>
+              <th>Total Price (incl. Tax)</th>
+            </tr>
+            <tr>
+              <td>$${quantity * bidPrice}</td>
+              <td>$${(quantity * bidPrice * taxRate).toFixed(2)}</td>
+              <td>$${(quantity * bidPrice + quantity * bidPrice * taxRate).toFixed(2)}</td>
+            </tr>
+          </table>
+
+          <p>The payment will be processed accordingly. Please proceed with the necessary arrangements for the delivery of the product.</p>
+          <p>Should you have any questions or require further information, please feel free to contact us.</p>
+          <p>Thank you for your cooperation.</p>
+          <p>Sincerely,</p>
+          <br>
+          <br>
+          <p>Panitia Pengadaan</p>
+        </div>
+      </body>
+    `;
+
+      const element = document.createElement("div");
+      element.innerHTML = letterHtml;
+
+      const options = {
+        margin: [20, 20, 20, 20], // Specify margins: top, left, bottom, right
+      };
+
+      html2pdf().set(options).from(element).save();
+    }
+  };
+
+
+
+
 
   // Rest of your code
 
@@ -368,12 +492,7 @@ const Orderpages = () => {
                 </button>
                 
               )}
-              <button
-                className="btn btn-sm btn-clear text-seacondary"
-                onClick={() => handleDeleteOrderItem(orderItem.id)}
-                >
-                <FaPrint />
-              </button>
+
             </td>
           </tr>
         ))}
@@ -683,6 +802,7 @@ const Orderpages = () => {
                     >
                       Print
                     </button>
+
                   </div>
                 </div>
               </div>
