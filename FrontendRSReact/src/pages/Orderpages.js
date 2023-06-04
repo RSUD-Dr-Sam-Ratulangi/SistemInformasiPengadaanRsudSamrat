@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../assets/vendorpages.css";
-import { FaTrash, FaInfoCircle, FaHandshake, FaCheck, FaPrint} from 'react-icons/fa';
+import {
+  FaTrash,
+  FaInfoCircle,
+  FaHandshake,
+  FaCheck,
+  FaPrint,
+} from "react-icons/fa";
 import html2pdf from "html2pdf.js";
 
 //import { saveAs } from 'file-saver';
@@ -12,10 +18,6 @@ import html2pdf from "html2pdf.js";
 //import ReactDOMServer from "react-dom/server";
 //import jsPDF from "jspdf";
 //import "jspdf-autotable";
-
-
-
-
 
 const Orderpages = () => {
   const [data, setData] = useState([]);
@@ -33,7 +35,6 @@ const Orderpages = () => {
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
   const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
   const navigate = useNavigate();
-
 
   const calculatePayoutAmount = (orderItems) => {
     let totalAmount = 0;
@@ -215,10 +216,10 @@ const Orderpages = () => {
     setSubmitModalOpen(true);
   };
 
-
   const handlePrintOrderItem = () => {
     if (selectedOrderItem) {
-      const { product, quantity, bidPrice, status, totalAmount } = selectedOrderItem;
+      const { product, quantity, bidPrice, status, totalAmount } =
+        selectedOrderItem;
 
       const taxRate = 0.11; // 11% tax rate
 
@@ -296,7 +297,10 @@ const Orderpages = () => {
             <tr>
               <td>$${quantity * bidPrice}</td>
               <td>$${(quantity * bidPrice * taxRate).toFixed(2)}</td>
-              <td>$${(quantity * bidPrice + quantity * bidPrice * taxRate).toFixed(2)}</td>
+              <td>$${(
+                quantity * bidPrice +
+                quantity * bidPrice * taxRate
+              ).toFixed(2)}</td>
             </tr>
           </table>
 
@@ -321,10 +325,6 @@ const Orderpages = () => {
       html2pdf().set(options).from(element).save();
     }
   };
-
-
-
-
 
   // Rest of your code
 
@@ -410,109 +410,129 @@ const Orderpages = () => {
                         </tr>
                       </thead>
                       <tbody>
-  {(() => {
-  const vendorItemsMap = new Map();
+                        {(() => {
+                          const vendorItemsMap = new Map();
 
-  selectedOrder.orderItems.forEach((orderItem) => {
-    const vendorName = orderItem.product.vendor.name;
+                          selectedOrder.orderItems.forEach((orderItem) => {
+                            const vendorName = orderItem.product.vendor.name;
 
-    if (vendorItemsMap.has(vendorName)) {
-      vendorItemsMap.get(vendorName).push(orderItem);
-    } else {
-      vendorItemsMap.set(vendorName, [orderItem]);
-    }
-  });
+                            if (vendorItemsMap.has(vendorName)) {
+                              vendorItemsMap.get(vendorName).push(orderItem);
+                            } else {
+                              vendorItemsMap.set(vendorName, [orderItem]);
+                            }
+                          });
 
-  const allItemsAccepted = [...vendorItemsMap].every(([vendorName, orderItems]) =>
-    orderItems.every((orderItem) => orderItem.status === "ACCEPTED")
-  );
+                          const allItemsAccepted = [...vendorItemsMap].every(
+                            ([vendorName, orderItems]) =>
+                              orderItems.every(
+                                (orderItem) => orderItem.status === "ACCEPTED"
+                              )
+                          );
 
-    return [...vendorItemsMap].map(([vendorName, orderItems]) => (
-      <React.Fragment key={vendorName}>
-        <tr>
-          <td colSpan="9">
-            <strong>{vendorName}</strong>
-          </td>
-        </tr>
-        {orderItems.map((orderItem) => (
-          <tr key={orderItem.id}>
-            <td>{orderItem.id}</td>
-            <td>{orderItem.product.productuuid}</td>
-            <td>{vendorName}</td>
-            <td>{orderItem.product.name}</td>
-            <td>{orderItem.product.price}</td>
-            <td>{orderItem.bidPrice}</td>
-            <td>{orderItem.status}</td>
-            <td>
-              <button
-                className="btn btn-sm btn-secondary"
-                onClick={() =>
-                  handleQuantityChange(orderItem.id, orderItem.quantity - 1)
-                }
-              >
-                -
-              </button>
-              {orderItem.quantity}
-              <button
-                className="btn btn-sm btn-secondary"
-                onClick={() =>
-                  handleQuantityChange(orderItem.id, orderItem.quantity + 1)
-                }
-              >
-                +
-              </button>
-            </td>
-            <td>
-            <button
-              className="btn btn-sm btn-clear text-danger"
-              onClick={() => handleDeleteOrderItem(orderItem.id)}
-            >
-              <FaTrash />
-            </button>
-              <button
-                className="btn btn-sm btn-clear text-info"
-                onClick={() =>
-                  handleDetailProduct(orderItem.product.productuuid)
-                }
-              >
-                <FaInfoCircle />
-              </button>
-              <button
-                className="btn btn-sm btn-clear text-success"
-                onClick={() => handleOffer(orderItem.id)}
-              >
-                <FaHandshake />
-              </button>
-              {orderItem.status === "ACCEPTED" && (
-                <button
-                  className="btn btn-sm btn-clear text-success"
-                  onClick={() => handleOpenSubmitModal(orderItem)}
-                >
-                  <FaCheck />
-                </button>
-                
-              )}
-
-            </td>
-          </tr>
-        ))}
-        {orderItems.some((orderItem) => orderItem.status === "ACCEPTED") && (
-          <tr>
-            <td colSpan="9">
-              <button
-                className="btn btn-sm btn-success"
-                onClick={() => console.log(allItemsAccepted)}
-              >
-                Submit All
-              </button>
-            </td>
-          </tr>
-        )}
-      </React.Fragment>
-    ));
-  })()}
-</tbody>
-
+                          return [...vendorItemsMap].map(
+                            ([vendorName, orderItems]) => (
+                              <React.Fragment key={vendorName}>
+                                <tr>
+                                  <td colSpan="9">
+                                    <strong>{vendorName}</strong>
+                                  </td>
+                                </tr>
+                                {orderItems.map((orderItem) => (
+                                  <tr key={orderItem.id}>
+                                    <td>{orderItem.id}</td>
+                                    <td>{orderItem.product.productuuid}</td>
+                                    <td>{vendorName}</td>
+                                    <td>{orderItem.product.name}</td>
+                                    <td>{orderItem.product.price}</td>
+                                    <td>{orderItem.bidPrice}</td>
+                                    <td>{orderItem.status}</td>
+                                    <td>
+                                      <button
+                                        className="btn btn-sm btn-secondary"
+                                        onClick={() =>
+                                          handleQuantityChange(
+                                            orderItem.id,
+                                            orderItem.quantity - 1
+                                          )
+                                        }
+                                      >
+                                        -
+                                      </button>
+                                      {orderItem.quantity}
+                                      <button
+                                        className="btn btn-sm btn-secondary"
+                                        onClick={() =>
+                                          handleQuantityChange(
+                                            orderItem.id,
+                                            orderItem.quantity + 1
+                                          )
+                                        }
+                                      >
+                                        +
+                                      </button>
+                                    </td>
+                                    <td>
+                                      <button
+                                        className="btn btn-sm btn-clear text-danger"
+                                        onClick={() =>
+                                          handleDeleteOrderItem(orderItem.id)
+                                        }
+                                      >
+                                        <FaTrash />
+                                      </button>
+                                      <button
+                                        className="btn btn-sm btn-clear text-info"
+                                        onClick={() =>
+                                          handleDetailProduct(
+                                            orderItem.product.productuuid
+                                          )
+                                        }
+                                      >
+                                        <FaInfoCircle />
+                                      </button>
+                                      <button
+                                        className="btn btn-sm btn-clear text-success"
+                                        onClick={() =>
+                                          handleOffer(orderItem.id)
+                                        }
+                                      >
+                                        <FaHandshake />
+                                      </button>
+                                      {orderItem.status === "ACCEPTED" && (
+                                        <button
+                                          className="btn btn-sm btn-clear text-success"
+                                          onClick={() =>
+                                            handleOpenSubmitModal(orderItem)
+                                          }
+                                        >
+                                          <FaCheck />
+                                        </button>
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                                {orderItems.some(
+                                  (orderItem) => orderItem.status === "ACCEPTED"
+                                ) && (
+                                  <tr>
+                                    <td colSpan="9">
+                                      <button
+                                        className="btn btn-sm btn-success"
+                                        onClick={() =>
+                                          console.log(vendorItemsMap)
+                                        }
+                                      >
+                                        Submit All
+                                      </button>
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
+                            )
+                          );
+                        })()}
+                      </tbody>
                     </table>
                     <div>
                       <button
@@ -802,7 +822,6 @@ const Orderpages = () => {
                     >
                       Print
                     </button>
-
                   </div>
                 </div>
               </div>
