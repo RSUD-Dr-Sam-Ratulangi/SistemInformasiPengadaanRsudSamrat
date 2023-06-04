@@ -35,7 +35,7 @@ const Footer = () => {
               className="btn btn-light"
               onClick={() => handleTabClick("/vendor")}
             >
-              Analyst Dashboard
+              Request
             </Link>
             <Link
               to="/products"

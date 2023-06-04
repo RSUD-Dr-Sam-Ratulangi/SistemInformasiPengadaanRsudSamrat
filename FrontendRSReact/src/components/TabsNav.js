@@ -6,9 +6,14 @@ import "../assets/tabsnav.css";
 const TabsNav = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.pathname);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleTabClick = (path) => {
     setActiveTab(path);
+  };
+  
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
   };
 
   return (
@@ -29,7 +34,7 @@ const TabsNav = () => {
             className={`nav-link ${activeTab === "/vendor" ? "active" : ""}`}
             onClick={() => handleTabClick("/vendor")}
           >
-            Analyst Dashboard
+            Request
           </Link>
         </li>
         <li className="nav-item">
