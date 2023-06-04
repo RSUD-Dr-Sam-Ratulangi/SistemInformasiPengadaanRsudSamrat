@@ -9,6 +9,7 @@
           <h1>Status : {{ orders.status }}</h1>
         </div>
         <div class="modal-body" style="overflow: auto;">
+<<<<<<< HEAD
           <div v-for="vendor in getUniqueVendors" :key="vendor">
             <h1 style="font-weight: bold;">From Vendor : {{ vendor }}</h1>
             <table class="table is-bordered is-striped is-narrow is-hoverable">
@@ -34,17 +35,51 @@
               </tbody>
             </table>
           </div>
+=======
+          <table class="table is-bordered is-striped is-narrow is-hoverable">
+            <thead>
+              <tr>
+                <th>id:</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Harga</th>
+                <th>Harga Penwaran</th>
+                <th>status</th>
+                <th>status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="orderItem in orders.orderItems">
+                <th @click="selectItem(orderItem)" style="cursor: default;">{{ orderItem.id }}</th>
+                <td @click="selectItem(orderItem)" style="cursor: default;">{{ orderItem.product.name }}</td>
+                <td>{{ orderItem.quantity }}</td>
+                <td>{{ orderItem.product.price }}</td>
+                <td>{{ orderItem.totalAmount }}</td>
+                <td>{{ orderItem.status }}</td>
+                <button class="button is-info">History</button>
+              </tr>
+            </tbody>
+          </table>
+>>>>>>> 79174ebf8c969ad3521bdab3c9428674f9b11065
           <h1>Total Harga :{{ orders.payment.amount }}</h1>
           <h1 style="font-weight: bolder;" v-if="selectedItem">Harga yang ditawar : {{ selectedItem.bidPrice }}</h1>
           <h1>Total yang akan dibayar : {{ orders.orderItems[0].totalAmount }}</h1>
         </div>
 
         <div class="buttons" v-if="selectedItem !== null">
+<<<<<<< HEAD
+
+          <div v-if="selectedItem.status === 'OFFER' ">
+          <button class="button is-primary" @click.prevent="acceptBid">Accept</button>
+          <button class="button is-danger" @click="showModalRejected">Reject</button>
+
+=======
           <div v-if="selectedItem.status === 'OFFER'">
             <button class="button is-primary" @click.prevent="acceptBid">Accept</button>
             <button class="button is-danger" @click="showModalRejected">Reject</button>
             <button class="button is-info">See Details</button>
             <button @click="showModalHistory"> See History </button>
+>>>>>>> 4fe6a4ac2debfdd3ba57e6c3f5168e22c7954baf
           </div>
 
           <div v-if="selectedItem.status === 'ACCEPTED'" style="padding-right: 5px;">
