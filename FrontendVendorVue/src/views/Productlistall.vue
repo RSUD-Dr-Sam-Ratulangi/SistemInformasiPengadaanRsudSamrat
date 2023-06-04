@@ -96,7 +96,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .card {
   border: 1px solid #ccc;
   border-radius: 4px;
