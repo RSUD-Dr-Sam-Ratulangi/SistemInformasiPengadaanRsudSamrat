@@ -72,7 +72,8 @@ const Orderpages = () => {
 
   const handleQuantityChange = (orderItemId, newQuantity) => {};
 
-  const handleDeleteOrderItem = (orderItemId) => {};
+  const handleDeleteOrderItem = (orderItemId) => {
+  };
 
   const handleAddProduct = () => {
     navigate("/products");
