@@ -299,9 +299,9 @@ const Orderpages = () => {
     }
   });
 
-  // const allItemsAccepted = [...vendorItemsMap].every(([vendorName, orderItems]) =>
-  //   orderItems.every((orderItem) => orderItem.status === "ACCEPTED")
-  // );
+  const allItemsAccepted = [...vendorItemsMap].every(([vendorName, orderItems]) =>
+    orderItems.every((orderItem) => orderItem.status === "ACCEPTED")
+  );
 
     return [...vendorItemsMap].map(([vendorName, orderItems]) => (
       <React.Fragment key={vendorName}>
@@ -382,7 +382,7 @@ const Orderpages = () => {
             <td colSpan="9">
               <button
                 className="btn btn-sm btn-success"
-                
+                onClick={() => console.log(allItemsAccepted)}
               >
                 Submit All
               </button>
