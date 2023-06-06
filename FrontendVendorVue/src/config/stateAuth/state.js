@@ -58,6 +58,7 @@ const store = createStore({
               localStorage.setItem("vendorId", vendorResponse.data.id)
               console.log(vendorResponse.data.vendoruuid);
               router.push({ path: "/", query: { user: vendor.username } });
+              location.reload();
             })
             .catch((err) => {
               console.log(`Gagal mengambil VendorUUID, ${err}`);

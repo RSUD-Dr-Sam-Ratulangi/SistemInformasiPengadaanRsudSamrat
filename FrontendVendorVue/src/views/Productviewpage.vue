@@ -1,24 +1,30 @@
 <template>
-  <div class="boxSearch">  
+  <div class="header-status">
+    <h1>SMART SAMRAT PROCUREMENT</h1>
+    <p>Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum DR Sam Ratulangi Tondano</p>
+  </div>
+
+  <div class="box">
     <h1>Search Your Products</h1>
     <div class="container">
       <div>
         <div class="field has-addons">
-          <div class="control">
-            <input class="input" type="text" placeholder="Search Products" v-model="searchInput">
-            <button class="button is-small" style="margin-top: 5px;" @click="addProductModal()">Add Product</button>
+          <div class="control is-expanded">
+            <input class="input is-fullwidth" type="text" placeholder="Search Products" v-model="searchInput">
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <button class="button is-small" style="margin-top: 5px;" @click="addProductModal()">Add Product</button>
+
   <div class="contentProduct">
     <div class="card" v-for="product in filteredProducts" :key="product.id">
       <div class="card-content">
         <div class="media">
           <div class="media-content">
-            <img :src="product.imageUrl"/>
+            <img :src="product.imageUrl" />
             <p class="title is-4">Product Name: {{ product.name }}</p>
           </div>
         </div>
@@ -38,23 +44,14 @@
   <!-- Modals edit Product -->
   <Teleport to="body">
     <!-- pakai komponen modal, passing ke prop(lihat Editproduct.vue) -->
-    <modal
-      :show="showmodaleditProduct"
-      :product="selectedProduct"
-      @close="showmodaleditProduct = false"
-    />
+    <modal :show="showmodaleditProduct" :product="selectedProduct" @close="showmodaleditProduct = false" />
   </Teleport>
 
-    <!-- Modals Add Product -->
-    <Teleport to="body">
+  <!-- Modals Add Product -->
+  <Teleport to="body">
     <!-- pakai komponen modal, passing ke prop(lihat Editproduct.vue) -->
-    <modalAddProduct
-      :show = "showModalAddProduct"
-      @close="showModalAddProduct = false"
-    />
+    <modalAddProduct :show="showModalAddProduct" @close="showModalAddProduct = false" />
   </Teleport>
-
-
 </template>
 
 <script>
@@ -141,8 +138,20 @@ export default {
 </script>
 
 <style scoped>
+.header-status {
+  padding-top: 10px;
+}
+
+.box {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  /* Atur bayangan sesuai kebutuhan */
+  background-color: #f1f1f1;
+  /* Atur warna latar belakang sesuai kebutuhan */
+  margin-top: 2%;
+  background-image: url('../components/img/bckgrund.jpeg');
+}
+
 .boxSearch {
-  margin-top: 5%;
   padding-bottom: 5px;
   width: 100%;
   align-items: center;
@@ -151,9 +160,9 @@ export default {
   background-color: rgb(255, 255, 255);
   border: #555;
 }
+
 .container {
   text-align: center;
-  display: flex;
   justify-content: center;
   align-items: center;
   height: auto;
@@ -190,5 +199,4 @@ export default {
   flex-wrap: wrap;
   justify-content: center;
 }
-
 </style>

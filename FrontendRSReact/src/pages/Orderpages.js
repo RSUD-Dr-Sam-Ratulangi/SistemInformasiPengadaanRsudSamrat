@@ -20,6 +20,7 @@ import logo from "../assets/logo.jpg";
 //import jsPDF from "jspdf";
 //import "jspdf-autotable";
 
+
 const Orderpages = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +38,12 @@ const Orderpages = () => {
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
   const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
   const [history, setHistory] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
 
   const calculatePayoutAmount = (orderItems) => {
     let totalAmount = 0;
@@ -294,77 +300,84 @@ const Orderpages = () => {
         }
       </style>
       <body>
-        <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
-          <img src=${logo} alt="Logo" className="logo" style="float: left; margin-right: 10px; height: 50px;">
-          <strong style="font-size: 16px;">PEMERINTAH KABUPATEN MINAHASA</strong>
-        </p>
-        <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
-          <strong style="font-size: 14px;">RUMAH SAKIT UMUM DAERAH DR. SAM RATULANGI TONDANO</strong>
-        </p>
-        <p style="text-align: center; font-size: 12px; line-height: 1;">
-          Jl. Suprapto Luaan Kecamatan Tondano Timur Telp. (0431) 321171 Fax. (0431) 321172
-        </p>
-        <hr style="border: none; height: 1px; background-color: #444444; opacity: 0.5; margin: 10px 0;">    
+      <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
+        <img src=${logo} alt="Logo" className="logo" style="float: left; margin-right: 10px; height: 50px;">
+        <strong style="font-size: 16px;">PEMERINTAH KABUPATEN MINAHASA</strong>
+      </p>
+      <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
+        <strong style="font-size: 14px;">RUMAH SAKIT UMUM DAERAH DR. SAM RATULANGI TONDANO</strong>
+      </p>
+      <p style="text-align: center; font-size: 12px; line-height: 1;">
+        Jl. Suprapto Luaan Kecamatan Tondano Timur Telp. (0431) 321171 Fax. (0431) 321172
+      </p>
+      <hr style="border: none; height: 1px; background-color: #444444; opacity: 0.5; margin: 10px 0;">    
 
-        <h2 style="font-size: 20px;">Accepted Offer</h2>
-        <div>
-          <p>Dear ${product.vendor.name},</p>
-          <p>We are pleased to inform you that your offer for the following product has been accepted:</p>
-          <table>
-            <tr>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Price</th>
-              <th>Final Bid</th>
-              <th>Quantity</th>
-            </tr>
-            <tr>
-              <td>${product.name}</td>
-              <td>${product.description}</td>
-              <td>$${product.price}</td>
-              <td>$${bidPrice}</td>
-              <td>${quantity}</td>
-            </tr>
-          </table>
+      <h2 style="font-size: 20px;"><b>Menyetujui Tawaran</b></h2>
+      <div>
+        <p>Kepada ${product.vendor.name},</p>
+        <p>Kami dengan senang hati memberitahukan bahwa penawaran Anda untuk produk berikut telah diterima:</p>
+        <table>
+          <tr>
+            <th>Nama</th>
+            <th>Deskripsi</th>
+            <th>Harga</th>
+            <th>Penawaran Akhir</th>
+            <th>Jumlah Barang</th>
+          </tr>
+          <tr>
+            <td>${product.name}</td>
+            <td>${product.description}</td>
+            <td>Rp.${product.price}</td>
+            <td>Rp.${bidPrice}</td>
+            <td>${quantity}</td>
+          </tr>
+        </table>
 
-          <table>
-            <tr>
-              <th>Quantity</th>
-              <th>Bid Price</th>
-              
-            </tr>
-            <tr>
-              <td>${quantity}</td>
-              <td>$${bidPrice}</td>
-              
-            </tr>
-          </table>
+        <table>
+          <tr>
+            <th>Jumlah Barang</th>
+            <th>Harga Penawaran</th>
+            
+          </tr>
+          <tr>
+            <td>${quantity}</td>
+            <td>Rp.${bidPrice}</td>
+            
+          </tr>
+        </table>
 
-          <table>
-            <tr>
-              <th>Total</th>
-              <th>11% Tax</th>
-              <th>Total Price (incl. Tax)</th>
-            </tr>
-            <tr>
-              <td>$${quantity * bidPrice}</td>
-              <td>$${(quantity * bidPrice * taxRate).toFixed(2)}</td>
-              <td>$${(
-                quantity * bidPrice +
-                quantity * bidPrice * taxRate
-              ).toFixed(2)}</td>
-            </tr>
-          </table>
+        <table>
+          <tr>
+            <th>Total</th>
+            <th>11% Pajak</th>
+            <th>Total Harga (termasuk Pajak)</th>
+          </tr>
+          <tr>
+            <td>Rp.${quantity * bidPrice}</td>
+            <td>Rp.${(quantity * bidPrice * taxRate).toFixed(2)}</td>
+            <td>Rp.${(
+              quantity * bidPrice +
+              quantity * bidPrice * taxRate
+            ).toFixed(2)}</td>
+          </tr>
+        </table>
 
-          <p>The payment will be processed accordingly. Please proceed with the necessary arrangements for the delivery of the product.</p>
-          <p>Should you have any questions or require further information, please feel free to contact us.</p>
-          <p>Thank you for your cooperation.</p>
-          <p>Sincerely,</p>
+        <p>Pembayaran akan diproses sesuai dengan yang disepakati. Harap lanjutkan dengan pengaturan yang diperlukan untuk pengiriman produk.</p>
+        <p>Jika Anda memiliki pertanyaan atau membutuhkan informasi lebih lanjut, jangan ragu untuk menghubungi kami.</p>
+        <p>Terima kasih atas kerjasamanya.</p>
+        <br>
+        <div style="text-align: right;">
+          <p>Hormat kami,</p>
+          <p>Penjabat Pengadaan</p>
           <br>
           <br>
-          <p>Panitia Pengadaan</p>
+          <p style="text-align: right;"><b><span style="font-size: 12px;">VICTOR R MAUKAR</span></b></p>
+          <p style="text-align: right;"><b><span style="font-size: 12px;">NIP 197504302007011009</span></b></p>
         </div>
-      </body>
+
+
+      </div>
+    </body>
     `;
 
       const element = document.createElement("div");
@@ -388,6 +401,31 @@ const Orderpages = () => {
       ) : (
         <>
           <div className="mb-3">
+          <div className="dropdown">
+        <button
+          className="btn btn-secondary dropdown-toggle"
+          type="button"
+          id="dropdownMenuButton"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded={isOpen ? "true" : "false"}
+          onClick={toggleDropdown}
+        >
+          Pejabat Pengadaan
+        </button>
+
+        <div className={`dropdown-menu${isOpen ? " show" : ""}`} aria-labelledby="dropdownMenuButton">
+          <a className="dropdown-item" href="#">  
+            PPKOM
+          </a>
+          <a className="dropdown-item" href="#">
+            Panitian Penerima
+          </a>
+          <a className="dropdown-item" href="#">
+            Keuangan
+          </a>
+        </div>
+      </div>
             <label htmlFor="sort">Sort By:</label>
             <select
               id="sort"
@@ -891,7 +929,9 @@ const Orderpages = () => {
                   <button
                       type="button"
                       className="close"
-                      onClick={() => setShowHistoryModal(null)}
+                      onClick={() => {
+                        setShowHistoryModal(null)
+                      }}
                     >
                       <span>&times;</span>
                     </button>

@@ -9,6 +9,13 @@
     gap: 50px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Perbarui efek box-shadow */
   }
+
+  .coming-soon {
+    font-size: 10px;
+    color: gray;
+    text-align: center;
+    margin-left: 5px;
+  }
   
   .nav-pills .nav-link {
     color: black;

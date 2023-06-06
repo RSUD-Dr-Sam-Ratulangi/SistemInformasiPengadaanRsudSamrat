@@ -54,6 +54,27 @@ const TabsNav = () => {
           >
             Orders
           </Link>
+          <span className="coming-soon">Coming Soon</span>
+        </li>
+        <li className="nav-item">
+          <Link
+            to="/Vendors"
+            className={`nav-link ${activeTab === "/Vendors" ? "active" : ""}`}
+            onClick={() => handleTabClick("/Vendors")}
+          >
+            Vendors
+          </Link>
+          <span className="coming-soon">Coming Soon</span>
+        </li>
+        <li className="nav-item">
+          <Link
+            to="/Payments"
+            className={`nav-link ${activeTab === "/Payments" ? "active" : ""}`}
+            onClick={() => handleTabClick("/Payments")}
+          >
+            Payment
+          </Link>
+          <span className="coming-soon">Coming Soon</span>
         </li>
       </ul>
 
