@@ -51,6 +51,20 @@ const Footer = () => {
             >
               Orders
             </Link>
+            <Link
+              to="/Vendors"
+              className="btn btn-light"
+              onClick={() => handleTabClick("/Vendors")}
+            >
+              Vendors
+            </Link>
+            <Link
+              to="/Payments"
+              className="btn btn-light"
+              onClick={() => handleTabClick("/Payments")}
+            >
+              Payments
+            </Link>
           </div>
         </div>
       )}

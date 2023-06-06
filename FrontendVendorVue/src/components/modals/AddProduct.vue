@@ -38,20 +38,16 @@
                     <input class="input is-large" type="text" placeholder="Description" v-model="product.description">
                   </div>
                   <div class="field">
-          <label class="label">Description</label>
-          <div class="control">
-            <input class="input is-large" type="text" placeholder="Description" v-model="product.description">
-          </div>
-          <p>Categories</p>
-          <label class="checkbox">
-            <input type="checkbox" v-model="product.categoryIds" :value="1">
-            Komputer 
-          </label>
-          <label class="checkbox" >
-            <input type="checkbox" v-model="product.categoryIds" :value="2">
-            Elektronik
-          </label>
-        </div>
+                    <p>Categories</p>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.categoryIds" :value="1">
+                      Komputer
+                    </label>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.categoryIds" :value="2">
+                      Elektronik
+                    </label>
+                  </div>
                   <!-- Dropdown -->
                   <!-- <div class="dropdown" :class="{ 'is-active': isActive }">
                     <div class="dropdown-trigger">
@@ -76,9 +72,9 @@
               </div>
               <div class="form-right">
                 <label class="label">Url image</label>
-                  <div class="control">
-                    <input class="input" type="text" placeholder="Url" v-model="product.imageUrl">
-                  </div>
+                <div class="control">
+                  <input class="input" type="text" placeholder="Url" v-model="product.imageUrl">
+                </div>
                 <!-- <div class="file has-name is-boxed">
                   <label class="file-label">
                     <input class="file-input" type="file" name="resume">
@@ -101,9 +97,9 @@
           </div>
         </div>
       </div>
-      
+
     </div>
-    
+
   </Transition>
 </template>
 
