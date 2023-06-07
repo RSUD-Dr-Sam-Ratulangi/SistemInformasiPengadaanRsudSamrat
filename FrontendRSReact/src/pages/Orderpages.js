@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import html2pdf from "html2pdf.js";
 import logo from "../assets/logo.jpg";
+import { useSelector } from "react-redux";
 
 //import { saveAs } from 'file-saver';
 //import {Document, Page, Text, PDFDownloadLink, StyleSheet, pdf} from '@react-pdf/renderer';
@@ -25,7 +26,7 @@ const Orderpages = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [sort, setSort] = useState("orderDate");
+  const [sort, setSort] = useState("status");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showProductDetailModal, setShowProductDetailModal] = useState(false);
@@ -39,7 +40,11 @@ const Orderpages = () => {
   const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
   const [history, setHistory] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+
   const navigate = useNavigate();
+
+  const role = useSelector((state) => state.auth.role);
+
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -62,6 +67,7 @@ const Orderpages = () => {
           `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock?page=${page}&sort=${sort}`
         );
         setData(response.data.content);
+        console.log(response.data)
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -70,6 +76,16 @@ const Orderpages = () => {
 
     fetchData();
   }, [page, sort]);
+
+  let filteredData = [];
+
+  if (role === "PPKOM") {
+    filteredData = data.filter(
+      (item) => item.status === "NEGOTIATION" || item.status === "ORDER"
+    );
+  } else if (role === "PP") {
+    filteredData = data.filter((item) => item.status === "CANCEL");
+  }
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -400,40 +416,13 @@ const Orderpages = () => {
         <div>Loading...</div>
       ) : (
         <>
-          <div className="mb-3">
-          <div className="dropdown">
-        <button
-          className="btn btn-secondary dropdown-toggle"
-          type="button"
-          id="dropdownMenuButton"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded={isOpen ? "true" : "false"}
-          onClick={toggleDropdown}
-        >
-          Pejabat Pengadaan
-        </button>
-
-        <div className={`dropdown-menu${isOpen ? " show" : ""}`} aria-labelledby="dropdownMenuButton">
-          <a className="dropdown-item" href="#">  
-            PPKOM
-          </a>
-          <a className="dropdown-item" href="#">
-            Panitian Penerima
-          </a>
-          <a className="dropdown-item" href="#">
-            Keuangan
-          </a>
-        </div>
-      </div>
+                      <div className="mb-3">
             <label htmlFor="sort">Sort By:</label>
             <select
               id="sort"
               className="form-control"
-              value={sort}
-              onChange={handleSortChange}
             >
-              <option value="orderDate">Order Date</option>
+              <option value="orderDate">Order Status</option>
               <option value="orderId">Order ID</option>
             </select>
           </div>
@@ -447,7 +436,7 @@ const Orderpages = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map((item) => (
+              {filteredData.map((item) => (
                 <tr key={item.orderItemId}>
                   <td>{item.orderId}</td>
                   <td>{item.orderDate}</td>

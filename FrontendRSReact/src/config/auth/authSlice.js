@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   isLoggedIn: localStorage.getItem('isLoggedIn') === 'true',
-  user: localStorage.getItem('user'),
+  user: JSON.parse(localStorage.getItem('user')),
   role: localStorage.getItem('role')
 };
 
@@ -13,14 +13,9 @@ const authSlice = createSlice({
     login(state, action) {
       state.isLoggedIn = true;
       state.user = action.payload;
-      if (action.payload.user) {
-        localStorage.setItem('user', JSON.stringify(action.payload.user));
-        localStorage.setItem('username', action.payload.user.username);
-      } else {
-        localStorage.removeItem('user');
-        localStorage.removeItem('username');
-      }
+      state.role = action.payload.role;
       localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('user', JSON.stringify(action.payload)); // Save the username in localStorage
       localStorage.setItem('role', action.payload.role);
     },
     logout(state) {
