@@ -21,7 +21,6 @@ import { useSelector } from "react-redux";
 //import jsPDF from "jspdf";
 //import "jspdf-autotable";
 
-
 const Orderpages = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +44,6 @@ const Orderpages = () => {
 
   const role = useSelector((state) => state.auth.role);
 
-
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
@@ -67,7 +65,7 @@ const Orderpages = () => {
           `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock?page=${page}&sort=${sort}`
         );
         setData(response.data.content);
-        console.log(response.data)
+        console.log(response.data);
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -84,7 +82,9 @@ const Orderpages = () => {
       (item) => item.status === "NEGOTIATION" || item.status === "ORDER"
     );
   } else if (role === "PP") {
-    filteredData = data.filter((item) => item.status === "CANCEL");
+    filteredData = data.filter(
+      (item) => item.status === "CANCEL" || item.status === "NEGOTIATION"
+    );
   }
 
   const handlePageChange = (newPage) => {
@@ -143,12 +143,16 @@ const Orderpages = () => {
   /* History function */
   const handleHistory = (orderItemId) => {
     setShowHistoryModal(true);
-    axios.get(`http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${selectedOrder.id}/${orderItemId}`)
-    .then((res) => {
-      console.log(res);
-      setHistory(res.data);
-      console.log("Berhasil");
-    }).catch(err => console.log(err));
+    axios
+      .get(
+        `http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${selectedOrder.id}/${orderItemId}`
+      )
+      .then((res) => {
+        console.log(res);
+        setHistory(res.data);
+        console.log("Berhasil");
+      })
+      .catch((err) => console.log(err));
   };
 
   const handleAddProduct = () => {
@@ -416,12 +420,9 @@ const Orderpages = () => {
         <div>Loading...</div>
       ) : (
         <>
-                      <div className="mb-3">
+          <div className="mb-3">
             <label htmlFor="sort">Sort By:</label>
-            <select
-              id="sort"
-              className="form-control"
-            >
+            <select id="sort" className="form-control">
               <option value="orderDate">Order Status</option>
               <option value="orderId">Order ID</option>
             </select>
@@ -436,7 +437,7 @@ const Orderpages = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredData.map((item) => (
+              {data.map((item) => (
                 <tr key={item.orderItemId}>
                   <td>{item.orderId}</td>
                   <td>{item.orderDate}</td>
@@ -525,7 +526,14 @@ const Orderpages = () => {
                                     <td>{orderItem.product.name}</td>
                                     <td>{orderItem.product.price}</td>
                                     <td>{orderItem.bidPrice}</td>
-                                    <td onClick={() => handleHistory(orderItem.id)} className="history-click">{orderItem.status}</td>
+                                    <td
+                                      onClick={() =>
+                                        handleHistory(orderItem.id)
+                                      }
+                                      className="history-click"
+                                    >
+                                      {orderItem.status}
+                                    </td>
                                     <td>
                                       <button
                                         className="btn btn-sm btn-secondary"
@@ -915,11 +923,11 @@ const Orderpages = () => {
               <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                   <div className="modal-header">
-                  <button
+                    <button
                       type="button"
                       className="close"
                       onClick={() => {
-                        setShowHistoryModal(null)
+                        setShowHistoryModal(null);
                       }}
                     >
                       <span>&times;</span>
@@ -948,7 +956,6 @@ const Orderpages = () => {
                         ))}
                       </tbody>
                     </table>
-
                   </div>
                   <div className="modal-footer">
                     <p>See Your history Order</p>
