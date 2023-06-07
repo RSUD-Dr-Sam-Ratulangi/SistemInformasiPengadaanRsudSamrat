@@ -3,7 +3,7 @@
     font-size: smaller;
     top: 0;
     z-index: 999;
-    position: sticky;
+    position: relative;
     display: flex;
     justify-content: center;
     gap: 50px;
@@ -30,5 +30,12 @@
   .content {
     background-color: #f9f9f9;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Perbarui efek box-shadow */
+  }
+
+  .dropdown-menu {
+    position: fixed;
+    right: 43%;
+    top: 80px; /* Adjust the top position as needed */
+    transform: translateX(50%);
   }
   

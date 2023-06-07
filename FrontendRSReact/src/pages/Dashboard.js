@@ -4,12 +4,13 @@ import Chart from "chart.js/auto";
 import "../assets/navigation.css";
 import "../assets/dashboard.css"
 import { useSelector } from "react-redux";
-// import { Dashboard } from "@mui/icons-material";
 
 
 const Dashboard = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const username = useSelector((state) => state.auth.user?.username);
+  const role = useSelector((state) => state.auth.role);
+
 
   // Mock procurement data
   const topVendors = [
@@ -120,7 +121,9 @@ const Dashboard = () => {
 
   return (
       <div className="dashboard">
-        <h2>Selamat Datang , {username}</h2>
+        <h2>Selamat Datang , {username}<br/> role: {role}</h2>
+        <div>
+        </div>
           {isLoggedIn && (
               <div className="container">
                   <div className="row">
