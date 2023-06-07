@@ -1,0 +1,41 @@
+.nav-pills {
+    background-color: #fff;
+    font-size: smaller;
+    top: 0;
+    z-index: 999;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Perbarui efek box-shadow */
+  }
+
+  .coming-soon {
+    font-size: 10px;
+    color: gray;
+    text-align: center;
+    margin-left: 5px;
+  }
+  
+  .nav-pills .nav-link {
+    color: black;
+  }
+  
+  .nav-pills .nav-link.active {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  /* Efek bayangan pada konten halaman */
+  .content {
+    background-color: #f9f9f9;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Perbarui efek box-shadow */
+  }
+
+  .dropdown-menu {
+    position: fixed;
+    right: 43%;
+    top: 80px; /* Adjust the top position as needed */
+    transform: translateX(50%);
+  }
+  

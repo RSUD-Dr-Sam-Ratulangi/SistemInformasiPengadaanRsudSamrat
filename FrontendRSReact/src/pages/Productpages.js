@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Card, Badge, Modal, Button } from "react-bootstrap";
+import { Card, Badge, Modal, Button} from "react-bootstrap";
 import "../assets/productpages.css";
-
 
 const Productpages = () => {
   const [products, setProducts] = useState([]);
@@ -12,13 +11,15 @@ const Productpages = () => {
   const [totalPages, setTotalPages] = useState(0);
   const quantity = 1;
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showNotAvailableModal, setShowNotAvailableModal] = useState(false);
   
 
   const handleConfirmationClose = () => setShowConfirmation(false);
+  const handleNotAvailableModalClose = () => setShowNotAvailableModal(false);
 
   useEffect(() => {
     axios
-      .get(`http://rsudsamrat.site:8080/pengadaan/dev/v1/products/${page}/5`)
+      .get(`http://rsudsamrat.site:8080/pengadaan/dev/v1/products/${page}/20`)
       .then((response) => {
         const productsWithVendor = response.data.content.filter(
           (product) => product.vendor !== null
@@ -30,15 +31,20 @@ const Productpages = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [page]); /* Rendering current page */
+  }, [page, searchTerm]);
 
 const handleSearch = (event) => {
   setSearchTerm(event.target.value);
 };
 
+
 const showOrderConfirmation = (product) => {
-  setSelectedProduct(product);
-  setShowConfirmation(true);
+  if (product.quantity > 0) {
+    setSelectedProduct(product);
+    setShowConfirmation(true);
+  } else {
+    setShowNotAvailableModal(true);
+  }
 };
 
   const handleOrderConfirmation = () => {
@@ -102,31 +108,40 @@ const nextPage = () => {
 };
 
 
-  const filteredProducts = products.filter((product) => {
-    const search = searchTerm.toLowerCase();
-    return (
-      product.id.toString().toLowerCase().includes(search) ||
-      product.name.toLowerCase().includes(search) ||
-      product.description.toLowerCase().includes(search) ||
-      product.price.toString().toLowerCase().includes(search) ||
-      product.quantity.toString().toLowerCase().includes(search) ||
-      (product.vendor && product.vendor.name.toLowerCase().includes(search)) // Pencarian berdasarkan nama vendor
-    );
-  });
+const filteredProducts = products.filter((product) => {
+  const search = searchTerm.toLowerCase();
+  return (
+    product.id.toString().toLowerCase().includes(search) ||
+    product.name.toLowerCase().includes(search) ||
+    product.description.toLowerCase().includes(search) ||
+    product.price.toString().toLowerCase().includes(search) ||
+    product.quantity.toString().toLowerCase().includes(search) ||
+    (product.vendor && product.vendor.name.toLowerCase().includes(search)) // Search by vendor name
+  );
+});
+
 
   return (
+    
+      <div className="page-container">
+        
+        <div className="Productpages">
     <div className="container mt-5">
-      <p>Products</p>
-      <div className="my-4">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Search by Name Product&Vendor, Description, Price, or Quantity"
-          value={searchTerm}
-          onChange={handleSearch}
-        />
+      
+    {/* <p>Products</p> */}
+    {/* <Button variant="primary" onClick={handleShowModal} style={{ backgroundColor: '#ccc', border: 'none' }}>
+        <FaPlus style={{ fontSize: '15px', color: '#000' }} />
+      </Button> */}
+    <div className="my-4">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Search by Name Product&Vendor, Description, Price, or Quantity"
+        value={searchTerm}
+        onChange={handleSearch}
+      />
       </div>
-      <div className="row row-cols-1 row-cols-md-3 g-4">
+      <div className="row row-cols-1 row-cols-md-3 g-4 product-container">
         {filteredProducts.map((product) => (
           <div className="col mb-4" key={product.id}>
             <Card className="h-100">
@@ -155,28 +170,46 @@ const nextPage = () => {
           </div>
         ))}
 
-<Modal show={showConfirmation} onHide={handleConfirmationClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>Order Confirmation</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {selectedProduct && (
-          <p>
-            Apakah Anda yakin ingin melakukan pemesanan produk{" "}
-            <strong>{selectedProduct.name}</strong>?
-          </p>
-        )}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleConfirmationClose}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={handleOrderConfirmation}>
-          Order
-        </Button>
-      </Modal.Footer>
-    </Modal>
+        <Modal show={showNotAvailableModal} onHide={handleNotAvailableModalClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Product Unavailable</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Maaf, produk ini sudah tidak tersedia.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={handleNotAvailableModalClose}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        <Modal show={showConfirmation} onHide={handleConfirmationClose}>
+              <Modal.Header closeButton>
+                <Modal.Title>Order Confirmation</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                {selectedProduct && (
+                  <p>
+                    Apakah Anda yakin ingin melakukan pemesanan produk{" "}
+                    <strong>{selectedProduct.name}</strong>?
+                  </p>
+                )}
+                {selectedProduct && selectedProduct.quantity === 0 && (
+                  <p>Maaf, produk ini sudah tidak tersedia.</p> // Tampilkan pesan bahwa produk sudah tidak tersedia
+                )}
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleConfirmationClose}>
+                  Cancel
+                </Button>
+                <Button variant="primary" onClick={handleOrderConfirmation}>
+                  Order
+                </Button>
+              </Modal.Footer>
+            </Modal>
       </div>
+
       <div className="d-flex justify-content-between align-items-center">
         <button className="btn btn-primary" onClick={prevPage}>
           Previous Page
@@ -189,6 +222,9 @@ const nextPage = () => {
         </button>
       </div>
     </div>
+        </div>
+        {/* <Vendorpages /> */}
+      </div>
   );
 };
 

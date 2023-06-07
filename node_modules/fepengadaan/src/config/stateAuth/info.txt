@@ -1,0 +1,5 @@
+StateAuth....
+
+Berisikan data komponen yang dapat diakses oleh seluruh komponen(GLOBAL) vue project.
+
+KEEP LEARNING.

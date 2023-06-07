@@ -34,27 +34,24 @@ const SignInpages = () => {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-
-    axios
-      .post("http://rsudsamrat.site:8080/employee/login", {
+  
+    try {
+      const loginResponse = await axios.post("http://rsudsamrat.site:8080/employee/login", {
         username: userName,
         password: password,
-      })
-      .then((res) => {
-        const { username, id } = res.data;
-        dispatch(login({ username, id }));
-        axios
-          .get(`http://rsudsamrat.site:8080/employee/${id}`)
-          .then((response) => {
-            const { role } = response.data;
-            console.log(role);
-          })
-          .catch((err) => console.log(err));
-        navigate("/");
-      })
-      .catch((err) => console.log(err));
+      });
+  
+      const { username, id } = loginResponse.data;
+      const userResponse = await axios.get(`http://rsudsamrat.site:8080/employee/${id}`);
+      const { role } = userResponse.data;
+  
+      dispatch(login({ username, id, role }));
+      navigate("/");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const theme = createTheme({
@@ -150,10 +147,10 @@ const SignInpages = () => {
               </Link>
             </Grid>
             <Grid item>
-              Don't have an account?{" "}
-              <Link href="#" variant="body2" sx={{ color: "black" }}>
+              {/* Don't have an account?{" "} */}
+              {/* <Link href="#" variant="body2" sx={{ color: "black" }}>
                 Sign Up
-              </Link>
+              </Link> */}
             </Grid>
           </Grid>
           </Box>

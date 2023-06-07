@@ -35,34 +35,24 @@
           <h1 style="font-weight: bolder;" v-if="selectedItem">Harga yang ditawar : {{ selectedItem.bidPrice }}</h1>
           <h1>Total yang akan dibayar : {{ orders.orderItems[0].totalAmount }}</h1>
         </div>
-        
+
         <div class="buttons" v-if="selectedItem !== null">
-          <div v-if="selectedItem.status === 'OFFER' ">
-          <button class="button is-primary" @click.prevent="acceptBid">Accept</button>
-          <button class="button is-danger" @click="showModalRejected">Reject</button>
-          <button class="button is-info">See Details</button>
+          <div v-if="selectedItem.status === 'OFFER'">
+            <button class="button is-primary" @click.prevent="acceptBid">Accept</button>
+            <button class="button is-danger" @click="showModalRejected">Reject</button>
+            <button class="button is-info">See Details</button>
+            <button @click="showModalHistory" class="button is-light"> See History </button>
           </div>
 
-          <div v-if="selectedItem.status === 'PENDING' || selectedItem.status === 'REJECTED' || selectedItem.status === 'ACCEPTED' ">
-            <button class="button is-info">See Details</button>
-          </div>
-          <!-- <div class="file has-name is-fullwidth">
-            <label class="file-label">
-              <input class="file-input" type="file" name="resume" @change="uploadFaktur"
-                accept="application/pdf, .doc, .docx">
-              <span class="file-cta">
-                <span class="file-icon">
-                  <i class="fas fa-upload"></i>
-                </span>
-                <span class="file-label">
-                  Upload Faktur (PDF/DOCX)
-                </span>
-              </span>
-              <span class="file-name">
-                {{ fileName }}
-              </span>
-            </label>
+          <!-- <div v-if="selectedItem.status === 'PENDING' || selectedItem.status === 'REJECTED' || selectedItem.status === 'ACCEPTED'" style="padding-right: 5px">
+            <button class="button is-info">See Details<span style="font-size: 12px;">(Comming Soon)</span></button>
           </div> -->
+
+          <div v-if="selectedItem.status === 'ACCEPTED'" style="padding-right: 5px;">
+            <button class="button is-primary">Kirim <span style="font-size: 12px;">(Comming Soon)</span></button>
+            <button @click="showModalHistory" class="button is-light"> See History </button>
+          </div>
+
         </div>
         <button style="display: flex; justify-content: flex-end; margin-top: 10px" class="button is-warning"
           @click="closeModal">
@@ -78,7 +68,7 @@
     <div v-if="showRejectModal" class="modal-mask" style="overflow: auto;">
       <div class="modal-container">
         <!-- Konten modal penolakan -->
-        <h1 style="font-weight: bold;">Tolak Penawaran</h1>
+        <h1 style="font-weight: bold;">History</h1>
         <p>Apakah Anda yakin ingin menolak penawaran BARANG {{ selectedItem.product.name }}</p>
         <div class="control">
           <input class="input is-hovered" type="number" placeholder="Harga" v-model="rejectBidInputBid" required>
@@ -86,6 +76,49 @@
         <div class="buttons">
           <button class="button is-danger" :disabled="!rejectBidInputBid" @click="rejectBid">Tolak</button>
           <button class="button is-primary" @click="closeRejectModal">Batal</button>
+        </div>
+      </div>
+    </div>
+  </Transition>
+
+  <!-- Modal History -->
+  <Transition name="modal">
+    <div v-if="showHistoryModal" class="modal-mask" style="overflow: auto;">
+      <div class="modal-container">
+        <!-- Konten modal penolakan -->
+        <h1 style="font-weight: bold;">History</h1>
+        <p>{{ orders.id }}</p>
+        <div class="control">
+          <div v-if="history">
+            <div v-if="history.length > 0">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Product Name</th>
+                    <th>Original Price</th>
+                    <th>bidPrice</th>
+                    <th>bidPriceChange</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="histori in history" :key="histori.id">
+                    <th>{{ histori.productName }}</th>
+                    <th>{{ histori.originalPrice }}</th>
+                    <th>{{ histori.bidPrice }}</th>
+                    <th>{{ histori.bidPriceChange }}</th>
+                    <th>{{ histori.status }}</th>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div v-if="history.length === 0">
+              <p>There is no history.</p>
+            </div>
+          </div>
+        </div>
+        <div class="buttons">
+          <button class="button is-primary" @click="closeHistoryModal">Close</button>
         </div>
       </div>
     </div>
@@ -104,36 +137,64 @@ export default {
 
   data() {
     return {
+      history: [],
       selectedItem: null,
       accepted: "ACCEPTED",
       rejected: "REJECTED",
       showRejectModal: false,
+      showHistoryModal: false,
       fileName: "",
       rejectBidInputBid: "",
     };
   },
 
+  computed: {
+    getUniqueVendors() {
+      const vendors = [];
+      for (const orderItem of this.orders.orderItems) {
+        const vendorName = orderItem.product.vendor.name;
+        if (!vendors.includes(vendorName)) {
+          vendors.push(vendorName);
+        }
+      }
+      return vendors;
+    },
+  },
+
   methods: {
     selectItem(orderItem) {
       this.selectedItem = orderItem;
+      axios.get(`http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${this.orders.id}/${this.selectedItem.id}`)
+        .then((res) => {
+          this.history = res.data;
+          console.log(this.history);
+        }).catch((err) => {
+          console.log(err)
+        })
     },
     acceptBid() {
-      axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem}`, {
+      axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
         orderItemId: this.selectedItem.id,
         status: this.accepted
       })
         .then((response) => {
           console.log(response.data);
           this.$emit('close')
+          location.reload();
         })
         .catch(err => console.log(err));
     },
     showModalRejected() {
       this.showRejectModal = true
     },
+    showModalHistory() {
+      this.showHistoryModal = true;
+    },
     closeRejectModal() {
       this.showRejectModal = false;
-      this.selectedItem = null;
+    },
+    closeHistoryModal() {
+      this.showHistoryModal = false;
     },
     rejectBid() {
       axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
@@ -144,18 +205,22 @@ export default {
         console.log(response.data);
         this.showRejectModal = false;
         this.$emit('close')
-        
+
       }).catch(err => console.log(err));
     },
     closeModal() {
       this.$emit('close'); // Mengemisikan event 'close' ke komponen induk
       this.selectedItem = null;
+      location.reload();
     },
     uploadFaktur(event) {
       const file = event.target.files[0]
       this.fileName = file.name
       console.log('Uploading file', file.name)
-    }
+    },
+    getItemsByVendor(vendor) {
+      return this.orders.orderItems.filter(orderItem => orderItem.product.vendor.name === vendor);
+    },
   },
 
 };
@@ -164,5 +229,65 @@ export default {
 <style scoped>
 .buttons {
   margin-right: 0.5em;
+}
+
+/* Modals */
+
+.modal-mask {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  transition: opacity 0.3s ease;
+}
+
+.modal-container {
+  width: auto;
+  margin: auto;
+  padding: 20px 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  transition: all 0.3s ease;
+}
+
+.modal-header h3 {
+  margin-top: 0;
+  color: #42b983;
+}
+
+.modal-body {
+  margin: 20px 0;
+}
+
+.modal-default-button {
+  float: right;
+}
+
+/*
+     * The following styles are auto-applied to elements with
+     * transition="modal" when their visibility is toggled
+     * by Vue.js.
+     *
+     * You can easily play with the modal transition by editing
+     * these styles.
+     */
+
+.modal-enter-from {
+  opacity: 50;
+}
+
+.modal-leave-to {
+  opacity: 100;
+}
+
+.modal-enter-from .modal-container,
+.modal-leave-to .modal-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
 }
 </style>
