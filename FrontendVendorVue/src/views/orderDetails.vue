@@ -1,5 +1,6 @@
 <template>
   <div>
+    <p>Semua pesanan yang diminta rumah sakit akan muncul di sini.</p>
     <table>
       <thead>
         <tr>
@@ -13,7 +14,7 @@
           <td>{{ datas.id }}</td>
           <td>{{ datas.orderDate }}</td>
           <td>
-            <button @click="selectOrdersItem(datas)" class="button is-primary">Detail</button>
+            <button @click="selectOrdersItem(datas)">Detail</button>
           </td>
         </tr>
       </tbody>

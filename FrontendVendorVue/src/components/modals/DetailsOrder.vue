@@ -18,6 +18,7 @@
                 <th>Harga</th>
                 <th>Harga Penwaran</th>
                 <th>status</th>
+                <th>status</th>
               </tr>
             </thead>
             <tbody>
@@ -28,6 +29,7 @@
                 <td>{{ orderItem.product.price }}</td>
                 <td>{{ orderItem.totalAmount }}</td>
                 <td>{{ orderItem.status }}</td>
+                <button class="button is-info">History</button>
               </tr>
             </tbody>
           </table>
@@ -37,22 +39,18 @@
         </div>
 
         <div class="buttons" v-if="selectedItem !== null">
-          <div v-if="selectedItem.status === 'OFFER'">
-            <button class="button is-primary" @click.prevent="acceptBid">Accept</button>
-            <button class="button is-danger" @click="showModalRejected">Reject</button>
+
+          <div v-if="selectedItem.status === 'OFFER' ">
+          <button class="button is-primary" @click.prevent="acceptBid">Accept</button>
+          <button class="button is-danger" @click="showModalRejected">Reject</button>
+
+          </div>
+
+          <div
+            v-if="selectedItem.status === 'PENDING' || selectedItem.status === 'REJECTED' || selectedItem.status === 'ACCEPTED'">
             <button class="button is-info">See Details</button>
-            <button @click="showModalHistory" class="button is-light"> See History </button>
+            <button @click="showModalHistory()" class="button is-primary"> See History </button>
           </div>
-
-          <!-- <div v-if="selectedItem.status === 'PENDING' || selectedItem.status === 'REJECTED' || selectedItem.status === 'ACCEPTED'" style="padding-right: 5px">
-            <button class="button is-info">See Details<span style="font-size: 12px;">(Comming Soon)</span></button>
-          </div> -->
-
-          <div v-if="selectedItem.status === 'ACCEPTED'" style="padding-right: 5px;">
-            <button class="button is-primary">Kirim <span style="font-size: 12px;">(Comming Soon)</span></button>
-            <button @click="showModalHistory" class="button is-light"> See History </button>
-          </div>
-
         </div>
         <button style="display: flex; justify-content: flex-end; margin-top: 10px" class="button is-warning"
           @click="closeModal">
@@ -86,35 +84,33 @@
     <div v-if="showHistoryModal" class="modal-mask" style="overflow: auto;">
       <div class="modal-container">
         <!-- Konten modal penolakan -->
-        <h1 style="font-weight: bold;">History</h1>
+        <h1 style="font-weight: bold;">Tolak Penawaran</h1>
         <p>{{ orders.id }}</p>
         <div class="control">
           <div v-if="history">
-            <div v-if="history.length > 0">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Product Name</th>
-                    <th>Original Price</th>
-                    <th>bidPrice</th>
-                    <th>bidPriceChange</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="histori in history" :key="histori.id">
-                    <th>{{ histori.productName }}</th>
-                    <th>{{ histori.originalPrice }}</th>
-                    <th>{{ histori.bidPrice }}</th>
-                    <th>{{ histori.bidPriceChange }}</th>
-                    <th>{{ histori.status }}</th>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div v-if="history.length === 0">
-              <p>There is no history.</p>
-            </div>
+            <table class="table">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>Original Price</th>
+                <th>bidPrice</th>
+                <th>bidPriceChange</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="histori in history" :key="histori.id">
+                <th>{{ histori.productName }}</th>
+                <th>{{ histori.originalPrice }}</th>
+                <th>{{ histori.bidPrice }}</th>
+                <th>{{ histori.bidPriceChange }}</th>
+                <th>{{ histori.status }}</th>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+          <div v-else>
+            <p>null</p>
           </div>
         </div>
         <div class="buttons">
@@ -148,19 +144,6 @@ export default {
     };
   },
 
-  computed: {
-    getUniqueVendors() {
-      const vendors = [];
-      for (const orderItem of this.orders.orderItems) {
-        const vendorName = orderItem.product.vendor.name;
-        if (!vendors.includes(vendorName)) {
-          vendors.push(vendorName);
-        }
-      }
-      return vendors;
-    },
-  },
-
   methods: {
     selectItem(orderItem) {
       this.selectedItem = orderItem;
@@ -180,7 +163,6 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.$emit('close')
-          location.reload();
         })
         .catch(err => console.log(err));
     },
@@ -192,6 +174,7 @@ export default {
     },
     closeRejectModal() {
       this.showRejectModal = false;
+      this.selectedItem = null;
     },
     closeHistoryModal() {
       this.showHistoryModal = false;
@@ -211,16 +194,12 @@ export default {
     closeModal() {
       this.$emit('close'); // Mengemisikan event 'close' ke komponen induk
       this.selectedItem = null;
-      location.reload();
     },
     uploadFaktur(event) {
       const file = event.target.files[0]
       this.fileName = file.name
       console.log('Uploading file', file.name)
-    },
-    getItemsByVendor(vendor) {
-      return this.orders.orderItems.filter(orderItem => orderItem.product.vendor.name === vendor);
-    },
+    }
   },
 
 };
@@ -229,65 +208,5 @@ export default {
 <style scoped>
 .buttons {
   margin-right: 0.5em;
-}
-
-/* Modals */
-
-.modal-mask {
-  position: fixed;
-  z-index: 9999;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  transition: opacity 0.3s ease;
-}
-
-.modal-container {
-  width: auto;
-  margin: auto;
-  padding: 20px 20px;
-  background-color: #fff;
-  border-radius: 5px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
-  transition: all 0.3s ease;
-}
-
-.modal-header h3 {
-  margin-top: 0;
-  color: #42b983;
-}
-
-.modal-body {
-  margin: 20px 0;
-}
-
-.modal-default-button {
-  float: right;
-}
-
-/*
-     * The following styles are auto-applied to elements with
-     * transition="modal" when their visibility is toggled
-     * by Vue.js.
-     *
-     * You can easily play with the modal transition by editing
-     * these styles.
-     */
-
-.modal-enter-from {
-  opacity: 50;
-}
-
-.modal-leave-to {
-  opacity: 100;
-}
-
-.modal-enter-from .modal-container,
-.modal-leave-to .modal-container {
-  -webkit-transform: scale(1.1);
-  transform: scale(1.1);
 }
 </style>

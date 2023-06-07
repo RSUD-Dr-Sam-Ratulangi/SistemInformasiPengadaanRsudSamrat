@@ -1,13 +1,11 @@
 <script>
 import Navigationbar from "./components/molecules/Navigationbar.vue";
 import Nologgedin from "./views/relativeViews/Nologgedin.vue";
-import Footer from "./components/molecules/Footer.vue";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { mapGetters } from "vuex";
 
 export default {
   name: "app",
-  components: { Navigationbar, Nologgedin, FontAwesomeIcon, Footer },
+  components: { Navigationbar, Nologgedin },
 
   computed: {
     ...mapGetters(["isLoggedIn"]),
@@ -16,32 +14,31 @@ export default {
 </script>
 
 <template>
-  <div class="inti">
-    <div>
-      <Navigationbar />
-      <div class="contentNoLoggedin" v-if="!isLoggedIn">
-        <Nologgedin />
-      </div>
-      <div v-if="isLoggedIn">
-        <div>
-          <div class="content">
-            <RouterView />
-          </div>
+  <div class="main-container">
+    <Navigationbar />
+    <div class="contentNoLoggedin" v-if="!isLoggedIn">
+      <Nologgedin />
+    </div>
+    <div v-if="isLoggedIn">
+      <div>
+        <div class="content">
+          <RouterView />
         </div>
       </div>
-      <div>
-      </div>
-    </div> 
+    </div>
+    <div>
+      <footer>
+        <span>RSUD SAMRATULANGI TONDANO</span> &copy; 2023. All Rights Reserved.
+      </footer>
+    </div>
   </div>
-  <footer>
-    <Footer />
-  </footer>
 </template>
 
 <style scoped>
+
 .content {
   text-align: center;
-  margin-bottom: 150px;
+  margin-bottom: 60px;
   margin-left: 60px;
   margin-right: 60px;
 }
@@ -52,11 +49,19 @@ export default {
 }
 
 footer {
-  position:fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #f5f5f5; /* Sesuaikan dengan warna latar belakang yang Anda inginkan */
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
   text-align: center;
+  font-size: 14px;
+  position: fixed;
+  bottom: 0;
+  z-index: 1;
+  width: 100%;
+}
+
+footer span {
+  font-weight: bold;
+  font-size: 16px;
 }
 </style>
