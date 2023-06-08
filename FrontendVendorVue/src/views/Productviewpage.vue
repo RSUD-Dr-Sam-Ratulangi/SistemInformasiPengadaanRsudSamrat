@@ -19,7 +19,30 @@
 
   <button class="button is-small" style="margin-top: 5px;" @click="addProductModal()">Add Product</button>
 
-  <div class="contentProduct">
+  <div>
+    <table>
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="product in products" :key="product.id">
+          <td>{{ product.name }}</td>
+          <td>{{ product.price }}</td>
+          <td>{{ product.quantity }}</td>
+          <td>{{ product.status }}</td>
+          <td><button @click="deleteProduct(product.productuuid, product.name)">Delete</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- <div class="contentProduct">
     <div class="card" v-for="product in filteredProducts" :key="product.id">
       <div class="card-content">
         <div class="media">
@@ -38,7 +61,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
 
   <!-- Modals edit Product -->
