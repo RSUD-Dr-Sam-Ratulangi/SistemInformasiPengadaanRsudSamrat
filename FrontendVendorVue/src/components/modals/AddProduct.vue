@@ -6,8 +6,8 @@
           <h1 style="font-style: italic; font-weight: bolder">
             Add Product
             <span class="close-button" @click="$emit('close')">
-            <FontAwesomeIcon icon="fas fa-xmark" />
-          </span>
+              <FontAwesomeIcon icon="fas fa-xmark" />
+            </span>
           </h1>
         </div>
         <div class="modal-body">
@@ -37,30 +37,38 @@
                   <div class="control">
                     <input class="input is-large" type="text" placeholder="Description" v-model="product.description">
                   </div>
-                  <p>Categories</p>
-                  <label class="checkbox">
-                    <input type="checkbox" v-model="product.categoryIds" :value="1">
-                    Komputer
-                  </label>
-                  <label class="checkbox">
-                    <input type="checkbox" v-model="product.categoryIds" :value="2">
-                    Elektronik
-                  </label>
+                  <div class="field">
+                    <p>Categories</p>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.categoryIds" :value="1">
+                      Komputer
+                    </label>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.categoryIds" :value="2">
+                      Elektronik
+                    </label>
+                  </div>
                 </div>
                 <button class="button is-primary" type="submit">Submit</button>
               </div>
               <div class="form-right">
-                <input class="input" placeholder="Isi URL" v-model="product.imageUrl" />
+                <label class="label">Url image</label>
+                <div class="control">
+                  <input class="input" type="text" placeholder="Url" v-model="product.imageUrl">
+                </div>
               </div>
             </form>
           </div>
         </div>
       </div>
+
     </div>
+
   </Transition>
 </template>
 
 <script>
+import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { mapGetters } from 'vuex';
 export default {
@@ -69,6 +77,7 @@ export default {
   },
   data() {
     return {
+      isActive: false,
       isLoading: false,
       product: {
         name: "",
@@ -84,7 +93,31 @@ export default {
   computed: {
     ...mapGetters(["vendoruuid"])
   },
-  components: { FontAwesomeIcon }
+  components: { FontAwesomeIcon },
+  methods: {
+    toggleDropdown() {
+      this.isActive = !this.isActive
+      console.log("okbro")
+    },
+    Submitform() {
+      axios
+        .post(
+          `http://rsudsamrat.site:8080/pengadaan/dev/v1/products/${this.vendoruuid}`,
+          this.product
+        )
+        .then((response) => {
+          this.$emit('close')
+          location.reload();
+          alert(`Product dengan nama : ${this.product.name} berhasil ditambahkan`)
+          console.log(
+            `Berhasil ditambahkan, Deskripsi: ${this.product.description}`
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    },
+  }
 }
 </script>
 
@@ -108,10 +141,15 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-left: 10px;
 }
 
 .close-button {
   justify-content: flex-end;
   cursor: pointer;
+}
+
+.dropdown {
+  padding-top: 10px;
 }
 </style>
