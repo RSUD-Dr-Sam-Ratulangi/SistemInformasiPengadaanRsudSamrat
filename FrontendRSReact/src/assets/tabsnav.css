@@ -32,10 +32,10 @@
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Perbarui efek box-shadow */
   }
 
-  .dropdown-menu {
+  /* .dropdown-menu {
     position: fixed;
     right: 43%;
-    top: 80px; /* Adjust the top position as needed */
+    top: 80px;
     transform: translateX(50%);
-  }
+  } */
   

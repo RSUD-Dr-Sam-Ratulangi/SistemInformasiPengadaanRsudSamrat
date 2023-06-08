@@ -75,6 +75,7 @@ const TabsNav = () => {
       <div
         className={`dropdown-menu${isOpen ? " show" : ""}`}
         aria-labelledby="dropdownMenuButton"
+        style={{position: "fixed", right: "43%", top: "80px", transform: "translateX(50%)"}}
       >
         <Link
           to="/orders"
