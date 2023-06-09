@@ -1,9 +1,10 @@
 <template>
   <div class="container">
     <h1>SMART PROCUREMENT</h1>
+    <p style="font-size: 20px;">Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum<br/> DR Sam Ratulangi Tondano</p>
   </div>
 
-  <!-- Dropdown -->
+  <!-- Dropdown
   <div class="dropdown" :class="{ 'is-active': isActive }">
     <div class="dropdown-trigger">
       <button class="button" @click="toggleDropdown" aria-controls="dropdown-menu3">
@@ -12,37 +13,42 @@
     </div>
     <div class="dropdown-menu" role="menu">
       <div class="dropdown-content">
-        <a href="#" class="dropdown-item">
+        <a href="#" class="dropdown-item" @click="selectOption('Komputer')">
           Komputer
         </a>
-        <a href="#" class="dropdown-item">
+        <a href="#" class="dropdown-item" @click="selectOption('Elektronik')">
           Elektronik
         </a>
       </div>
     </div>
-  </div>
+    <p>You are click {{ selectedOption  }}</p>
+  </div> -->
 </template>
 
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-export default {
-  components: {FontAwesomeIcon},
-  data() {
-    return {
-      isActive: false,
-    };
-  },
-  methods: {
-    toggleDropdown() {
-      this.isActive = !this.isActive;
-    },
-  },
-}
+// import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+// export default {
+//   components: {FontAwesomeIcon},
+//   data() {
+//     return {
+//       isActive: false,
+//       selectedOption : null,
+//     };
+//   },
+//   methods: {
+//     toggleDropdown() {
+//       this.isActive = !this.isActive;
+//     },
+//     selectOption(kategori) {
+//       this.selectedOption = kategori
+//     }
+//   },
+// }
 </script>
 
 <style scoped>
 h1 {
-  font-size: 20px;
+  font-size: 70px;
 }
 </style>
 

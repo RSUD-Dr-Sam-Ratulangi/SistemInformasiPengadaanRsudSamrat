@@ -3,11 +3,18 @@
     font-size: smaller;
     top: 0;
     z-index: 999;
-    position: sticky;
+    position: relative;
     display: flex;
     justify-content: center;
     gap: 50px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Perbarui efek box-shadow */
+  }
+
+  .coming-soon {
+    font-size: 10px;
+    color: gray;
+    text-align: center;
+    margin-left: 5px;
   }
   
   .nav-pills .nav-link {
@@ -24,4 +31,11 @@
     background-color: #f9f9f9;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Perbarui efek box-shadow */
   }
+
+  /* .dropdown-menu {
+    position: fixed;
+    right: 43%;
+    top: 80px;
+    transform: translateX(50%);
+  } */
   

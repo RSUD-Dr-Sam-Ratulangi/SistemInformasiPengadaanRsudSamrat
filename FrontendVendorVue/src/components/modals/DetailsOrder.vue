@@ -9,33 +9,6 @@
           <h1>Status : {{ orders.status }}</h1>
         </div>
         <div class="modal-body" style="overflow: auto;">
-<<<<<<< HEAD
-          <div v-for="vendor in getUniqueVendors" :key="vendor">
-            <h1 style="font-weight: bold;">From Vendor : {{ vendor }}</h1>
-            <table class="table is-bordered is-striped is-narrow is-hoverable">
-              <thead>
-                <tr>
-                  <th>id</th>
-                  <th>Product Name</th>
-                  <th>Quantity</th>
-                  <th>Harga</th>
-                  <th>Harga Penwaran</th>
-                  <th>status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="orderItem in getItemsByVendor(vendor)" :key="orderItem.id">
-                  <th @click="selectItem(orderItem)" style="cursor: default;">{{ orderItem.id }}</th>
-                  <td @click="selectItem(orderItem)" style="cursor: default;">{{ orderItem.product.name }}</td>
-                  <td>{{ orderItem.quantity }}</td>
-                  <td>{{ orderItem.product.price }}</td>
-                  <td>{{ orderItem.totalAmount }}</td>
-                  <td>{{ orderItem.status }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-=======
           <table class="table is-bordered is-striped is-narrow is-hoverable">
             <thead>
               <tr>
@@ -44,7 +17,6 @@
                 <th>Quantity</th>
                 <th>Harga</th>
                 <th>Harga Penwaran</th>
-                <th>status</th>
                 <th>status</th>
               </tr>
             </thead>
@@ -56,40 +28,31 @@
                 <td>{{ orderItem.product.price }}</td>
                 <td>{{ orderItem.totalAmount }}</td>
                 <td>{{ orderItem.status }}</td>
-                <button class="button is-info">History</button>
               </tr>
             </tbody>
           </table>
->>>>>>> 79174ebf8c969ad3521bdab3c9428674f9b11065
           <h1>Total Harga :{{ orders.payment.amount }}</h1>
           <h1 style="font-weight: bolder;" v-if="selectedItem">Harga yang ditawar : {{ selectedItem.bidPrice }}</h1>
           <h1>Total yang akan dibayar : {{ orders.orderItems[0].totalAmount }}</h1>
         </div>
 
         <div class="buttons" v-if="selectedItem !== null">
-<<<<<<< HEAD
-
-          <div v-if="selectedItem.status === 'OFFER' ">
-          <button class="button is-primary" @click.prevent="acceptBid">Accept</button>
-          <button class="button is-danger" @click="showModalRejected">Reject</button>
-
-=======
           <div v-if="selectedItem.status === 'OFFER'">
             <button class="button is-primary" @click.prevent="acceptBid">Accept</button>
             <button class="button is-danger" @click="showModalRejected">Reject</button>
             <button class="button is-info">See Details</button>
-            <button @click="showModalHistory"> See History </button>
->>>>>>> 4fe6a4ac2debfdd3ba57e6c3f5168e22c7954baf
+            <button @click="showModalHistory" class="button is-light"> See History </button>
           </div>
+
+          <!-- <div v-if="selectedItem.status === 'PENDING' || selectedItem.status === 'REJECTED' || selectedItem.status === 'ACCEPTED'" style="padding-right: 5px">
+            <button class="button is-info">See Details<span style="font-size: 12px;">(Comming Soon)</span></button>
+          </div> -->
 
           <div v-if="selectedItem.status === 'ACCEPTED'" style="padding-right: 5px;">
-            <button class="button is-primary">Kirim</button>
+            <button class="button is-primary">Kirim <span style="font-size: 12px;">(Comming Soon)</span></button>
+            <button @click="showModalHistory" class="button is-light"> See History </button>
           </div>
 
-          <div
-            v-if="selectedItem.status === 'PENDING' || selectedItem.status === 'REJECTED' || selectedItem.status === 'ACCEPTED'">
-            <button class="button is-info">See Details</button>
-          </div>
         </div>
         <button style="display: flex; justify-content: flex-end; margin-top: 10px" class="button is-warning"
           @click="closeModal">
@@ -123,30 +86,35 @@
     <div v-if="showHistoryModal" class="modal-mask" style="overflow: auto;">
       <div class="modal-container">
         <!-- Konten modal penolakan -->
-        <h1 style="font-weight: bold;">Tolak Penawaran</h1>
+        <h1 style="font-weight: bold;">History</h1>
         <p>{{ orders.id }}</p>
         <div class="control">
           <div v-if="history">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Product Name</th>
-                  <th>Original Price</th>
-                  <th>bidPrice</th>
-                  <th>bidPriceChange</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="histori in history" :key="histori.id">
-                  <th>{{ histori.productName }}</th>
-                  <th>{{ histori.originalPrice }}</th>
-                  <th>{{ histori.bidPrice }}</th>
-                  <th>{{ histori.bidPriceChange }}</th>
-                  <th>{{ histori.status }}</th>
-                </tr>
-              </tbody>
-            </table>
+            <div v-if="history.length > 0">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Product Name</th>
+                    <th>Original Price</th>
+                    <th>bidPrice</th>
+                    <th>bidPriceChange</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="histori in history" :key="histori.id">
+                    <th>{{ histori.productName }}</th>
+                    <th>{{ histori.originalPrice }}</th>
+                    <th>{{ histori.bidPrice }}</th>
+                    <th>{{ histori.bidPriceChange }}</th>
+                    <th>{{ histori.status }}</th>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div v-if="history.length === 0">
+              <p>There is no history.</p>
+            </div>
           </div>
         </div>
         <div class="buttons">
@@ -212,6 +180,7 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.$emit('close')
+          location.reload();
         })
         .catch(err => console.log(err));
     },
@@ -223,7 +192,6 @@ export default {
     },
     closeRejectModal() {
       this.showRejectModal = false;
-      this.selectedItem = null;
     },
     closeHistoryModal() {
       this.showHistoryModal = false;
@@ -243,6 +211,7 @@ export default {
     closeModal() {
       this.$emit('close'); // Mengemisikan event 'close' ke komponen induk
       this.selectedItem = null;
+      location.reload();
     },
     uploadFaktur(event) {
       const file = event.target.files[0]
@@ -277,7 +246,7 @@ export default {
 }
 
 .modal-container {
-  width: 500px;
+  width: auto;
   margin: auto;
   padding: 20px 20px;
   background-color: #fff;

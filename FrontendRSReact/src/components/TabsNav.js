@@ -2,18 +2,17 @@ import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import "../assets/tabsnav.css";
 
-
 const TabsNav = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.pathname);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleTabClick = (path) => {
     setActiveTab(path);
   };
-  
+
   const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
+    setIsOpen(!isOpen);
   };
 
   return (
@@ -47,19 +46,67 @@ const TabsNav = () => {
           </Link>
         </li>
         <li className="nav-item">
-          <Link
-            to="/orders"
-            className={`nav-link ${activeTab === "/orders" ? "active" : ""}`}
-            onClick={() => handleTabClick("/orders")}
-          >
+        <li className="nav-item dropdown">
+          <button className="nav-link dropdown-toggle" onClick={toggleDropdown}>
             Orders
+          </button>
+        </li>
+        </li>
+        <li className="nav-item">
+          <Link
+            to="/Vendors"
+            className={`nav-link ${activeTab === "/Vendors" ? "active" : ""}`}
+            onClick={() => handleTabClick("/Vendors")}
+          >
+            Vendors
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link
+            to="/Payments"
+            className={`nav-link ${activeTab === "/Payments" ? "active" : ""}`}
+            onClick={() => handleTabClick("/Payments")}
+          >
+            Payment
           </Link>
         </li>
       </ul>
 
-      <div className="content">
-        {/* Konten halaman utama */}
+      <div
+        className={`dropdown-menu${isOpen ? " show" : ""}`}
+        aria-labelledby="dropdownMenuButton"
+        style={{position: "fixed", right: "43%", top: "80px", transform: "translateX(50%)"}}
+      >
+        <Link
+          to="/orders"
+          className={`dropdown-item ${activeTab === "" ? "active" : ""}`}
+          onClick={() => handleTabClick("/orders")}
+        >
+          PP
+        </Link>
+        <Link
+          to="/orders"
+          className={`dropdown-item ${activeTab === "" ? "active" : ""}`}
+          onClick={() => handleTabClick("/orders")}
+        >
+          PPKOM
+        </Link>
+        <Link
+          to="/orders"
+          className={`dropdown-item ${activeTab === "" ? "active" : ""}`}
+          onClick={() => handleTabClick("/orders")}
+        >
+          PANPEN
+        </Link>
+        <Link
+          to="/orders"
+          className={`dropdown-item ${activeTab === "" ? "active" : ""}`}
+          onClick={() => handleTabClick("/orders")}
+        >
+          KEUANGAN
+        </Link>
       </div>
+      <div className="content">{/* Konten halaman utama */}</div>
     </div>
   );
 };

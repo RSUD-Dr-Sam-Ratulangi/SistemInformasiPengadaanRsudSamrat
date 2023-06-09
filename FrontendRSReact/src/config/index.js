@@ -10,7 +10,11 @@ import Orderpages from "../pages/Orderpages";
 import Notificationpages from "../pages/Notificationpages";
 import Profilpages from "../pages/Profilpages";
 import SignInpages from "../pages/SignInpages";
+import Vendors from "../pages/Vendor";
+import CommingSoon from "../pages/CommingSoon";
+import Payment from "../pages/Payment";
 import { useSelector } from "react-redux";
+
 
 const Routers = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -35,6 +39,9 @@ const Routers = () => {
             <Route path="/orders" element={<Orderpages />} />
             <Route path="/notifications" element={<Notificationpages />} />
             <Route path="/profile" element={<Profilpages />} />
+            <Route path="/Vendors" element={<Vendors />} />
+            <Route path="/CommingSoon" element={<CommingSoon />} />
+            <Route path="/Payments" element={<Payment />} />
           </>
         )}
         <Route path="/signIn" element={<SignInpages />} />

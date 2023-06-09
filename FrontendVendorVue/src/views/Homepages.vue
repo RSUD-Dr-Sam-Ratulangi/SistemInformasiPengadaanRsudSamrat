@@ -119,7 +119,6 @@ export default {
   padding-bottom: 10px;
   justify-content: center;
   align-items: center;
-  height: auto;
 }
 
 .table {
