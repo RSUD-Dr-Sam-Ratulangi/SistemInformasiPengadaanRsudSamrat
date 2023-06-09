@@ -23,6 +23,7 @@ public class PengadaanRsudSamratApplication {
         SpringApplication.run(PengadaanRsudSamratApplication.class, args);
         Logger.getLogger("com.example").info("darkzill");
 
+
     }
 
 }
