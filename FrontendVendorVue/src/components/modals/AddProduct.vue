@@ -60,6 +60,17 @@
                       JASA
                     </label>
                   </div>
+                  <div class="field">
+                    <p>Sub Categories</p>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.subCategoryId" :value="1">
+                      NON MEDIS    
+                    </label>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.subCategoryId" :value="2">
+                      MEDIS
+                    </label>
+                  </div>
                 </div>
                 <button class="button is-primary" type="submit">Submit</button>
               </div>
@@ -98,7 +109,7 @@ export default {
         description: "",
         imageUrl: "",
         categoryIds: [],
-        subCategoryId: [1]
+        subCategoryId: []
       },
       message: "",
     };
