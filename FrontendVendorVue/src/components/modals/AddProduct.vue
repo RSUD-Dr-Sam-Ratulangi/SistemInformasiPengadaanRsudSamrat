@@ -40,14 +40,6 @@
                   <div class="field">
                     <p>Categories</p>
                     <label class="checkbox">
-                      <input type="checkbox" v-model="product.categoryIds" :value="1">
-                      Komputer
-                    </label>
-                    <label class="checkbox">
-                      <input type="checkbox" v-model="product.categoryIds" :value="2">
-                      Elektronik
-                    </label>
-                    <label class="checkbox">
                       <input type="checkbox" v-model="product.categoryIds" :value="3">
                       BPH
                     </label>
