@@ -2,6 +2,8 @@ package com.example.pengadaanrsudsamrat.products;
 
 import com.example.pengadaanrsudsamrat.Category.CategoryModel;
 import com.example.pengadaanrsudsamrat.Category.CategoryRepository;
+import com.example.pengadaanrsudsamrat.Category.SubCategoryModel;
+import com.example.pengadaanrsudsamrat.Category.SubCategoryRepository;
 import com.example.pengadaanrsudsamrat.products.DTO.ProductRequestDTO;
 import com.example.pengadaanrsudsamrat.products.DTO.ProductResponseDTO;
 import com.example.pengadaanrsudsamrat.vendor.VendorModel;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -31,20 +34,24 @@ public class ProductServiceImpl implements ProductService {
     private final ModelMapper modelMapper;
     private final CategoryRepository categoryRepository;
 
+    private final SubCategoryRepository subCategoryRepository;
+
     /**
      * Instantiates a new Product service.
      *
-     * @param productRepository  the product repository
-     * @param vendorRepository   the vendor repository
-     * @param modelMapper        the model mapper
+     * @param productRepository     the product repository
+     * @param vendorRepository      the vendor repository
+     * @param modelMapper           the model mapper
      * @param categoryRepository
+     * @param subCategoryRepository
      */
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, VendorRepository vendorRepository, ModelMapper modelMapper, CategoryRepository categoryRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, VendorRepository vendorRepository, ModelMapper modelMapper, CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository) {
         this.productRepository = productRepository;
         this.vendorRepository = vendorRepository;
         this.modelMapper = modelMapper;
         this.categoryRepository = categoryRepository;
+        this.subCategoryRepository = subCategoryRepository;
     }
 
 
@@ -71,20 +78,34 @@ public class ProductServiceImpl implements ProductService {
         VendorModel vendor = vendorRepository.findByVendoruuid(vendorUuid)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
-        ProductModel product = modelMapper.map(productRequestDTO, ProductModel.class);
-
-        // Map the category IDs from the request DTO to CategoryModel instances
-        Set<CategoryModel> categories = productRequestDTO.getCategoryIds().stream()
-                .map(categoryId -> categoryRepository.findById(categoryId)
-                        .orElseThrow(() -> new RuntimeException("Category not found: " + categoryId)))
-                .collect(Collectors.toSet());
-        product.setCategories(categories);
-
+        ProductModel product = new ProductModel();
+        product.setName(productRequestDTO.getName());
+        product.setDescription(productRequestDTO.getDescription());
+        product.setPrice(productRequestDTO.getPrice());
+        product.setQuantity(productRequestDTO.getQuantity());
         product.setVendor(vendor);
 
+        Set<CategoryModel> categories = new HashSet<>();
+        for (Long categoryId : productRequestDTO.getCategoryIds()) {
+            CategoryModel category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("Category not found: " + categoryId));
+            categories.add(category);
+        }
+        product.setCategories(categories);
+
+        Set<SubCategoryModel> subcategories = new HashSet<>();
+        for (Long subcategoryId : productRequestDTO.getSubCategoryId()) {
+            SubCategoryModel subcategory = subCategoryRepository.findById(subcategoryId)
+                    .orElseThrow(() -> new RuntimeException("Subcategory not found: " + subcategoryId));
+            subcategories.add(subcategory);
+        }
+        product.setSubcategories(subcategories);
+        product.setStatus(productRequestDTO.getStatus());
         ProductModel savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponseDTO.class);
     }
+
+
 
 
     @Override

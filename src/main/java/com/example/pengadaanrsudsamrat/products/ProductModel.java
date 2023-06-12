@@ -1,6 +1,7 @@
 package com.example.pengadaanrsudsamrat.products;
 
 import com.example.pengadaanrsudsamrat.Category.CategoryModel;
+import com.example.pengadaanrsudsamrat.Category.SubCategoryModel;
 import com.example.pengadaanrsudsamrat.vendor.VendorModel;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -21,6 +22,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductModel {
+
+    public enum Status {
+        PENDING,
+        APPROVED,
+        REJECTED
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,6 +59,16 @@ public class ProductModel {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<CategoryModel> categories;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "product_subcategory",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "subcategory_id"))
+    private Set<SubCategoryModel> subcategories;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
 
     @Column(name = "image_url")
     private String imageUrl;

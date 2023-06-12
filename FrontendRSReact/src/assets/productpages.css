@@ -1,14 +1,12 @@
 .Productpages {
   padding: 20px;
-  position: fixed;
   top: 50px; /* Adjust the top value as needed to align with your header */
   left: 0;
   right: 0;
   z-index: 999;
   background-color: #fff;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  height: calc(100vh - 50px); /* Adjust the height based on your needs */
-  overflow-y: auto;
+  /* box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); */
+
 }
 
 
@@ -99,3 +97,6 @@
   justify-content: space-between;
 }
 
+.product-container {
+  margin-top: 20px; /* Sesuaikan margin atas sesuai kebutuhan */
+}

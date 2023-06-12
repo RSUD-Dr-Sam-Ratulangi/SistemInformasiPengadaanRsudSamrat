@@ -1,219 +1,175 @@
-import { useEffect, useState } from "react";
 import axios from "axios";
-import { Card, Badge, Modal, Button } from "react-bootstrap";
-import "../assets/productpages.css";
-
+import { useState, useEffect } from "react";
 
 const Productpages = () => {
+  const [vendor, setVendor] = useState([]);
   const [products, setProducts] = useState([]);
-  const [page, setPage] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [totalPages, setTotalPages] = useState(0);
-  const quantity = 1;
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [showNotAvailableModal, setShowNotAvailableModal] = useState(false);
+  const [selectedVendor, setSelectedVendor] = useState(null);
+  const [filteredData, setFilteredData] = useState([]);
+  const [filteredPendingProducts, setFilteredPendingProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const handleConfirmationClose = () => setShowConfirmation(false);
-  const handleNotAvailableModalClose = () => setShowNotAvailableModal(false);
+  // Mengambil data Vendor
+  useEffect(() => {
+    loadVendors();
+  }, []);
+
+  // Mengambil data Product berdasarkan VendorUUID
+  useEffect(() => {
+    if (selectedVendor) {
+      loadProducts();
+    }
+  }, [selectedVendor]);
 
   useEffect(() => {
-    axios
-      .get(`http://rsudsamrat.site:8080/pengadaan/dev/v1/products/${page}/5`)
-      .then((response) => {
-        const productsWithVendor = response.data.content.filter(
-          (product) => product.vendor !== null
-        );
-        setProducts(productsWithVendor);
-        setTotalPages(response.data.totalPages);
-        console.log(productsWithVendor);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [page]); /* Rendering current page */
+    if (products.length > 0) {
+      const filteredPending = products.filter((item) => item.status === "PENDING");
+      setFilteredPendingProducts(filteredPending);
+    }
+  }, [products]);
 
-const handleSearch = (event) => {
-  setSearchTerm(event.target.value);
-};
-
-const showOrderConfirmation = (product) => {
-  if (product.quantity > 0) {
-    setSelectedProduct(product);
-    setShowConfirmation(true);
-  } else {
-    setShowNotAvailableModal(true);
-  }
-};
-
-  const handleOrderConfirmation = () => {
-    setShowConfirmation(false);
-
-    const storedOrderId = sessionStorage.getItem("orderId");
-
-    if (storedOrderId) {
-      const orderItem = [{ productId: selectedProduct.id, quantity: quantity }];
-      axios
-        .post(
-          `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${storedOrderId}/items`,
-          orderItem
-        )
-        .then((response) => {
-          console.log(response.data);
-          alert("Add Item Success");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      axios
-        .post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
-        .then((response) => {
-          console.log(response.data);
-          const orderId = response.data.id;
-          sessionStorage.setItem("orderId", orderId);
-          const orderItem = [{ productId: selectedProduct.id, quantity: quantity }];
-          axios
-            .post(
-              `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${orderId}/items`,
-              orderItem
-            )
-            .then((response) => {
-              console.log(response.data);
-              alert("Add Item Success");
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+  // Load Vendors
+  const loadVendors = async () => {
+    try {
+      const response = await axios.get(
+        "http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=2&size=25"
+      );
+      setVendor(response.data);
+    } catch (err) {
+      console.log(err);
     }
   };
 
-  
+  // Load Vendor Products berdasarkan yang dipilih
+  const loadProducts = async () => {
+    try {
+      const respone = await axios.get(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/products/vendor/${selectedVendor}`
+      );
+      setProducts(respone.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-const prevPage = () => {
-  if (page > 0) {
-    setPage(page - 1);
-  }
-};
+  // Filter data produk berdasarkan status "APPROVED"
+  useEffect(() => {
+    if (products.length > 0) {
+      const filteredProducts = products.filter((item) => item.status === "APPROVED");
+      setFilteredData(filteredProducts);
+    }
+  }, [products]);
 
-const nextPage = () => {
-  if (page < totalPages - 1) {
-    setPage(page + 1);
-  }
-};
+  const handlePendingProducts = () => {
+    setFilteredData(filteredPendingProducts);
+  };
 
+  const handleVendorSelection = (vendorUUID) => {
+    setSelectedVendor(vendorUUID);
+  };
 
-  const filteredProducts = products.filter((product) => {
-    const search = searchTerm.toLowerCase();
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const filteredProducts = filteredData.filter((item) => {
+    const { name, description, quantity, price, id, productuuid, vendor } = item;
+    const lowerCaseQuery = searchQuery.toLowerCase();
     return (
-      product.id.toString().toLowerCase().includes(search) ||
-      product.name.toLowerCase().includes(search) ||
-      product.description.toLowerCase().includes(search) ||
-      product.price.toString().toLowerCase().includes(search) ||
-      product.quantity.toString().toLowerCase().includes(search) ||
-      (product.vendor && product.vendor.name.toLowerCase().includes(search)) // Pencarian berdasarkan nama vendor
+      name.toLowerCase().includes(lowerCaseQuery) ||
+      description.toLowerCase().includes(lowerCaseQuery) ||
+      quantity.toString().includes(lowerCaseQuery) ||
+      price.toString().includes(lowerCaseQuery) ||
+      id.toString().includes(lowerCaseQuery) ||
+      productuuid.toLowerCase().includes(lowerCaseQuery) ||
+      vendor.name.toLowerCase().includes(lowerCaseQuery) // Menggunakan vendor.name
     );
   });
+  
 
   return (
-      <div className="page-container">
-        <div className="Productpages">
-    <div className="container mt-5">
-      <p>Products</p>
-      <div className="my-4">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Search by Name Product&Vendor, Description, Price, or Quantity"
-          value={searchTerm}
-          onChange={handleSearch}
-        />
-      </div>
-      <div className="row row-cols-1 row-cols-md-3 g-4">
-        {filteredProducts.map((product) => (
-          <div className="col mb-4" key={product.id}>
-            <Card className="h-100">
-              <Card.Img variant="top" src={product.imageUrl} />
-              {/* <Card.Img variant="top" /> */}
-              <Card.Body>
-                <p>{product.vendor.name}</p> {/* Menampilkan nama vendor */}
-                <Card.Title>{product.name}</Card.Title>
-                <Card.Text>{product.description}</Card.Text>
-                <div className="d-flex justify-content-between align-items-center">
-                  <Badge bg="primary" className="p-2">
-                    {`Rp ${product.price}`}
-                  </Badge>
-                  <Badge bg="secondary" className="p-2">
-                    {`Quantity: ${product.quantity}`}
-                  </Badge>
+    <div style={{ display: "flex" }}>
+      <div style={{ paddingRight: "5px" }}>
+        <h3>Choose Vendor</h3>
+        <style>
+          {`.list-group {
+            font-size: 12px;
+            width: 240px;
+          }`}
+        </style>
+        <ol className="list-group">
+          {vendor.map((item) => (
+            <li
+              className="list-group-item d-flex justify-content-between align-items-start"
+              key={item.id}
+            >
+              <div
+                className="ms-2 me-auto"
+                onClick={() => handleVendorSelection(item.vendoruuid)}
+              >
+                <div className="fw-bold">{item.name}</div>
+                {item.address}
+              </div>
+              <span className="badge bg-primary rounded-pill">10</span>
+            </li>
+          ))}
+        </ol>
+        {selectedVendor && (
                   <button
-                    className="btn btn-primary"
-                    onClick={() => showOrderConfirmation(product)}
-                  >
-                    Order
-                  </button>
-                </div>
-              </Card.Body>
-            </Card>
-          </div>
-        ))}
-<Modal show={showNotAvailableModal} onHide={handleNotAvailableModalClose}>
-  <Modal.Header closeButton>
-    <Modal.Title>Product Unavailable</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <p>Maaf, produk ini sudah tidak tersedia.</p>
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="primary" onClick={handleNotAvailableModalClose}>
-      Close
-    </Button>
-  </Modal.Footer>
-</Modal>
+                  className="btn btn-primary"
+                  style={{ marginLeft: "10px", marginTop: "15px" }}
+                  onClick={handlePendingProducts}
+                >
+                  See Pending Product
+                </button>
+        )}
+      </div>
 
-<Modal show={showConfirmation} onHide={handleConfirmationClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>Order Confirmation</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {selectedProduct && (
-          <p>
-            Apakah Anda yakin ingin melakukan pemesanan produk{" "}
-            <strong>{selectedProduct.name}</strong>?
-          </p>
-        )}
-        {selectedProduct && selectedProduct.quantity === 0 && (
-          <p>Maaf, produk ini sudah tidak tersedia.</p> // Tampilkan pesan bahwa produk sudah tidak tersedia
-        )}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleConfirmationClose}>
-          Cancel
-        </Button>
-        <Button variant="primary" onClick={handleOrderConfirmation}>
-          Order
-        </Button>
-      </Modal.Footer>
-    </Modal>
-      </div>
-      <div className="d-flex justify-content-between align-items-center">
-        <button className="btn btn-primary" onClick={prevPage}>
-          Previous Page
-        </button>
-        <p>
-          Page {page + 1} of {totalPages}
-        </p>
-        <button className="btn btn-primary" onClick={nextPage}>
-          Next Page
-        </button>
-      </div>
-    </div>
+      {selectedVendor && (
+        <div style={{ flex: 1 }}>
+          <div className="row justify-content-start">
+            <div className="col-md-12 mb-4">
+              <div className="input-group mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search..."
+                  aria-label="Search"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  style={{marginTop: "15px"}}
+                />
+              </div>
+            </div>
+            {filteredProducts.map((item) => (
+              <div className="col-md-3 mb-4" key={item.id}>
+                <div className="card h-100" style={{ width: "100%" }}>
+                  <img
+                    src={item.imageUrl}
+                    className="card-img-top"
+                    alt="Product"
+                  />
+                  <div className="card-body">
+                    <h5 className="card-title" style={{ fontSize: "12px" }}>
+                      {item.name}
+                    </h5>
+                    <p className="card-text" style={{ fontSize: "10px" }}>
+                      Quantity: {item.quantity}
+                    </p>
+                    <p className="card-text" style={{ fontSize: "10px" }}>
+                      Price: {item.price}
+                    </p>
+                    <p className="card-text" style={{ fontSize: "10px" }}>
+                      Status: {item.status}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+    </div>
   );
 };
 

@@ -1,6 +1,8 @@
 package com.example.pengadaanrsudsamrat.products.DTO;
 
 import com.example.pengadaanrsudsamrat.Category.DTO.CategoryResponseDTO;
+import com.example.pengadaanrsudsamrat.Category.DTO.SubCategoryResponseDTO;
+import com.example.pengadaanrsudsamrat.products.ProductModel;
 import com.example.pengadaanrsudsamrat.vendor.DTO.VendorResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,9 +10,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
-/**
- * The type Product response dto.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,7 +21,8 @@ public class ProductResponseDTO {
     private double price;
     private int quantity;
     private VendorResponseDTO vendor;
+    private ProductModel.Status status;
     private Set<CategoryResponseDTO> categories;
+    private Set<SubCategoryResponseDTO> subcategories;
     private String imageUrl;
-
 }

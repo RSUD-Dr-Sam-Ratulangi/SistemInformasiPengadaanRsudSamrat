@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Table, Pagination, Button, Modal, Form } from 'react-bootstrap';
 import "../assets/vendorpages.css";
+// import { useSelector } from "react-redux";
+import { FaPlus } from 'react-icons/fa';
 
 const Vendorpages = () => {
   const [productList, setProductList] = useState([]);
+  // const username = useSelector((state) => state.auth.user?.username);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(10);
+  const [productsPerPage] = useState(20);
   const [showModal, setShowModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false); // State for confirmation modal
   const [newProduct, setNewProduct] = useState({
@@ -56,12 +59,11 @@ const Vendorpages = () => {
     );
   });
 
-  // Get current products
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage); // Defining totalPages
+   // Get current products
+   const indexOfLastProduct = currentPage * productsPerPage;
+   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+   const totalPages = Math.ceil(filteredProducts.length / productsPerPage); // Defining totalPages
 
   // Change page
   const handlePageChange = (pageNumber) => {
@@ -71,8 +73,8 @@ const Vendorpages = () => {
   // Calculate total pages
   // const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
-  // Modal
-  const handleCloseModal = () => {
+   // Modal
+   const handleCloseModal = () => {
     setShowModal(false);
   };
 
@@ -122,8 +124,14 @@ const Vendorpages = () => {
 
   return (
     <Container>
-      <h2>Request Product List</h2>
-      <Button variant="primary" onClick={handleShowModal}>Add</Button>
+
+      {/* <h2>Selamat Datang , {username}</h2> */}
+      {/* <h2>Request Product List</h2> */}
+      {/* <p>Request Product List</p> */}
+      <Button variant="primary" onClick={handleShowModal} style={{ backgroundColor: '#ccc', border: 'none' }}>
+        <FaPlus style={{ fontSize: '15px', color: '#000' }} />
+      </Button>
+
       <div className="my-4">
         <input
           type="text"
@@ -170,8 +178,6 @@ const Vendorpages = () => {
           </Pagination.Item>
         ))}
       </Pagination>
-
-
 
       <Modal show={showModal} onHide={handleCloseModal} className="modal-background">
   <Modal.Header closeButton>
