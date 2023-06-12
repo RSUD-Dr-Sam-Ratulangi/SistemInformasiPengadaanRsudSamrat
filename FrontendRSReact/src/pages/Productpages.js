@@ -85,7 +85,18 @@ const Productpages = () => {
     console.log(orderedItems);
   };
   const placeOrder = () => {
-    console.log(orderedItems);
+    
+    axios.post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
+    .then((res) => {
+      console.log(res.data.id);
+      const orderItem = orderedItems.map((items) => {
+        return { productId: items.id, quantity: 1 }
+      })
+      axios.post(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
+        orderItem
+      ).then(console.log("Berhasil")).catch((err) => console.log(err));
+      
+    }).catch(err => console.log(err));
   };
   useEffect(() => {
     console.log(orderedItems);
@@ -356,6 +367,9 @@ const Productpages = () => {
                       {item.name}
                     </h5>
                     <p className="card-text" style={{ fontSize: "10px" }}>
+                      ID: {item.id}
+                    </p>
+                    <p className="card-text" style={{ fontSize: "10px" }}>
                       Description: {item.description}
                     </p>
                     <p className="card-text" style={{ fontSize: "10px" }}>
@@ -410,6 +424,7 @@ const Productpages = () => {
                     <hr />
                   </div>
                 ))}
+                 <button onClick={placeOrder}>Place Order</button>
               </div>
             </div>
           </div>
