@@ -9,6 +9,9 @@ const Productpages = () => {
   const [filteredPendingProducts, setFilteredPendingProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [filteredJasaProducts, setFilteredJasaProducts] = useState([]);
+  const [filteredBMProducts, setFilteredBMProducts] = useState([]);
+  const [filteredBHPProducts, setFilteredBHPProducts] = useState([]);
 
 
   // Mengambil data Vendor
@@ -28,6 +31,27 @@ const Productpages = () => {
       const filteredPending = products.filter((item) => item.status === "PENDING");
       setFilteredPendingProducts(filteredPending);
     }
+  }, [products]);
+
+  useEffect(() => { 
+    if (products.length > 0) { 
+      const filteredJasa = products.filter((item) => item.categories && item.categories[0] && item.categories[0].name === "JASA"); 
+      setFilteredJasaProducts(filteredJasa); 
+    } 
+  }, [products]);
+
+  useEffect(() => { 
+    if (products.length > 0) { 
+      const filteredBM = products.filter((item) => item.categories && item.categories[0] && item.categories[0].name === "BM"); 
+      setFilteredBMProducts(filteredBM); 
+    } 
+  }, [products]);
+
+  useEffect(() => { 
+    if (products.length > 0) { 
+      const filteredBHP = products.filter((item) => item.categories && item.categories[0] && item.categories[0].name === "BPH"); 
+      setFilteredBHPProducts(filteredBHP); 
+    } 
   }, [products]);
 
   // Load Vendors
@@ -64,6 +88,18 @@ const Productpages = () => {
 
   const handlePendingProducts = () => {
     setFilteredData(filteredPendingProducts);
+  };
+
+  const handleJasaProducts = () => {
+    setFilteredData(filteredJasaProducts);
+  };
+
+  const handleBMProducts = () => {
+    setFilteredData(filteredBMProducts);
+  };
+
+  const handleBHPProducts = () => {
+    setFilteredData(filteredBHPProducts);
   };
 
   const handleVendorSelection = (vendorUUID) => {
@@ -174,10 +210,11 @@ const Productpages = () => {
                   className={`list-group-item d-flex justify-content-between align-items-start ${
                     selectedCategory === "Jasa" ? "active" : ""
                   }`}
-                  onClick={() => handleCategorySelection("Jasa")}
+                  onClick={() => handleJasaProducts("Jasa")}
                 >
                   <div className="ms-2 me-auto">
                     <div className="fw-bold">Jasa</div>
+                    Select Jasa category
                   </div>
                   {/* <span className="badge bg-primary rounded-pill">10</span> */}
                 </button>
@@ -185,10 +222,11 @@ const Productpages = () => {
                   className={`list-group-item d-flex justify-content-between align-items-start ${
                     selectedCategory === "BM" ? "active" : ""
                   }`}
-                  onClick={() => handleCategorySelection("BM")}
+                  onClick={() => handleBMProducts("BM")}
                 >
                   <div className="ms-2 me-auto">
                     <div className="fw-bold">BM</div>
+                    Select BM category
                   </div>
                   {/* <span className="badge bg-primary rounded-pill">10</span> */}
                 </button>
@@ -224,10 +262,11 @@ const Productpages = () => {
                   className={`list-group-item d-flex justify-content-between align-items-start ${
                     selectedCategory === "BHP" ? "active" : ""
                   }`}
-                  onClick={() => handleCategorySelection("BHP")}
+                  onClick={() => handleBHPProducts("BHP")}
                 >
                   <div className="ms-2 me-auto">
                     <div className="fw-bold">BHP</div>
+                    Select BHP category
                   </div>
                   {/* <span className="badge bg-primary rounded-pill">10</span> */}
                 </button>
