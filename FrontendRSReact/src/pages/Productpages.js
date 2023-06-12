@@ -8,6 +8,8 @@ const Productpages = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [filteredPendingProducts, setFilteredPendingProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+
 
   // Mengambil data Vendor
   useEffect(() => {
@@ -72,6 +74,15 @@ const Productpages = () => {
     setSearchQuery(e.target.value);
   };
 
+  const handleCategorySelection = (category) => {
+    setSelectedCategory(category);
+  };
+  
+  const handleSubcategorySelection = (subcategory) => {
+    // Lakukan tindakan yang sesuai dengan pemilihan subkategori
+    console.log("Selected Subcategory:", subcategory);
+  };
+
   const filteredProducts = filteredData.filter((item) => {
     const { name, description, quantity, price, id, productuuid, vendor } = item;
     const lowerCaseQuery = searchQuery.toLowerCase();
@@ -95,12 +106,28 @@ const Productpages = () => {
           {`.list-group {
             font-size: 12px;
             width: 240px;
-          }`}
+          }
+
+          .vendor-item {
+            cursor: pointer;
+          }
+
+          // .vendor-item:hover {
+          //   background-color: #f2f2f2;
+          // }
+
+          .selected-vendor {
+            background-color: #EDEBEB;
+          }
+          
+          // .selected-vendor:hover {
+          //   background-color: #ffa800;
+          // }`}
         </style>
         <ol className="list-group">
           {vendor.map((item) => (
             <li
-              className="list-group-item d-flex justify-content-between align-items-start"
+              className={`list-group-item d-flex justify-content-between align-items-start ${selectedVendor === item.vendoruuid ? 'selected-vendor' : 'vendor-item'}`}
               key={item.id}
             >
               <div
@@ -115,59 +142,144 @@ const Productpages = () => {
           ))}
         </ol>
         {selectedVendor && (
-                  <button
-                  className="btn btn-primary"
-                  style={{ marginLeft: "10px", marginTop: "15px" }}
-                  onClick={handlePendingProducts}
-                >
-                  See Pending Product
-                </button>
+          <button
+            className="btn btn-primary"
+            style={{ marginLeft: "10px", marginTop: "15px" }}
+            onClick={handlePendingProducts}
+          >
+            See Pending Product
+          </button>
         )}
       </div>
 
       {selectedVendor && (
         <div style={{ flex: 1 }}>
           <div className="row justify-content-start">
-            <div className="col-md-12 mb-4">
-              <div className="input-group mb-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search..."
-                  aria-label="Search"
-                  value={searchQuery}
-                  onChange={handleSearch}
-                  style={{marginTop: "15px"}}
-                />
+                  <div className="col-md-12 mb-4">
+                    <div className="input-group mb-3">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search..."
+                        aria-label="Search"
+                        value={searchQuery}
+                        onChange={handleSearch}
+                        style={{ marginTop: "40px" }}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-12 mb-4">
+              <div className="list-group">
+                <button
+                  className={`list-group-item d-flex justify-content-between align-items-start ${
+                    selectedCategory === "Jasa" ? "active" : ""
+                  }`}
+                  onClick={() => handleCategorySelection("Jasa")}
+                >
+                  <div className="ms-2 me-auto">
+                    <div className="fw-bold">Jasa</div>
+                  </div>
+                  {/* <span className="badge bg-primary rounded-pill">10</span> */}
+                </button>
+                <button
+                  className={`list-group-item d-flex justify-content-between align-items-start ${
+                    selectedCategory === "BM" ? "active" : ""
+                  }`}
+                  onClick={() => handleCategorySelection("BM")}
+                >
+                  <div className="ms-2 me-auto">
+                    <div className="fw-bold">BM</div>
+                  </div>
+                  {/* <span className="badge bg-primary rounded-pill">10</span> */}
+                </button>
+                {selectedCategory === "BM" && (
+                  <ul className="list-group mt-2">
+                    <li className="list-group-item">
+                      <button
+                        className="list-group-item d-flex justify-content-between align-items-start"
+                        onClick={() => handleSubcategorySelection("Alkes")}
+                      >
+                        <div className="ms-2 me-auto">Alkes</div>
+                      </button>
+                    </li>
+                    <li className="list-group-item">
+                      <button
+                        className="list-group-item d-flex justify-content-between align-items-start"
+                        onClick={() => handleSubcategorySelection("Alkon")}
+                      >
+                        <div className="ms-2 me-auto">Alkon</div>
+                      </button>
+                    </li>
+                    <li className="list-group-item">
+                      <button
+                        className="list-group-item d-flex justify-content-between align-items-start"
+                        onClick={() => handleSubcategorySelection("Peralatan Lainnya")}
+                      >
+                        <div className="ms-2 me-auto">Peralatan Lainnya</div>
+                      </button>
+                    </li>
+                  </ul>
+                )}
+                <button
+                  className={`list-group-item d-flex justify-content-between align-items-start ${
+                    selectedCategory === "BHP" ? "active" : ""
+                  }`}
+                  onClick={() => handleCategorySelection("BHP")}
+                >
+                  <div className="ms-2 me-auto">
+                    <div className="fw-bold">BHP</div>
+                  </div>
+                  {/* <span className="badge bg-primary rounded-pill">10</span> */}
+                </button>
+                {selectedCategory === "BHP" && (
+                  <ul className="list-group mt-2">
+                    <li className="list-group-item">
+                      <button
+                        className="list-group-item d-flex justify-content-between align-items-start"
+                        onClick={() => handleSubcategorySelection("BHP Non Medis")}
+                      >
+                        <div className="ms-2 me-auto">BHP Non Medis</div>
+                      </button>
+                    </li>
+                    <li className="list-group-item">
+                      <button
+                        className="list-group-item d-flex justify-content-between align-items-start"
+                        onClick={() => handleSubcategorySelection("BHP Medis")}
+                      >
+                        <div className="ms-2 me-auto">BHP Medis</div>
+                      </button>
+                    </li>
+                  </ul>
+                )}
               </div>
             </div>
-            {filteredProducts.map((item) => (
-              <div className="col-md-3 mb-4" key={item.id}>
-                <div className="card h-100" style={{ width: "100%" }}>
-                  <img
-                    src={item.imageUrl}
-                    className="card-img-top"
-                    alt="Product"
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title" style={{ fontSize: "12px" }}>
-                      {item.name}
-                    </h5>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      Quantity: {item.quantity}
-                    </p>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      Price: {item.price}
-                    </p>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      Status: {item.status}
-                    </p>
+
+              {filteredProducts.map((item) => (
+                <div className="col-md-3 mb-4" key={item.id}>
+                  <div className="card h-100" style={{ width: "100%" }}>
+                    <img src={item.imageUrl} className="card-img-top" alt="Product" />
+                    <div className="card-body">
+                      <h5 className="card-title" style={{ fontSize: "12px" }}>
+                        {item.name}
+                      </h5>
+                      <p className="card-text" style={{ fontSize: "10px" }}>
+                        Description: {item.description}
+                      </p>
+                      <p className="card-text" style={{ fontSize: "10px" }}>
+                        Quantity: {item.quantity}
+                      </p>
+                      <p className="card-text" style={{ fontSize: "10px" }}>
+                        Price: {item.price}
+                      </p>
+                      <p className="card-text" style={{ fontSize: "10px" }}>
+                        Status: {item.status}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
-        </div>
+        </div>            
       )}
     </div>
   );
