@@ -47,6 +47,18 @@
                       <input type="checkbox" v-model="product.categoryIds" :value="2">
                       Elektronik
                     </label>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.categoryIds" :value="3">
+                      BPH
+                    </label>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.categoryIds" :value="4">
+                      BM
+                    </label>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.categoryIds" :value="5">
+                      JASA
+                    </label>
                   </div>
                 </div>
                 <button class="button is-primary" type="submit">Submit</button>
@@ -86,6 +98,7 @@ export default {
         description: "",
         imageUrl: "",
         categoryIds: [],
+        subCategoryId: [1]
       },
       message: "",
     };
