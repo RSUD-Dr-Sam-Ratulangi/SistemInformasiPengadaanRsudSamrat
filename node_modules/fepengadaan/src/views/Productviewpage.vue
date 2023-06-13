@@ -27,6 +27,8 @@
           <th>Price</th>
           <th>Quantity</th>
           <th>Status</th>
+          <th>Categories</th>
+          <th>Sub Categories</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -36,7 +38,13 @@
           <td>{{ product.price }}</td>
           <td>{{ product.quantity }}</td>
           <td>{{ product.status }}</td>
-          <td><button @click="deleteProduct(product.productuuid, product.name)">Delete</button></td>
+          <td v-if="product.categories && product.categories.length > 0">{{ product.categories[0].name }}</td>
+          <td v-else>No category available</td>
+          <td v-if="product.subcategories && product.subcategories.length > 0">{{ product.subcategories[0].name }}</td>
+          <td v-else>No Sub Category</td>
+          <td><button class="button is-danger"
+              @click="deleteProduct(product.productuuid, product.name)">Delete</button><button
+              class="button is-primary">Details</button></td>
         </tr>
       </tbody>
     </table>
@@ -121,6 +129,7 @@ export default {
       )
       .then((response) => {
         this.products = response.data;
+        console.log(response.data)
       })
       .catch((err) => {
         console.log(`Terjadi error guyss, ${err}`);

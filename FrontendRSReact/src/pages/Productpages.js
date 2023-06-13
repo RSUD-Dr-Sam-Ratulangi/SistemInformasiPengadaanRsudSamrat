@@ -84,8 +84,8 @@ const Productpages = () => {
     setShowToast(true);
     console.log(orderedItems);
   };
+
   const placeOrder = () => {
-    
     axios.post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
     .then((res) => {
       console.log(res.data.id);
@@ -95,9 +95,10 @@ const Productpages = () => {
       axios.post(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
         orderItem
       ).then(console.log("Berhasil")).catch((err) => console.log(err));
-      
+
     }).catch(err => console.log(err));
   };
+
   useEffect(() => {
     console.log(orderedItems);
   }, [orderedItems]);
@@ -279,7 +280,7 @@ const Productpages = () => {
                   className={`list-group-item d-flex justify-content-between align-items-start ${
                     selectedCategory === "BM" ? "active" : ""
                   }`}
-                  onClick={() => handleBMProducts("BM")}
+                  onClick={() => handleCategorySelection("BM")}
                 >
                   <div className="ms-2 me-auto">
                     <div className="fw-bold">BM</div>
@@ -292,7 +293,7 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleSubcategorySelection("Alkes")}
+                        onClick={() => handleBMProducts("Alkes")}
                       >
                         <div className="ms-2 me-auto">Alkes</div>
                       </button>
@@ -300,7 +301,7 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleSubcategorySelection("Alkon")}
+                        onClick={() => handleBMProducts("Alkon")}
                       >
                         <div className="ms-2 me-auto">Alkon</div>
                       </button>
@@ -309,7 +310,7 @@ const Productpages = () => {
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
                         onClick={() =>
-                          handleSubcategorySelection("Peralatan Lainnya")
+                          handleBMProducts("Peralatan Lainnya")
                         }
                       >
                         <div className="ms-2 me-auto">Peralatan Lainnya</div>
@@ -321,7 +322,7 @@ const Productpages = () => {
                   className={`list-group-item d-flex justify-content-between align-items-start ${
                     selectedCategory === "BHP" ? "active" : ""
                   }`}
-                  onClick={() => handleBHPProducts("BHP")}
+                  onClick={() => handleCategorySelection("BHP")}
                 >
                   <div className="ms-2 me-auto">
                     <div className="fw-bold">BHP</div>
@@ -335,7 +336,7 @@ const Productpages = () => {
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
                         onClick={() =>
-                          handleSubcategorySelection("BHP Non Medis")
+                          handleBHPProducts("BHP Non Medis")
                         }
                       >
                         <div className="ms-2 me-auto">BHP Non Medis</div>
@@ -344,7 +345,7 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleSubcategorySelection("BHP Medis")}
+                        onClick={() => handleBHPProducts("BHP Medis")}
                       >
                         <div className="ms-2 me-auto">BHP Medis</div>
                       </button>
@@ -395,8 +396,20 @@ const Productpages = () => {
               </div>
             ))}
           </div>
-          <button onClick={placeOrder}>Show all orders</button>
-          <button onClick={showModalOrder}>See modal</button>
+          <button
+            className="btn btn-primary"
+            style={{ marginLeft: "10px", marginTop: "15px" }}
+            onClick={placeOrder}
+          >
+            Show all orders
+          </button>
+          <button
+            className="btn btn-primary"
+            style={{ marginLeft: "10px", marginTop: "15px" }}
+            onClick={showModalOrder}
+          >
+            See modal
+          </button>
         </div>
       )}
 
@@ -424,7 +437,14 @@ const Productpages = () => {
                     <hr />
                   </div>
                 ))}
-                 <button onClick={placeOrder}>Place Order</button>
+                <button
+                  className="btn btn-primary"
+                  style={{ marginLeft: "10px", marginTop: "15px" }}
+                  onClick={placeOrder}
+                >
+                  Place Order
+                </button>
+                
               </div>
             </div>
           </div>
