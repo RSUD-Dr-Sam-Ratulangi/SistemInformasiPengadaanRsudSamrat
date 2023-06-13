@@ -32,6 +32,14 @@
         </div>
       </RouterLink>
     </div>
+    <div>
+      <RouterLink to="/orderDetails">
+        <div class="nav-item">
+          <FontAwesomeIcon icon="fas fa-solid fa-bell"  class="nav-icon" />
+          <p v-if="!isOpen">Orders</p>
+        </div>
+      </RouterLink>
+    </div>
   </div>
 </template>
 
