@@ -10,6 +10,7 @@ const Dashboard = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const username = useSelector((state) => state.auth.user?.username);
   const role = useSelector((state) => state.auth.role);
+  const id = useSelector((state) => state.auth.id)
 
 
   // Mock procurement data
@@ -121,7 +122,7 @@ const Dashboard = () => {
 
   return (
       <div className="dashboard">
-        <h2>Selamat Datang , {username}<br/> role: {role}</h2>
+        <h2>Selamat Datang , {username}<br/> role: {role} id: {id}</h2>
         <div>
         </div>
           {isLoggedIn && (
