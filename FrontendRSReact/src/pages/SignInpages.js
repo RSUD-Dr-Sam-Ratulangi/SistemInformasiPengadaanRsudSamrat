@@ -46,7 +46,7 @@ const SignInpages = () => {
       const { username, id } = loginResponse.data;
       const userResponse = await axios.get(`http://rsudsamrat.site:8080/employee/${id}`);
       const { role } = userResponse.data;
-  
+      console.log(id);
       dispatch(login({ username, id, role }));
       navigate("/");
     } catch (err) {

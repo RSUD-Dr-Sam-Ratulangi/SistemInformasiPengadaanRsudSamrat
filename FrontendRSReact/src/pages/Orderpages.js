@@ -43,6 +43,7 @@ const Orderpages = () => {
   const navigate = useNavigate();
 
   const role = useSelector((state) => state.auth.role);
+  const idUser = useSelector((state) => state.auth.id);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -203,12 +204,21 @@ const Orderpages = () => {
         }
       )
       .then((response) => {
+
         // Handle the response
         console.log("Offer updated:", response.data);
         // Close the offer modal
         setShowOfferModal(false);
         // Update the state to show the success modal
         setIsOfferSubmitted(true);
+        //send notif
+        axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+          sender: role,
+          senderId: idUser,
+          receiver: selectedOrderItem.product.vendor.name,
+          receiverId: selectedOrderItem.product.vendor.id,
+          message: `OFFER PRODUCT FROM ${role}`
+        })
       })
       .catch((error) => {
         // Handle any error that occurred during the API call
@@ -231,6 +241,14 @@ const Orderpages = () => {
         setShowOfferModal(false);
         // Update the state to show the success modal
         setIsOfferAccepted(true);
+
+        axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+          sender: role,
+          senderId: idUser,
+          receiver: selectedOrderItem.product.vendor.name,
+          receiverId: selectedOrderItem.product.vendor.id,
+          message: `Product ${selectedOrderItem.id} Accepted`
+        })
       })
       .catch((error) => {
         // Handle any error that occurred during the API call
