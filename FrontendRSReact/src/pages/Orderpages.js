@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import '../assets/vendorpages.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "../assets/vendorpages.css";
 
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 
-import ModalHistory from '../components/orderPages/ModalHistory';
-import ModalOrderItem from '../components/orderPages/ModalOrderItem';
-import ModalAcceptedOffer from '../components/orderPages/ModalAcceptedOffer';
-import ModalSubmittedOffer from '../components/orderPages/ModalSubmittedOffer';
-import ModalOffer from '../components/orderPages/ModalOffer';
-import ModalPayoutDetails from '../components/orderPages/ModalPayoutDetails';
-import ModalProductDetails from '../components/orderPages/ModalProductDetails';
-import ModalOrderDetails from '../components/orderPages/ModalOrderDetails';
+import ModalHistory from "../components/orderPages/ModalHistory";
+import ModalOrderItem from "../components/orderPages/ModalOrderItem";
+import ModalAcceptedOffer from "../components/orderPages/ModalAcceptedOffer";
+import ModalSubmittedOffer from "../components/orderPages/ModalSubmittedOffer";
+import ModalOffer from "../components/orderPages/ModalOffer";
+import ModalPayoutDetails from "../components/orderPages/ModalPayoutDetails";
+import ModalProductDetails from "../components/orderPages/ModalProductDetails";
+import ModalOrderDetails from "../components/orderPages/ModalOrderDetails";
 
 const Orderpages = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [sort, setSort] = useState('status');
+  const [sort, setSort] = useState("status");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showProductDetailModal, setShowProductDetailModal] = useState(false);
@@ -25,7 +25,7 @@ const Orderpages = () => {
   const [payoutDetails, setPayoutDetails] = useState(null);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [selectedOrderItem, setSelectedOrderItem] = useState(null);
-  const [bidPrice, setBidPrice] = useState('');
+  const [bidPrice, setBidPrice] = useState("");
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
   const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
@@ -41,8 +41,21 @@ const Orderpages = () => {
         const response = await axios.get(
           `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock?page=${page}&sort=${sort}`
         );
-        setData(response.data.content);
-        console.log(response.data);
+
+        // Filter and remove duplicate IDs
+        const uniqueData = [];
+        const seenIds = new Set();
+
+        response.data.content.forEach((item) => {
+          if (!seenIds.has(item.orderId)) {
+            uniqueData.push(item);
+            seenIds.add(item.orderId);
+          }
+        });
+
+        setData(uniqueData);
+        console.log("order filter: ", uniqueData);
+        console.log("order: ", response.data);
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -54,13 +67,13 @@ const Orderpages = () => {
 
   let filteredData = [];
 
-  if (role === 'PPKOM') {
+  if (role === "PPKOM") {
     filteredData = data.filter(
-      (item) => item.status === 'NEGOTIATION' || item.status === 'ORDER'
+      (item) => item.status === "NEGOTIATION" || item.status === "ORDER"
     );
-  } else if (role === 'PP') {
+  } else if (role === "PP") {
     filteredData = data.filter(
-      (item) => item.status === 'CANCEL' || item.status === 'NEGOTIATION'
+      (item) => item.status === "CANCEL" || item.status === "NEGOTIATION"
     );
   }
 
@@ -89,7 +102,7 @@ const Orderpages = () => {
       .then((res) => {
         console.log(res);
         setHistory(res.data);
-        console.log('Berhasil');
+        console.log("Berhasil");
       })
       .catch((err) => console.log(err));
   };
@@ -126,7 +139,7 @@ const Orderpages = () => {
   };
 
   const handleOfferSubmit = () => {
-    const status = 'OFFER';
+    const status = "OFFER";
     // Make the API call to update the order item
     axios
       .put(
@@ -134,12 +147,12 @@ const Orderpages = () => {
         {
           orderItemId: selectedOrderItem.id,
           bidPrice: parseFloat(bidPrice),
-          status: status
+          status: status,
         }
       )
       .then((response) => {
         // Handle the response
-        console.log('Offer updated:', response.data);
+        console.log("Offer updated:", response.data);
         // Close the offer modal
         setShowOfferModal(false);
         // Update the state to show the success modal
@@ -150,17 +163,17 @@ const Orderpages = () => {
           senderId: idUser,
           receiver: selectedOrderItem.product.vendor.name,
           receiverId: selectedOrderItem.product.vendor.id,
-          message: `OFFER PRODUCT FROM ${role}`
+          message: `OFFER PRODUCT FROM ${role}`,
         });
       })
       .catch((error) => {
         // Handle any error that occurred during the API call
-        console.error('Error updating offer:', error);
+        console.error("Error updating offer:", error);
       });
   };
 
   const handleOfferAccepted = () => {
-    const status = 'ACCEPTED';
+    const status = "ACCEPTED";
     // Make the API call to update the order item
     axios
       .put(
@@ -169,7 +182,7 @@ const Orderpages = () => {
       )
       .then((response) => {
         // Handle the response
-        console.log('Offer accepted:', response.data);
+        console.log("Offer accepted:", response.data);
         // Close the offer modal
         setShowOfferModal(false);
         // Update the state to show the success modal
@@ -180,18 +193,18 @@ const Orderpages = () => {
           senderId: idUser,
           receiver: selectedOrderItem.product.vendor.name,
           receiverId: selectedOrderItem.product.vendor.id,
-          message: `Product ${selectedOrderItem.id} Accepted`
+          message: `Product ${selectedOrderItem.id} Accepted`,
         });
       })
       .catch((error) => {
         // Handle any error that occurred during the API call
-        console.error('Error accepting offer:', error);
+        console.error("Error accepting offer:", error);
       });
   };
 
   // Function to handle closing the submit modal
   const handleCloseSubmitModal = () => {
-    console.log('closed modal');
+    console.log("closed modal");
     setSubmitModalOpen(false);
   };
 
@@ -208,7 +221,7 @@ const Orderpages = () => {
       // Create the message to display in the alert
       const orderItemsMessage = orderItems
         .map((orderItem) => `Order Item: ${orderItem.quantity}`)
-        .join(', ');
+        .join(", ");
 
       // Display a success alert with the order items data
       alert(
@@ -216,7 +229,7 @@ const Orderpages = () => {
       );
     } catch (error) {
       // Display an error alert
-      alert('Failed to submit payment to the vendor. Please try again.');
+      alert("Failed to submit payment to the vendor. Please try again.");
     }
   };
 
@@ -227,23 +240,23 @@ const Orderpages = () => {
   };
 
   return (
-    <div className='container'>
+    <div className="container">
       {loading ? (
         <div>Loading...</div>
       ) : (
         <>
           {/* Sort */}
-          <div className='mb-3'>
-            <label htmlFor='sort'>Sort By:</label>
-            <select id='sort' className='form-control'>
-              <option value='orderDate'>Order Status</option>
-              <option value='orderId'>Order ID</option>
+          <div className="mb-3">
+            <label htmlFor="sort">Sort By:</label>
+            <select id="sort" className="form-control">
+              <option value="orderDate">Order Status</option>
+              <option value="orderId">Order ID</option>
             </select>
           </div>
 
           {/* Main Table */}
-          <table className='table'>
-            <thead className='thead-dark'>
+          <table className="table">
+            <thead className="thead-dark">
               <tr>
                 <th>Order ID</th>
                 <th>Order Date</th>
@@ -259,8 +272,9 @@ const Orderpages = () => {
                   <td>{item.status}</td>
                   <td>
                     <button
-                      className='btn btn-primary'
-                      onClick={() => openModal(item.orderId)}>
+                      className="btn btn-primary"
+                      onClick={() => openModal(item.orderId)}
+                    >
                       Nota
                     </button>
                   </td>
@@ -343,16 +357,18 @@ const Orderpages = () => {
           )}
 
           {/* Pagination */}
-          <div className='pagination'>
+          <div className="pagination">
             <button
-              className='btn btn-secondary'
+              className="btn btn-secondary"
               disabled={page === 0}
-              onClick={() => handlePageChange(page - 1)}>
+              onClick={() => handlePageChange(page - 1)}
+            >
               Previous
             </button>
             <button
-              className='btn btn-secondary'
-              onClick={() => handlePageChange(page + 1)}>
+              className="btn btn-secondary"
+              onClick={() => handlePageChange(page + 1)}
+            >
               Next
             </button>
           </div>
