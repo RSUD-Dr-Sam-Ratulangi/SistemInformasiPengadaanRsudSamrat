@@ -1,31 +1,38 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from 'react-router-dom';
-import "../assets/vendorpages.css";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import '../assets/vendorpages.css';
+
+import { useSelector } from 'react-redux';
+
+import ModalHistory from '../components/orderPages/ModalHistory';
+import ModalOrderItem from '../components/orderPages/ModalOrderItem';
+import ModalAcceptedOffer from '../components/orderPages/ModalAcceptedOffer';
+import ModalSubmittedOffer from '../components/orderPages/ModalSubmittedOffer';
+import ModalOffer from '../components/orderPages/ModalOffer';
+import ModalPayoutDetails from '../components/orderPages/ModalPayoutDetails';
+import ModalProductDetails from '../components/orderPages/ModalProductDetails';
+import ModalOrderDetails from '../components/orderPages/ModalOrderDetails';
 
 const Orderpages = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [sort, setSort] = useState("orderDate");
+  const [sort, setSort] = useState('status');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showProductDetailModal, setShowProductDetailModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [payoutDetails, setPayoutDetails] = useState(null);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [selectedOrderItem, setSelectedOrderItem] = useState(null);
-  const [bidPrice, setBidPrice] = useState("");
+  const [bidPrice, setBidPrice] = useState('');
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
-  const navigate = useNavigate();
+  const [isOfferAccepted, setIsOfferAccepted] = useState(false);
+  const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
+  const [history, setHistory] = useState([]);
 
-  const calculatePayoutAmount = (orderItems) => {
-    let totalAmount = 0;
-    for (let i = 0; i < orderItems.length; i++) {
-      const orderItem = orderItems[i];
-      totalAmount += orderItem.quantity * orderItem.product.price;
-    }
-    return totalAmount;
-  };
+  const role = useSelector((state) => state.auth.role);
+  const idUser = useSelector((state) => state.auth.id);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +42,7 @@ const Orderpages = () => {
           `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock?page=${page}&sort=${sort}`
         );
         setData(response.data.content);
+        console.log(response.data);
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -44,12 +52,20 @@ const Orderpages = () => {
     fetchData();
   }, [page, sort]);
 
+  let filteredData = [];
+
+  if (role === 'PPKOM') {
+    filteredData = data.filter(
+      (item) => item.status === 'NEGOTIATION' || item.status === 'ORDER'
+    );
+  } else if (role === 'PP') {
+    filteredData = data.filter(
+      (item) => item.status === 'CANCEL' || item.status === 'NEGOTIATION'
+    );
+  }
+
   const handlePageChange = (newPage) => {
     setPage(newPage);
-  };
-
-  const handleSortChange = (event) => {
-    setSort(event.target.value);
   };
 
   const openModal = async (orderId) => {
@@ -63,16 +79,19 @@ const Orderpages = () => {
     }
   };
 
-  const closeModal = () => {
-    setSelectedOrder(null);
-  };
-
-  const handleQuantityChange = (orderItemId, newQuantity) => { };
-
-  const handleDeleteOrderItem = (orderItemId) => { };
-
-  const handleAddProduct = () => { 
-    navigate('/products');
+  /* History function */
+  const handleHistory = (orderItemId) => {
+    setShowHistoryModal(true);
+    axios
+      .get(
+        `http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${selectedOrder.id}/${orderItemId}`
+      )
+      .then((res) => {
+        console.log(res);
+        setHistory(res.data);
+        console.log('Berhasil');
+      })
+      .catch((err) => console.log(err));
   };
 
   const handleDetailProduct = async (productUuid) => {
@@ -107,42 +126,74 @@ const Orderpages = () => {
   };
 
   const handleOfferSubmit = () => {
-    // // Prepare the request payload
-    // const payload = {
-    //   orderId: selectedOrder.id, // Get the orderId from the selected order
-    //   orderItems: [
-    //     {
-    //       orderItemId: selectedOrderItem.id,
-    //       status: "OFFER",
-    //       bidPrice: parseFloat(bidPrice),
-    //     },
-    //   ],
-    // };
-    const status = "OFFER";
+    const status = 'OFFER';
     // Make the API call to update the order item
     axios
       .put(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/items/${selectedOrderItem.id}`,
-        {orderItemId: selectedOrderItem.id, bidPrice: parseFloat(bidPrice), status: status}
+        {
+          orderItemId: selectedOrderItem.id,
+          bidPrice: parseFloat(bidPrice),
+          status: status
+        }
       )
       .then((response) => {
         // Handle the response
-        console.log("Offer updated:", response.data);
+        console.log('Offer updated:', response.data);
         // Close the offer modal
         setShowOfferModal(false);
-        // You may want to update the order details in the UI after a successful update
+        // Update the state to show the success modal
+        setIsOfferSubmitted(true);
+        //send notif
+        axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+          sender: role,
+          senderId: idUser,
+          receiver: selectedOrderItem.product.vendor.name,
+          receiverId: selectedOrderItem.product.vendor.id,
+          message: `OFFER PRODUCT FROM ${role}`
+        });
       })
       .catch((error) => {
         // Handle any error that occurred during the API call
-        console.error("Error updating offer:", error);
+        console.error('Error updating offer:', error);
+      });
+  };
+
+  const handleOfferAccepted = () => {
+    const status = 'ACCEPTED';
+    // Make the API call to update the order item
+    axios
+      .put(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/items/${selectedOrderItem.id}`,
+        { orderItemId: selectedOrderItem.id, status: status }
+      )
+      .then((response) => {
+        // Handle the response
+        console.log('Offer accepted:', response.data);
+        // Close the offer modal
+        setShowOfferModal(false);
+        // Update the state to show the success modal
+        setIsOfferAccepted(true);
+
+        axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+          sender: role,
+          senderId: idUser,
+          receiver: selectedOrderItem.product.vendor.name,
+          receiverId: selectedOrderItem.product.vendor.id,
+          message: `Product ${selectedOrderItem.id} Accepted`
+        });
+      })
+      .catch((error) => {
+        // Handle any error that occurred during the API call
+        console.error('Error accepting offer:', error);
       });
   };
 
   // Function to handle closing the submit modal
   const handleCloseSubmitModal = () => {
+    console.log('closed modal');
     setSubmitModalOpen(false);
   };
-
 
   const handleSubmitOrderItem = async () => {
     try {
@@ -150,34 +201,23 @@ const Orderpages = () => {
       const response = await axios.put(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/${selectedOrderItem.id}/payment`
       );
-  
-      // Handle the response as needed
-      // ...
-  
+
       // Extract the order items from the response
       const { orderItems } = response.data;
-  
-      // Create the message to display in the alert
-      const orderItemsMessage = orderItems.map(
-        (orderItem) => `Order Item: ${orderItem.quantity}`
-      ).join(", ");
-  
-      // Display a success alert with the order items data
-      alert(`Payment submitted to the vendor successfully!\nOrder Items: ${orderItemsMessage}`);
-    } catch (error) {
-      // Handle any errors
-      // ...
-  
-      // Display an error alert
-      alert("Failed to submit payment to the vendor. Please try again.");
-    }
-  };
-  
 
-  // Function to handle printing the order item to PDF
-  const handlePrintOrderItem = () => {
-    // Generate PDF for the selected order item with price
-    // ...
+      // Create the message to display in the alert
+      const orderItemsMessage = orderItems
+        .map((orderItem) => `Order Item: ${orderItem.quantity}`)
+        .join(', ');
+
+      // Display a success alert with the order items data
+      alert(
+        `Payment submitted to the vendor successfully!\nOrder Items: ${orderItemsMessage}`
+      );
+    } catch (error) {
+      // Display an error alert
+      alert('Failed to submit payment to the vendor. Please try again.');
+    }
   };
 
   // Function to open the submit modal
@@ -186,34 +226,28 @@ const Orderpages = () => {
     setSubmitModalOpen(true);
   };
 
-  // Rest of your code
-
   return (
-    <div className="container">
-      <h2>Order Table</h2>
+    <div className='container'>
       {loading ? (
         <div>Loading...</div>
       ) : (
         <>
-          <div className="mb-3">
-            <label htmlFor="sort">Sort By:</label>
-            <select
-              id="sort"
-              className="form-control"
-              value={sort}
-              onChange={handleSortChange}
-            >
-              <option value="orderDate">Order Date</option>
-              <option value="orderId">Order ID</option>
+          {/* Sort */}
+          <div className='mb-3'>
+            <label htmlFor='sort'>Sort By:</label>
+            <select id='sort' className='form-control'>
+              <option value='orderDate'>Order Status</option>
+              <option value='orderId'>Order ID</option>
             </select>
           </div>
-          <table className="table">
-            <thead className="thead-dark">
+
+          {/* Main Table */}
+          <table className='table'>
+            <thead className='thead-dark'>
               <tr>
                 <th>Order ID</th>
                 <th>Order Date</th>
                 <th>Status</th>
-
                 <th>Operations</th>
               </tr>
             </thead>
@@ -225,9 +259,8 @@ const Orderpages = () => {
                   <td>{item.status}</td>
                   <td>
                     <button
-                      className="btn btn-primary"
-                      onClick={() => openModal(item.orderId)}
-                    >
+                      className='btn btn-primary'
+                      onClick={() => openModal(item.orderId)}>
                       Nota
                     </button>
                   </td>
@@ -236,347 +269,90 @@ const Orderpages = () => {
             </tbody>
           </table>
 
+          {/* Order Details Modal */}
           {selectedOrder && (
-            <div className="modal modal-background" style={{ display: "block" }}>
-              <div className="modal-dialog modal-dialog-centered modal-xl">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h3 className="modal-title">Order Details</h3>
-                    <button
-                      type="button"
-                      className="close"
-                      onClick={closeModal}
-                      aria-label="Close"
-                    >
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <h4>Order Items:</h4>
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          <th>OrderId</th>
-                          <th>Product UUID</th>
-                          <th>Vendor Name</th>
-                          <th>Product Name</th>
-                          <th>Product Price</th>
-                          <th>bidprice</th>
-                          <th>STATUS</th>
-                          <th>Quantity</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedOrder.orderItems.map((orderItem) => (
-                          <tr key={orderItem.id}>
-                            <td>{orderItem.id}</td>
-                            <td>{orderItem.product.productuuid}</td>
-                            <td>{orderItem.product.vendor.name}</td>
-                            <td>{orderItem.product.name}</td>
-                            <td>{orderItem.product.price}</td>
-                            <td>{orderItem.bidPrice}</td>
-                            <td>{orderItem.status}</td>
-                            <td>
-                              <button
-                                className="btn btn-sm btn-secondary"
-                                onClick={() =>
-                                  handleQuantityChange(
-                                    orderItem.id,
-                                    orderItem.quantity - 1
-                                  )
-                                }
-                              >
-                                -
-                              </button>
-                              {orderItem.quantity}
-                              <button
-                                className="btn btn-sm btn-secondary"
-                                onClick={() =>
-                                  handleQuantityChange(
-                                    orderItem.id,
-                                    orderItem.quantity + 1
-                                  )
-                                }
-                              >
-                                +
-                              </button>
-                            </td>
-                            <td>
-                              <button
-                                className="btn btn-sm btn-danger"
-                                onClick={() =>
-                                  handleDeleteOrderItem(orderItem.id)
-                                }
-                              >
-                                Delete
-                              </button>
-                              <button
-                                className="btn btn-sm btn-info"
-                                onClick={() =>
-                                  handleDetailProduct(
-                                    orderItem.product.productuuid
-                                  )
-                                }
-                              >
-                                Detail
-                              </button>
-                              <td>
-                                <button
-                                  className="btn btn-sm btn-warning"
-                                  onClick={() => handleOffer(orderItem.id)}
-                                >
-                                  Offer
-                                </button>
-                              </td>
-                              <td>
-                                {orderItem.status === "ACCEPTED" && (
-                                  <button
-                                    className="btn btn-sm btn-success"
-                                    onClick={() =>
-                                      handleOpenSubmitModal(orderItem)
-                                    }
-                                  >
-                                    Submit
-                                  </button>
-                                )}
-                              </td>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <div>
-                      <button
-                        className="btn btn-primary"
-                        onClick={handleAddProduct}
-                      >
-                        Add Product
-                      </button>
-                    </div>
-                  </div>
-                  <div className="modal-footer">
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={handlePayoutDetail}
-                    >
-                      Payout Detail
-                    </button>
-                    <button type="button" className="btn btn-secondary">
-                      Check Status
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ModalOrderDetails
+              onClose={() => setSelectedOrder(null)}
+              selectedOrder={selectedOrder}
+              handleHistory={handleHistory}
+              handleDetailProduct={handleDetailProduct}
+              handleOffer={handleOffer}
+              handleOpenSubmitModal={handleOpenSubmitModal}
+              handlePayoutDetail={handlePayoutDetail}
+            />
           )}
 
+          {/* Product Details Modal */}
           {showProductDetailModal && selectedProduct && (
-            <div className="modal modal-background" style={{ display: "block" }}>
-              <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h3 className="modal-title">Product Details</h3>
-                    <button
-                      type="button"
-                      className="close"
-                      onClick={() => setShowProductDetailModal(false)}
-                    >
-                      <span>&times;</span>
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <p>Product ID: {selectedProduct.id}</p>
-                    <p>Product UUID: {selectedProduct.productuuid}</p>
-                    <p>Product Name: {selectedProduct.name}</p>
-                    <p>Product Description: {selectedProduct.description}</p>
-                    <p>Product Price: {selectedProduct.price}</p>
-                    <p>Product Quantity: {selectedProduct.quantity}</p>
-                    <p>Vendor ID: {selectedProduct.vendor.id}</p>
-                    <p>Vendor UUID: {selectedProduct.vendor.vendoruuid}</p>
-                    <p>Vendor Name: {selectedProduct.vendor.name}</p>
-                    <p>Vendor Address: {selectedProduct.vendor.address}</p>
-                    <p>
-                      Vendor Phone Number: {selectedProduct.vendor.phoneNumber}
-                    </p>
-                    <p>Vendor Owner ID: {selectedProduct.vendor.owner.id}</p>
-                    <p>
-                      Vendor Owner Username:{" "}
-                      {selectedProduct.vendor.owner.username}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ModalProductDetails
+              onClose={() => setShowProductDetailModal(false)}
+              selectedProduct={selectedProduct}
+            />
           )}
 
+          {/* Payout Details Modal */}
           {payoutDetails && (
-            <div className="modal modal-background" style={{ display: "block" }}>
-              <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h3 className="modal-title">Payout Details</h3>
-                    <button
-                      type="button"
-                      className="close"
-                      onClick={() => setPayoutDetails(null)}
-                    >
-                      <span>&times;</span>
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <h4>Order ID: {payoutDetails.id}</h4>
-                    <h4>Order Date: {payoutDetails.orderDate}</h4>
-                    <h4>Order Items:</h4>
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          <th>Product Name</th>
-                          <th>Quantity</th>
-                          <th>Price</th>
-                          <th>Amount Per Item</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {payoutDetails.orderItems.map((orderItem) => (
-                          <tr key={orderItem.id}>
-                            <td>{orderItem.product.name}</td>
-                            <td>{orderItem.quantity}</td>
-                            <td>{orderItem.product.price}</td>
-                            <td>
-                              {orderItem.quantity * orderItem.product.price}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <h4>
-                      Payout Amount:{" "}
-                      {calculatePayoutAmount(payoutDetails.orderItems)}
-                    </h4>
-                  </div>
-                  <div className="modal-footer">
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      onClick={() => setPayoutDetails(null)}
-                    >
-                      Close
-                    </button>
-                    <button type="button" className="btn btn-info">
-                      Print
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ModalPayoutDetails
+              onClose={() => setPayoutDetails(null)}
+              payoutDetails={payoutDetails}
+            />
           )}
 
+          {/* Offer Modal */}
           {showOfferModal && selectedOrderItem && (
-            <div className="modal modal-background" style={{ display: "block" }}>
-              <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h3 className="modal-title">Make an Offer</h3>
-                    <button
-                      type="button"
-                      className="close"
-                      onClick={() => setShowOfferModal(false)}
-                    >
-                      <span>&times;</span>
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <p>Product: {selectedOrderItem.product.name}</p>
-                    <p>Current Price: {selectedOrderItem.product.price}</p>
-                    <label htmlFor="bidPrice">Enter Your Offer:</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      id="bidPrice"
-                      value={bidPrice}
-                      onChange={(e) => setBidPrice(e.target.value)}
-                    />
-                  </div>
-                  <div className="modal-footer">
-                    <button
-                      type="button"
-                      className="btn btn-success"
-                      onClick={handleOfferSubmit}
-                    >
-                      Submit Offer
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ModalOffer
+              onClose={() => setShowOfferModal(false)}
+              onAccept={handleOfferAccepted}
+              onSubmit={handleOfferSubmit}
+              bidPrice={bidPrice}
+              setBidPrice={setBidPrice}
+              selectedOrderItem={selectedOrderItem}
+            />
           )}
 
-          {selectedOrderItem && (
-            <div
-              className="modal modal-background"
-              style={{ display: submitModalOpen ? "block" : "none" }}
-            >
-            
-              <div className="modal-dialog modal-dialog-centered">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h3 className="modal-title">Submit Order</h3>
-                    <button
-                      type="button"
-                      className="close"
-                      onClick={handleCloseSubmitModal}
-                    >
-                      <span>&times;</span>
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <p>Status: {selectedOrderItem.status}</p>
-                    <p>Bid Price: {selectedOrderItem.bidPrice}</p>
-                    <p>Order Item: {selectedOrderItem.quantity}</p>
-                    <p>Total Price: {selectedOrderItem.bidPrice * selectedOrderItem.quantity}</p>
-                  </div>
-                  <div className="modal-footer">
-                    <button
-                      type="button"
-                      className="btn btn-success"
-                      onClick={handleSubmitOrderItem}
-                    >
-                      Submit
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-danger"
-                      onClick={handleCloseSubmitModal}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-info"
-                      onClick={handlePrintOrderItem}
-                    >
-                      Print
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Submitted Offer Modal */}
+          {isOfferSubmitted && (
+            <ModalSubmittedOffer
+              onClose={() => setIsOfferSubmitted(false)}
+              product={selectedOrderItem.product.name}
+            />
           )}
 
-          <div className="pagination">
+          {/* Accepted Offer Modal */}
+          {isOfferAccepted && (
+            <ModalAcceptedOffer
+              product={selectedOrderItem.product.name}
+              onClose={() => setIsOfferAccepted(false)}
+            />
+          )}
+
+          {/* Order Item Modal */}
+          {selectedOrderItem && submitModalOpen && (
+            <ModalOrderItem
+              onClose={() => handleCloseSubmitModal(null)}
+              onSubmit={() => handleSubmitOrderItem()}
+              selectedOrderItem={selectedOrderItem}
+            />
+          )}
+          {/* History Modal */}
+          {showHistoryModal && (
+            <ModalHistory
+              history={history}
+              onClose={() => setShowHistoryModal(null)}
+            />
+          )}
+
+          {/* Pagination */}
+          <div className='pagination'>
             <button
-              className="btn btn-secondary"
+              className='btn btn-secondary'
               disabled={page === 0}
-              onClick={() => handlePageChange(page - 1)}
-            >
+              onClick={() => handlePageChange(page - 1)}>
               Previous
             </button>
             <button
-              className="btn btn-secondary"
-              onClick={() => handlePageChange(page + 1)}
-            >
+              className='btn btn-secondary'
+              onClick={() => handlePageChange(page + 1)}>
               Next
             </button>
           </div>
