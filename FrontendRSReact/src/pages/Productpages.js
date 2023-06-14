@@ -14,10 +14,6 @@ const Productpages = () => {
   const [filteredPendingProducts, setFilteredPendingProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedSubCategory, setSelectedSubCategory] = useState('');
-  const [filteredJasaProducts, setFilteredJasaProducts] = useState([]);
-  const [filteredBMProducts, setFilteredBMProducts] = useState([]);
-  const [filteredBHPProducts, setFilteredBHPProducts] = useState([]);
 
   //order
   const [orderedItems, setOrderedItems] = useState([]);
@@ -50,80 +46,33 @@ const Productpages = () => {
   }, [products]);
 
   useEffect(() => {
+    console.log(orderedItems);
+  }, [orderedItems]);
+
+  // Filter data produk berdasarkan status "APPROVED"
+  useEffect(() => {
     if (products.length > 0) {
-      const filteredJasa = products.filter(
-        (item) =>
-          item.categories &&
-          item.categories[0] &&
-          item.categories[0].name === "JASA"
+      const filteredProducts = products.filter(
+        (item) => item.status === "APPROVED"
       );
-      setFilteredJasaProducts(filteredJasa);
+      setFilteredData(filteredProducts);
     }
   }, [products]);
 
-  useEffect(() => {
-    if (products.length > 0) {
-      const filteredBM = products.filter(
-        (item) =>
-          item.categories &&
-          item.categories[0] &&
-          item.categories[0].name === "BM"
-      );
-      setFilteredBMProducts(filteredBM);
-    }
-  }, [products]);
 
-  useEffect(() => {
-    if (products.length > 0) {
-      const filteredBHP = products.filter(
-        (item) =>
-          item.categories &&
-          item.categories[0] &&
-          item.categories[0].name === "BPH"
-      );
-      setFilteredBHPProducts(filteredBHP);
-    }
-  }, [products]);
+
+  function showModalOrder() {
+    setShowModalOrderedProduct(true);
+  };
 
   //order
-  const addToCart = (item) => {
+  function addToCart(item) {
     setOrderedItems([...orderedItems, item]);
     setShowToast(true);
     console.log(orderedItems);
   };
 
-
-
-  const CategoryButton = ({ value }) => {
-    return (
-      // <button className={`list-group-item d-flex justify-content-between align items-start ${(selectedCategory === value) ? 'active' : ''}`} onClick={() => handleCategorySelection(value)}>
-      <button type='button' className={`btn btn-secondary ${(selectedCategory === value) ? 'active' : ''}`} onClick={() => handleCategorySelection(value)}>
-        <div className='ms-2 me-auto'>
-          <div className='fw-bold'>{value}</div>
-          Select {value} category
-        </div>
-        {/* <span className="badge bg-primary rounded-pill">10</span> */}
-      </button>
-    );
-  };
-
-  const CategorySubItemButton = ({ onClick, values }) => {
-    return (
-      <ul className='list-group mt-2'>
-        {values.map((item, index) => (
-          <li key={index} className='list-group-item'>
-            <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedSubCategory === item) ? 'active' : ''}`} onClick={() => onClick(item)}>
-              <div className='ms-2 me-auto'>{item}</div>
-            </button>
-          </li>
-        ))}
-      </ul>
-    );
-  };
-
-
-
-  const placeOrder = () => {
+  function placeOrder() {
     axios.post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
     .then((res) => {
       console.log(res.data.id);
@@ -137,15 +86,8 @@ const Productpages = () => {
     }).catch(err => console.log(err));
   };
 
-  useEffect(() => {
-    console.log(orderedItems);
-  }, [orderedItems]);
-  const showModalOrder = () => {
-    setShowModalOrderedProduct(true);
-  };
-
   // Load Vendors
-  const loadVendors = async () => {
+  async function loadVendors() {
     try {
       const response = await axios.get(
         "http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=2&size=25"
@@ -157,60 +99,36 @@ const Productpages = () => {
   };
 
   // Load Vendor Products berdasarkan yang dipilih
-  const loadProducts = async () => {
+  async function loadProducts() {
     try {
-      const respone = await axios.get(
+      const response = await axios.get(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/products/vendor/${selectedVendor}`
       );
-      setProducts(respone.data);
+      setProducts(response.data);
     } catch (err) {
       console.log(err);
     }
   };
 
-  // Filter data produk berdasarkan status "APPROVED"
-  useEffect(() => {
-    if (products.length > 0) {
-      const filteredProducts = products.filter(
-        (item) => item.status === "APPROVED"
-      );
-      setFilteredData(filteredProducts);
-    }
-  }, [products]);
-
-  const handlePendingProducts = () => {
+  function handlePendingProducts() {
     setFilteredData(filteredPendingProducts);
   };
 
-  const handleJasaProducts = () => {
-    setFilteredData(filteredJasaProducts);
-  };
-
-  const handleBMProducts = (value) => {
-    setSelectedSubCategory(value);
-    setFilteredData(filteredBMProducts);
-  };
-
-  const handleBHPProducts = (value) => {
-    setSelectedSubCategory(value);
-    setFilteredData(filteredBHPProducts);
-  };
-
-  const handleVendorSelection = (vendorUUID) => {
+  function handleVendorSelection(vendorUUID) {
     setSelectedVendor(vendorUUID);
   };
 
-  const handleSearch = (e) => {
+  function handleSearch(e) {
     setSearchQuery(e.target.value);
   };
 
-  const handleCategorySelection = (category) => {
+  function handleCategorySelection(category) {
+    filterProductOnCategory(category);
     setSelectedCategory(category);
   };
 
-  const handleSubcategorySelection = (subcategory) => {
-    // Lakukan tindakan yang sesuai dengan pemilihan subkategori
-    console.log("Selected Subcategory:", subcategory);
+  function handleSubcategorySelection(subCategory) {
+    filterProductOnSubCategory(subCategory);
   };
 
   const filteredProducts = filteredData.filter((item) => {
@@ -227,6 +145,47 @@ const Productpages = () => {
       vendor.name.toLowerCase().includes(lowerCaseQuery) // Menggunakan vendor.name
     );
   });
+
+  function filterProductOnCategory(category) {
+    let filteredProducts = [];
+    
+    if(category === 'All') {
+      filteredProducts = products.filter(
+        (item) => item.status === "APPROVED"
+      );
+    }
+    else {
+      products.forEach(product => {
+        if(product.categories.length > 0) {
+          product.categories.forEach(productCategory => {
+            if(category.toLowerCase() === productCategory.name.toLowerCase()) {
+              filteredProducts.push(product);
+            }
+          });
+        }
+      });
+    }
+
+    setFilteredData(filteredProducts);
+  }
+
+  function filterProductOnSubCategory(subCategory) {
+    let filteredProducts = [];
+    
+    products.forEach(product => {
+      if(product.subcategories.length > 0) {
+        product.subcategories.forEach(productSubCategory => {
+          if(subCategory.toLowerCase() === productSubCategory.name.toLowerCase()) {
+            filteredProducts.push(product);
+          }
+        });
+      }
+    });
+
+    setFilteredData(filteredProducts);
+  }
+
+
 
   return (
     <div id='products-page' style={{ display: "flex" }}>
@@ -282,12 +241,17 @@ const Productpages = () => {
             </div>
             <div className="col-md-12 mb-4">
               <div className='list-group list-group-horizontal' style={{width: '100%'}}>
+                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === "All") ? "active" : "light"} category-button`} onClick={() => handleCategorySelection("All")}>
+                  <div className="ms-2 me-auto category-button-text">
+                    <div className="fw-bold category-button-text">All</div>
+                    All category
+                  </div>
+                </button>
                 <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === "Jasa") ? "active" : "light"} category-button`} onClick={() => handleCategorySelection("Jasa")}>
                   <div className="ms-2 me-auto category-button-text">
                     <div className="fw-bold category-button-text">Jasa</div>
                     Jasa category
                   </div>
-                  {/* <span className="badge bg-primary rounded-pill">10</span> */}
                 </button>
                 <Dropdown className='category-button' onClick={() => handleCategorySelection('BM')}>
                   <Dropdown.Toggle variant={(selectedCategory === 'BM' ? 'primary' : 'light')} style={{width: '100%'}}>
@@ -295,12 +259,10 @@ const Productpages = () => {
                       <div className="fw-bold">BM</div>
                       Select BM category
                     </div>
-                    {/* <span className="badge bg-primary rounded-pill">10</span> */}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
-                    <Dropdown.Item>Alkes</Dropdown.Item>
-                    <Dropdown.Item>Alkon</Dropdown.Item>
-                    <Dropdown.Item>Peralatan Lainnya</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleSubcategorySelection('Alkes')}>Alkes</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleSubcategorySelection('Alkon')}>Alkon</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
                 <Dropdown className='category-button' onClick={() => handleCategorySelection('BHP')}>
@@ -309,11 +271,10 @@ const Productpages = () => {
                       <div className="fw-bold">BHP</div>
                       Select BHP category
                     </div>
-                    {/* <span className="badge bg-primary rounded-pill">10</span> */}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
-                    <Dropdown.Item>BHP Non Medis</Dropdown.Item>
-                    <Dropdown.Item>BHP Medis</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleSubcategorySelection('BHP Non Medis')}>BHP Non Medis</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleSubcategorySelection('BHP Medis')}>BHP Medis</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
