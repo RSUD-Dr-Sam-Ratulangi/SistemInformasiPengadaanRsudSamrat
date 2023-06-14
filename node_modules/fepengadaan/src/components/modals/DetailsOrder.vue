@@ -127,6 +127,7 @@
 
 <script>
 import axios from 'axios';
+import { mapGetters } from "vuex";
 
 export default {
   props: {
@@ -159,6 +160,7 @@ export default {
       }
       return vendors;
     },
+    ...mapGetters(["message", "username", "vendoruuid", "vendorid"]),
   },
 
   methods: {
@@ -179,6 +181,13 @@ export default {
       })
         .then((response) => {
           console.log(response.data);
+          axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+            sender: this.username,
+            senderId: this.vendorid,
+            receiver: this.selectedItem.product.vendor.name,
+            receiverId: this.selectedItem.product.vendor.vendorid,
+            message: `Your Product Is Accepted `
+          }).then((res) => console.log(res.data)).catch(err => console.log(err))
           this.$emit('close')
           location.reload();
         })
@@ -204,8 +213,16 @@ export default {
       }).then((response) => {
         console.log(response.data);
         this.showRejectModal = false;
-        this.$emit('close')
-
+        axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+          sender: this.username,
+          senderId: this.vendorid,
+          receiver: this.selectedItem.product.vendor.name,
+          receiverId: this.selectedItem.product.vendor.vendorid,
+          message: `Rejected from Vendor : ${this.username}`
+        }).then((res) => {
+          this.$emit('close')
+        }).catch(err => console.log(err))
+        // this.$emit('close')
       }).catch(err => console.log(err));
     },
     closeModal() {
