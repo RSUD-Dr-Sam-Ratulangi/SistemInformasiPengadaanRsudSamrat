@@ -1,6 +1,6 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
-import { Toast } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Toast, Button, Modal } from "react-bootstrap";
 
 const Productpages = () => {
   const [vendor, setVendor] = useState([]);
@@ -20,6 +20,10 @@ const Productpages = () => {
 
   //notif
   const [showToast, setShowToast] = useState(false);
+
+  const [item, setItem] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   // Mengambil data Vendor
   useEffect(() => {
@@ -79,24 +83,31 @@ const Productpages = () => {
   }, [products]);
 
   //order
-  const addToCart = (item) => {
-    setOrderedItems([...orderedItems, item]);
+  const addToCart = () => {
+    const updatedItem = { ...item, quantity };
+    setOrderedItems([...orderedItems, updatedItem]);
+    setShowModal(false);
     setShowToast(true);
     console.log(orderedItems);
   };
 
   const placeOrder = () => {
-    axios.post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
-    .then((res) => {
-      console.log(res.data.id);
-      const orderItem = orderedItems.map((items) => {
-        return { productId: items.id, quantity: 1 }
+    axios
+      .post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
+      .then((res) => {
+        console.log(res.data.id);
+        const orderItem = orderedItems.map((items) => {
+          return { productId: items.id, quantity: 1 };
+        });
+        axios
+          .post(
+            `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
+            orderItem
+          )
+          .then(console.log("Berhasil"))
+          .catch((err) => console.log(err));
       })
-      axios.post(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
-        orderItem
-      ).then(console.log("Berhasil")).catch((err) => console.log(err));
-
-    }).catch(err => console.log(err));
+      .catch((err) => console.log(err));
   };
 
   useEffect(() => {
@@ -168,6 +179,29 @@ const Productpages = () => {
     setSelectedCategory(category);
   };
 
+  const openModal = (item) => {
+    setItem(item);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setQuantity(1);
+  };
+
+  const removeItem = (itemId) => {
+    const updatedItems = orderedItems.filter((item) => item.id !== itemId);
+    setOrderedItems(updatedItems);
+  };
+
+  const handleCancelClick = () => {
+    // Menghapus semua produk yang telah dipilih (misalnya dalam sebuah array bernama 'selectedProducts')
+    setOrderedItems([]);
+
+    // Mengosongkan halaman modal dengan mengatur state 'showModalOrderedProduct' menjadi false
+    setShowModalOrderedProduct(false);
+  };
+
   const handleSubcategorySelection = (subcategory) => {
     // Lakukan tindakan yang sesuai dengan pemilihan subkategori
     console.log("Selected Subcategory:", subcategory);
@@ -231,13 +265,13 @@ const Productpages = () => {
                 <div className="fw-bold">{item.name}</div>
                 {item.address}
               </div>
-              <span className="badge bg-primary rounded-pill">10</span>
+              {/* <span className="badge bg-primary rounded-pill">10</span> */}
             </li>
           ))}
         </ol>
         {selectedVendor && (
           <button
-            className="btn btn-primary"
+            className="btn btn-light shadow"
             style={{ marginLeft: "10px", marginTop: "15px" }}
             onClick={handlePendingProducts}
           >
@@ -309,9 +343,7 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() =>
-                          handleBMProducts("Peralatan Lainnya")
-                        }
+                        onClick={() => handleBMProducts("Peralatan Lainnya")}
                       >
                         <div className="ms-2 me-auto">Peralatan Lainnya</div>
                       </button>
@@ -335,9 +367,7 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() =>
-                          handleBHPProducts("BHP Non Medis")
-                        }
+                        onClick={() => handleBHPProducts("BHP Non Medis")}
                       >
                         <div className="ms-2 me-auto">BHP Non Medis</div>
                       </button>
@@ -357,7 +387,7 @@ const Productpages = () => {
 
             {filteredProducts.map((item) => (
               <div className="col-md-3 mb-4" key={item.id}>
-                <div className="card h-100" style={{ width: "100%" }}>
+                <div className="card h-100 w-full md:w-3/4 lg:w-1/2 xl:w-1/3">
                   <img
                     src={item.imageUrl}
                     className="card-img-top"
@@ -384,27 +414,47 @@ const Productpages = () => {
                     </p>
                   </div>
                   <button
-                    className="btn btn-primary"
-                    onClick={() => {
-                      addToCart(item);
-                      setShowToast(true);
-                    }}
+                    className="btn btn-dark"
+                    onClick={() => openModal(item)}
                   >
                     Order
                   </button>
+
+                  <Modal show={showModal} onHide={closeModal}>
+                    <Modal.Header closeButton>
+                      <Modal.Title>Add Quantity</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <label>Quantity:</label>
+                      <input
+                        type="number"
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
+                        min={1}
+                      />
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button variant="secondary" onClick={closeModal}>
+                        Close
+                      </Button>
+                      <Button variant="primary" onClick={addToCart}>
+                        Add
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
                 </div>
               </div>
             ))}
           </div>
           <button
-            className="btn btn-primary"
+            className="btn btn-light shadow"
             style={{ marginLeft: "10px", marginTop: "15px" }}
             onClick={placeOrder}
           >
             Show all orders
           </button>
           <button
-            className="btn btn-primary"
+            className="btn btn-light shadow"
             style={{ marginLeft: "10px", marginTop: "15px" }}
             onClick={showModalOrder}
           >
@@ -434,29 +484,48 @@ const Productpages = () => {
                     <p>Description: {item.description}</p>
                     <p>Quantity: {item.quantity}</p>
                     <p>Price: {item.price}</p>
+                    <button
+                      className="btn btn-danger"
+                      style={{ marginRight: "10px" }}
+                      onClick={() => removeItem(item.id)}
+                    >
+                      Delete
+                    </button>
                     <hr />
                   </div>
                 ))}
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-dark"
                   style={{ marginLeft: "10px", marginTop: "15px" }}
                   onClick={placeOrder}
                 >
                   Place Order
                 </button>
-                
+                <button
+                  className="btn btn-dark"
+                  style={{ marginLeft: "10px", marginTop: "15px" }}
+                  onClick={handleCancelClick} // Menambahkan event handler pada button Cancel
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
-        <Toast show={showToast} className="toast-container fixed-top" bg="primary" autohide delay={2000} onClose={() => setShowToast(false)}>
+
+      <Toast
+        show={showToast}
+        className="toast-container fixed-top"
+        bg="primary"
+        autohide
+        delay={2000}
+        onClose={() => setShowToast(false)}
+      >
         <Toast.Header>
           <strong className="me-auto">Notification</strong>
         </Toast.Header>
-        <Toast.Body>
-          Berhasil di tambahkan ke order Details.
-        </Toast.Body>
+        <Toast.Body>Berhasil ditambahkan ke See Modal</Toast.Body>
       </Toast>
     </div>
   );
