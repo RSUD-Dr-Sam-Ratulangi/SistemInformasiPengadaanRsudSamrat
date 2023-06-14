@@ -1,10 +1,18 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { Toast, Dropdown, Modal, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import {
+  Toast,
+  Dropdown,
+  Modal,
+  Button
+} from "react-bootstrap";
 
 import '../assets/css/pages/products.css';
 
 const Productpages = () => {
+  const navigate = useNavigate();
+
   const [vendors, setVendors] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedVendor, setSelectedVendor] = useState(null);
@@ -20,9 +28,11 @@ const Productpages = () => {
   //notif
   const [showToast, setShowToast] = useState(false);
 
-  const [item, setItem] = useState(null);
+  // modal
+  const [selectedItem, setSelectedItem] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [modalErrorMessage, setModalErrorMessage] = useState('');
 
   // Mengambil data Vendor
   useEffect(() => {
@@ -52,9 +62,8 @@ const Productpages = () => {
   // Filter data produk berdasarkan status "APPROVED"
   useEffect(() => {
     if (products.length > 0) {
-      const filteredProducts = products.filter(
-        (item) => item.status === "APPROVED"
-      );
+      console.log('products', products);
+      const filteredProducts = products.filter(item => (item.status === "APPROVED" && item.quantity > 0));
       setFilteredData(filteredProducts);
     }
   }, [products]);
@@ -67,8 +76,11 @@ const Productpages = () => {
 
   //order
   function addToCart() {
-    const updatedItem = { ...item, quantity };
+    const updatedItem = { ...selectedItem, quantity: parseInt(quantity) };
     setOrderedItems([...orderedItems, updatedItem]);
+    setSelectedItem(null);
+    setQuantity(1);
+    setModalErrorMessage('');
     setShowModal(false);
     setShowToast(true);
     console.log(orderedItems);
@@ -80,14 +92,20 @@ const Productpages = () => {
       .then((res) => {
         console.log(res.data.id);
         const orderItem = orderedItems.map((items) => {
-          return { productId: items.id, quantity: 1 };
+          return { productId: items.id, quantity: items.quantity };
         });
         axios
           .post(
             `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
             orderItem
           )
-          .then(console.log("Berhasil"))
+          .then(() => {
+            navigate('/orders');
+            setSelectedItem(null);
+            setShowModal(false);
+            setQuantity(1);
+            setModalErrorMessage('');
+          })
           .catch((err) => console.log(err));
       })
       .catch((err) => console.log(err));
@@ -122,6 +140,7 @@ const Productpages = () => {
   };
 
   function handleVendorSelection(vendorUUID) {
+    setOrderedItems([]);
     setSelectedVendor(vendorUUID);
   };
 
@@ -134,18 +153,26 @@ const Productpages = () => {
     setSelectedCategory(category);
   };
 
-  function handleSubcategorySelection(subCategory) {
+  function handleSubCategorySelection(subCategory) {
     filterProductOnSubCategory(subCategory);
   }
-  const openModal = (item) => {
-    setItem(item);
+
+  function openModal(item) {
+    setSelectedItem(item);
     setShowModal(true);
   };
 
-  const closeModal = () => {
+  function closeModal() {
     setShowModal(false);
     setQuantity(1);
   };
+
+  function handleQuantity(value) {
+    if(parseInt(value) > 0 && parseInt(value) <= selectedItem.quantity) setModalErrorMessage('');
+    else setModalErrorMessage('Quantity is not valid.');
+
+    setQuantity(value);
+  }
 
   const removeItem = (itemId) => {
     const updatedItems = orderedItems.filter((item) => item.id !== itemId);
@@ -177,15 +204,14 @@ const Productpages = () => {
 
   function filterProductOnCategory(category) {
     let filteredProducts = [];
+    console.log('category', category);
     
     if(category === 'All') {
-      filteredProducts = products.filter(
-        (item) => item.status === "APPROVED"
-      );
+      filteredProducts = products.filter(item => (item.status === "APPROVED" && item.quantity > 0));
     }
     else {
       products.forEach(product => {
-        if(product.categories.length > 0) {
+        if(product.categories.length > 0 && product.quantity > 0) {
           product.categories.forEach(productCategory => {
             if(category.toLowerCase() === productCategory.name.toLowerCase()) {
               filteredProducts.push(product);
@@ -195,14 +221,16 @@ const Productpages = () => {
       });
     }
 
+    console.log('filteredProducts category', filteredProducts);
     setFilteredData(filteredProducts);
   }
 
   function filterProductOnSubCategory(subCategory) {
     let filteredProducts = [];
+    console.log('subCategory', subCategory);
     
     products.forEach(product => {
-      if(product.subcategories.length > 0) {
+      if(product.subcategories.length > 0 && product.quantity > 0) {
         product.subcategories.forEach(productSubCategory => {
           if(subCategory.toLowerCase() === productSubCategory.name.toLowerCase()) {
             filteredProducts.push(product);
@@ -211,6 +239,7 @@ const Productpages = () => {
       }
     });
 
+    console.log('filteredProducts subCategory', filteredProducts);
     setFilteredData(filteredProducts);
   }
 
@@ -281,28 +310,28 @@ const Productpages = () => {
                     Jasa category
                   </div>
                 </button>
-                <Dropdown className='category-button' onClick={() => handleCategorySelection('BM')}>
+                <Dropdown className='category-button'>
                   <Dropdown.Toggle variant={(selectedCategory === 'BM' ? 'primary' : 'light')} style={{width: '100%'}}>
-                    <div className="ms-2 me-auto">
+                    <div className="ms-2 me-auto" onClick={() => handleCategorySelection('BM')}>
                       <div className="fw-bold">BM</div>
                       Select BM category
                     </div>
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => handleSubcategorySelection('Alkes')}>Alkes</Dropdown.Item>
-                    <Dropdown.Item onClick={() => handleSubcategorySelection('Alkon')}>Alkon</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleSubCategorySelection('Alkes')}>Alkes</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleSubCategorySelection('Alkon')}>Alkon</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
-                <Dropdown className='category-button' onClick={() => handleCategorySelection('BHP')}>
+                <Dropdown className='category-button'>
                   <Dropdown.Toggle variant={(selectedCategory === 'BHP' ? 'primary' : 'light')} style={{width: '100%'}}>
-                    <div className="ms-2 me-auto">
+                    <div className="ms-2 me-auto" onClick={() => handleCategorySelection('BHP')}>
                       <div className="fw-bold">BHP</div>
                       Select BHP category
                     </div>
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => handleSubcategorySelection('BHP Non Medis')}>BHP Non Medis</Dropdown.Item>
-                    <Dropdown.Item onClick={() => handleSubcategorySelection('BHP Medis')}>BHP Medis</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleSubCategorySelection('BHP Non Medis')}>BHP Non Medis</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleSubCategorySelection('BHP Medis')}>BHP Medis</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
@@ -348,19 +377,22 @@ const Productpages = () => {
                       <Modal.Title>Add Quantity</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                      <label>Quantity:</label>
-                      <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        min={1}
-                      />
+                      <div>
+                        <label>Quantity:</label>
+                        <input
+                          type="number"
+                          value={quantity}
+                          onChange={e => handleQuantity(e.target.value)}
+                          min={1}
+                        />
+                      </div>
+                      <label>{modalErrorMessage}</label>
                     </Modal.Body>
                     <Modal.Footer>
                       <Button variant="secondary" onClick={closeModal}>
                         Close
                       </Button>
-                      <Button variant="primary" onClick={addToCart}>
+                      <Button variant="primary" onClick={addToCart} disabled={(modalErrorMessage.length !== 0)}>
                         Add
                       </Button>
                     </Modal.Footer>
@@ -406,7 +438,7 @@ const Productpages = () => {
                     <p>Name: {item.name}</p>
                     <p>Description: {item.description}</p>
                     <p>Quantity: {item.quantity}</p>
-                    <p>Price: {item.price}</p>
+                    <p>Price: Rp. {item.price * item.quantity}</p>
                     <button
                       className="btn btn-danger"
                       style={{ marginRight: "10px" }}
