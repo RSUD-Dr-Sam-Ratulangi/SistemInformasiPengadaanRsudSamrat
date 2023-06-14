@@ -2,7 +2,6 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Toast, Button, Modal } from "react-bootstrap";
 
-
 const Productpages = () => {
   const [vendor, setVendor] = useState([]);
   const [products, setProducts] = useState([]);
@@ -21,11 +20,10 @@ const Productpages = () => {
 
   //notif
   const [showToast, setShowToast] = useState(false);
-  
+
   const [item, setItem] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [quantity, setQuantity] = useState(1);
-
 
   // Mengambil data Vendor
   useEffect(() => {
@@ -94,17 +92,22 @@ const Productpages = () => {
   };
 
   const placeOrder = () => {
-    axios.post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
-    .then((res) => {
-      console.log(res.data.id);
-      const orderItem = orderedItems.map((items) => {
-        return { productId: items.id, quantity: 1 }
+    axios
+      .post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
+      .then((res) => {
+        console.log(res.data.id);
+        const orderItem = orderedItems.map((items) => {
+          return { productId: items.id, quantity: 1 };
+        });
+        axios
+          .post(
+            `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
+            orderItem
+          )
+          .then(console.log("Berhasil"))
+          .catch((err) => console.log(err));
       })
-      axios.post(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
-        orderItem
-      ).then(console.log("Berhasil")).catch((err) => console.log(err));
-
-    }).catch(err => console.log(err));
+      .catch((err) => console.log(err));
   };
 
   useEffect(() => {
@@ -194,12 +197,10 @@ const Productpages = () => {
   const handleCancelClick = () => {
     // Menghapus semua produk yang telah dipilih (misalnya dalam sebuah array bernama 'selectedProducts')
     setOrderedItems([]);
-  
+
     // Mengosongkan halaman modal dengan mengatur state 'showModalOrderedProduct' menjadi false
     setShowModalOrderedProduct(false);
   };
-  
-
 
   const handleSubcategorySelection = (subcategory) => {
     // Lakukan tindakan yang sesuai dengan pemilihan subkategori
@@ -270,13 +271,12 @@ const Productpages = () => {
         </ol>
         {selectedVendor && (
           <button
-          className="btn btn-light shadow"
-          style={{ marginLeft: "10px", marginTop: "15px" }}
-          onClick={handlePendingProducts}
-        >
-          See Pending Product
-        </button>
-        
+            className="btn btn-light shadow"
+            style={{ marginLeft: "10px", marginTop: "15px" }}
+            onClick={handlePendingProducts}
+          >
+            See Pending Product
+          </button>
         )}
       </div>
 
@@ -343,9 +343,7 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() =>
-                          handleBMProducts("Peralatan Lainnya")
-                        }
+                        onClick={() => handleBMProducts("Peralatan Lainnya")}
                       >
                         <div className="ms-2 me-auto">Peralatan Lainnya</div>
                       </button>
@@ -369,9 +367,7 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() =>
-                          handleBHPProducts("BHP Non Medis")
-                        }
+                        onClick={() => handleBHPProducts("BHP Non Medis")}
                       >
                         <div className="ms-2 me-auto">BHP Non Medis</div>
                       </button>
@@ -446,7 +442,6 @@ const Productpages = () => {
                       </Button>
                     </Modal.Footer>
                   </Modal>
-
                 </div>
               </div>
             ))}
@@ -469,7 +464,7 @@ const Productpages = () => {
       )}
 
       {showModalOrderedProduct && (
-        <div className="modal modal-background" style={{ display: 'block' }}>
+        <div className="modal modal-background" style={{ display: "block" }}>
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
@@ -491,7 +486,7 @@ const Productpages = () => {
                     <p>Price: {item.price}</p>
                     <button
                       className="btn btn-danger"
-                      style={{ marginRight: '10px' }}
+                      style={{ marginRight: "10px" }}
                       onClick={() => removeItem(item.id)}
                     >
                       Delete
@@ -501,26 +496,25 @@ const Productpages = () => {
                 ))}
                 <button
                   className="btn btn-dark"
-                  style={{ marginLeft: '10px', marginTop: '15px' }}
+                  style={{ marginLeft: "10px", marginTop: "15px" }}
                   onClick={placeOrder}
                 >
                   Place Order
                 </button>
                 <button
                   className="btn btn-dark"
-                  style={{ marginLeft: '10px', marginTop: '15px' }}
+                  style={{ marginLeft: "10px", marginTop: "15px" }}
                   onClick={handleCancelClick} // Menambahkan event handler pada button Cancel
                 >
                   Cancel
                 </button>
-                
               </div>
             </div>
           </div>
         </div>
-      )}  
-      
-        <Toast
+      )}
+
+      <Toast
         show={showToast}
         className="toast-container fixed-top"
         bg="primary"
