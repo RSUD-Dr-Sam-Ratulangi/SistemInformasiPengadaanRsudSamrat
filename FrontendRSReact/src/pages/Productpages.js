@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Toast } from "react-bootstrap";
 
 const Productpages = () => {
@@ -231,18 +231,19 @@ const Productpages = () => {
                 <div className="fw-bold">{item.name}</div>
                 {item.address}
               </div>
-              <span className="badge bg-primary rounded-pill">10</span>
+              {/* <span className="badge bg-primary rounded-pill">10</span> */}
             </li>
           ))}
         </ol>
         {selectedVendor && (
           <button
-            className="btn btn-primary"
-            style={{ marginLeft: "10px", marginTop: "15px" }}
-            onClick={handlePendingProducts}
-          >
-            See Pending Product
-          </button>
+          className="btn btn-light shadow"
+          style={{ marginLeft: "10px", marginTop: "15px" }}
+          onClick={handlePendingProducts}
+        >
+          See Pending Product
+        </button>
+        
         )}
       </div>
 
@@ -357,7 +358,7 @@ const Productpages = () => {
 
             {filteredProducts.map((item) => (
               <div className="col-md-3 mb-4" key={item.id}>
-                <div className="card h-100" style={{ width: "100%" }}>
+                <div className="card h-100 w-full md:w-3/4 lg:w-1/2 xl:w-1/3">
                   <img
                     src={item.imageUrl}
                     className="card-img-top"
@@ -384,7 +385,7 @@ const Productpages = () => {
                     </p>
                   </div>
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-dark"
                     onClick={() => {
                       addToCart(item);
                       setShowToast(true);
@@ -397,14 +398,14 @@ const Productpages = () => {
             ))}
           </div>
           <button
-            className="btn btn-primary"
+            className="btn btn-light shadow"
             style={{ marginLeft: "10px", marginTop: "15px" }}
             onClick={placeOrder}
           >
             Show all orders
           </button>
           <button
-            className="btn btn-primary"
+            className="btn btn-light shadow"
             style={{ marginLeft: "10px", marginTop: "15px" }}
             onClick={showModalOrder}
           >
@@ -438,7 +439,7 @@ const Productpages = () => {
                   </div>
                 ))}
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-dark"
                   style={{ marginLeft: "10px", marginTop: "15px" }}
                   onClick={placeOrder}
                 >
