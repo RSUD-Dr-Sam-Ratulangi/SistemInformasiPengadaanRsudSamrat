@@ -40,12 +40,27 @@
                   <div class="field">
                     <p>Categories</p>
                     <label class="checkbox">
-                      <input type="checkbox" v-model="product.categoryIds" :value="1">
-                      Komputer
+                      <input type="checkbox" v-model="product.categoryIds" :value="3">
+                      BPH
                     </label>
                     <label class="checkbox">
-                      <input type="checkbox" v-model="product.categoryIds" :value="2">
-                      Elektronik
+                      <input type="checkbox" v-model="product.categoryIds" :value="4">
+                      BM
+                    </label>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.categoryIds" :value="5">
+                      JASA
+                    </label>
+                  </div>
+                  <div class="field">
+                    <p>Sub Categories</p>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.subCategoryId" :value="1">
+                      NON MEDIS    
+                    </label>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.subCategoryId" :value="2">
+                      MEDIS
                     </label>
                   </div>
                 </div>
@@ -86,6 +101,8 @@ export default {
         description: "",
         imageUrl: "",
         categoryIds: [],
+        subCategoryId: [],
+        status: "PENDING"
       },
       message: "",
     };

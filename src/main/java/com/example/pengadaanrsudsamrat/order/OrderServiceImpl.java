@@ -283,6 +283,9 @@ public class OrderServiceImpl implements OrderService {
 
         // Map the updated response to the request DTO for the subsequent POST request
         BidExchangeHistoryRequestDTO requestDTO = new BidExchangeHistoryRequestDTO();
+        if (savedOrderModel.getId() == null) {
+            throw new IllegalStateException("The savedOrderModel must have a valid ID.");
+        }
         requestDTO.setOrderId(savedOrderModel.getId());
         requestDTO.setOrderDate(savedOrderModel.getOrderDate().toString());
 
@@ -318,13 +321,10 @@ public class OrderServiceImpl implements OrderService {
                 BidExchangeHistoryResponseDTO.class
         );
 
-        // Get the response body from the response entity
+
         BidExchangeHistoryResponseDTO responseDTO = responseEntity.getBody();
 
-        // Map the response DTO back to the appropriate model or DTO if needed
-        // ...
 
-        // Return the updated order response
         return modelMapper.map(savedOrderModel, OrderResponseDTO.class);
     }
 

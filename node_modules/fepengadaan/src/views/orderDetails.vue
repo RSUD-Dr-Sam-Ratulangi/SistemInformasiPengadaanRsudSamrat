@@ -5,6 +5,7 @@
         <tr>
           <th>Order ID</th>
           <th>Tanggal Pesanan</th>
+          <th>Status</th>
           <th>Tindakan</th>
         </tr>
       </thead>
@@ -12,6 +13,7 @@
         <tr v-for="datas in data" :key="datas.id">
           <td>{{ datas.id }}</td>
           <td>{{ datas.orderDate }}</td>
+          <td>{{ datas.status }}</td>
           <td>
             <button @click="selectOrdersItem(datas)" class="button is-primary">Detail</button>
           </td>

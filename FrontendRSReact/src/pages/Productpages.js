@@ -1,5 +1,6 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { Toast } from "react-bootstrap";
 
 const Productpages = () => {
   const [vendor, setVendor] = useState([]);
@@ -13,6 +14,12 @@ const Productpages = () => {
   const [filteredBMProducts, setFilteredBMProducts] = useState([]);
   const [filteredBHPProducts, setFilteredBHPProducts] = useState([]);
 
+  //order
+  const [orderedItems, setOrderedItems] = useState([]);
+  const [showModalOrderedProduct, setShowModalOrderedProduct] = useState(false);
+
+  //notif
+  const [showToast, setShowToast] = useState(false);
 
   // Mengambil data Vendor
   useEffect(() => {
@@ -28,31 +35,76 @@ const Productpages = () => {
 
   useEffect(() => {
     if (products.length > 0) {
-      const filteredPending = products.filter((item) => item.status === "PENDING");
+      const filteredPending = products.filter(
+        (item) => item.status === "PENDING"
+      );
       setFilteredPendingProducts(filteredPending);
     }
   }, [products]);
 
-  useEffect(() => { 
-    if (products.length > 0) { 
-      const filteredJasa = products.filter((item) => item.categories && item.categories[0] && item.categories[0].name === "JASA"); 
-      setFilteredJasaProducts(filteredJasa); 
-    } 
+  useEffect(() => {
+    if (products.length > 0) {
+      const filteredJasa = products.filter(
+        (item) =>
+          item.categories &&
+          item.categories[0] &&
+          item.categories[0].name === "JASA"
+      );
+      setFilteredJasaProducts(filteredJasa);
+    }
   }, [products]);
 
-  useEffect(() => { 
-    if (products.length > 0) { 
-      const filteredBM = products.filter((item) => item.categories && item.categories[0] && item.categories[0].name === "BM"); 
-      setFilteredBMProducts(filteredBM); 
-    } 
+  useEffect(() => {
+    if (products.length > 0) {
+      const filteredBM = products.filter(
+        (item) =>
+          item.categories &&
+          item.categories[0] &&
+          item.categories[0].name === "BM"
+      );
+      setFilteredBMProducts(filteredBM);
+    }
   }, [products]);
 
-  useEffect(() => { 
-    if (products.length > 0) { 
-      const filteredBHP = products.filter((item) => item.categories && item.categories[0] && item.categories[0].name === "BPH"); 
-      setFilteredBHPProducts(filteredBHP); 
-    } 
+  useEffect(() => {
+    if (products.length > 0) {
+      const filteredBHP = products.filter(
+        (item) =>
+          item.categories &&
+          item.categories[0] &&
+          item.categories[0].name === "BPH"
+      );
+      setFilteredBHPProducts(filteredBHP);
+    }
   }, [products]);
+
+  //order
+  const addToCart = (item) => {
+    setOrderedItems([...orderedItems, item]);
+    setShowToast(true);
+    console.log(orderedItems);
+  };
+
+  const placeOrder = () => {
+    axios.post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
+    .then((res) => {
+      console.log(res.data.id);
+      const orderItem = orderedItems.map((items) => {
+        return { productId: items.id, quantity: 1 }
+      })
+      axios.post(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
+        orderItem
+      ).then(console.log("Berhasil")).catch((err) => console.log(err));
+
+    }).catch(err => console.log(err));
+  };
+
+  useEffect(() => {
+    console.log(orderedItems);
+  }, [orderedItems]);
+  const showModalOrder = () => {
+    setShowModalOrderedProduct(true);
+  };
 
   // Load Vendors
   const loadVendors = async () => {
@@ -81,7 +133,9 @@ const Productpages = () => {
   // Filter data produk berdasarkan status "APPROVED"
   useEffect(() => {
     if (products.length > 0) {
-      const filteredProducts = products.filter((item) => item.status === "APPROVED");
+      const filteredProducts = products.filter(
+        (item) => item.status === "APPROVED"
+      );
       setFilteredData(filteredProducts);
     }
   }, [products]);
@@ -113,14 +167,15 @@ const Productpages = () => {
   const handleCategorySelection = (category) => {
     setSelectedCategory(category);
   };
-  
+
   const handleSubcategorySelection = (subcategory) => {
     // Lakukan tindakan yang sesuai dengan pemilihan subkategori
     console.log("Selected Subcategory:", subcategory);
   };
 
   const filteredProducts = filteredData.filter((item) => {
-    const { name, description, quantity, price, id, productuuid, vendor } = item;
+    const { name, description, quantity, price, id, productuuid, vendor } =
+      item;
     const lowerCaseQuery = searchQuery.toLowerCase();
     return (
       name.toLowerCase().includes(lowerCaseQuery) ||
@@ -132,7 +187,6 @@ const Productpages = () => {
       vendor.name.toLowerCase().includes(lowerCaseQuery) // Menggunakan vendor.name
     );
   });
-  
 
   return (
     <div style={{ display: "flex" }}>
@@ -148,22 +202,20 @@ const Productpages = () => {
             cursor: pointer;
           }
 
-          // .vendor-item:hover {
-          //   background-color: #f2f2f2;
-          // }
-
           .selected-vendor {
             background-color: #EDEBEB;
-          }
+          }`}
           
-          // .selected-vendor:hover {
-          //   background-color: #ffa800;
-          // }`}
+        
         </style>
         <ol className="list-group">
           {vendor.map((item) => (
             <li
-              className={`list-group-item d-flex justify-content-between align-items-start ${selectedVendor === item.vendoruuid ? 'selected-vendor' : 'vendor-item'}`}
+              className={`list-group-item d-flex justify-content-between align-items-start ${
+                selectedVendor === item.vendoruuid
+                  ? "selected-vendor"
+                  : "vendor-item"
+              }`}
               key={item.id}
             >
               <div
@@ -173,38 +225,39 @@ const Productpages = () => {
                 <div className="fw-bold">{item.name}</div>
                 {item.address}
               </div>
-              <span className="badge bg-primary rounded-pill">10</span>
+              {/* <span className="badge bg-primary rounded-pill">10</span> */}
             </li>
           ))}
         </ol>
         {selectedVendor && (
           <button
-            className="btn btn-primary"
-            style={{ marginLeft: "10px", marginTop: "15px" }}
-            onClick={handlePendingProducts}
-          >
-            See Pending Product
-          </button>
+          className="btn btn-light shadow"
+          style={{ marginLeft: "10px", marginTop: "15px" }}
+          onClick={handlePendingProducts}
+        >
+          See Pending Product
+        </button>
+        
         )}
       </div>
 
       {selectedVendor && (
         <div style={{ flex: 1 }}>
           <div className="row justify-content-start">
-                  <div className="col-md-12 mb-4">
-                    <div className="input-group mb-3">
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Search..."
-                        aria-label="Search"
-                        value={searchQuery}
-                        onChange={handleSearch}
-                        style={{ marginTop: "40px" }}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-md-12 mb-4">
+            <div className="col-md-12 mb-4">
+              <div className="input-group mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search Product..."
+                  aria-label="Search"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  style={{ marginTop: "40px" }}
+                />
+              </div>
+            </div>
+            <div className="col-md-12 mb-4">
               <div className="list-group">
                 <button
                   className={`list-group-item d-flex justify-content-between align-items-start ${
@@ -222,7 +275,7 @@ const Productpages = () => {
                   className={`list-group-item d-flex justify-content-between align-items-start ${
                     selectedCategory === "BM" ? "active" : ""
                   }`}
-                  onClick={() => handleBMProducts("BM")}
+                  onClick={() => handleCategorySelection("BM")}
                 >
                   <div className="ms-2 me-auto">
                     <div className="fw-bold">BM</div>
@@ -235,7 +288,7 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleSubcategorySelection("Alkes")}
+                        onClick={() => handleBMProducts("Alkes")}
                       >
                         <div className="ms-2 me-auto">Alkes</div>
                       </button>
@@ -243,7 +296,7 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleSubcategorySelection("Alkon")}
+                        onClick={() => handleBMProducts("Alkon")}
                       >
                         <div className="ms-2 me-auto">Alkon</div>
                       </button>
@@ -251,7 +304,9 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleSubcategorySelection("Peralatan Lainnya")}
+                        onClick={() =>
+                          handleBMProducts("Peralatan Lainnya")
+                        }
                       >
                         <div className="ms-2 me-auto">Peralatan Lainnya</div>
                       </button>
@@ -262,7 +317,7 @@ const Productpages = () => {
                   className={`list-group-item d-flex justify-content-between align-items-start ${
                     selectedCategory === "BHP" ? "active" : ""
                   }`}
-                  onClick={() => handleBHPProducts("BHP")}
+                  onClick={() => handleCategorySelection("BHP")}
                 >
                   <div className="ms-2 me-auto">
                     <div className="fw-bold">BHP</div>
@@ -275,7 +330,9 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleSubcategorySelection("BHP Non Medis")}
+                        onClick={() =>
+                          handleBHPProducts("BHP Non Medis")
+                        }
                       >
                         <div className="ms-2 me-auto">BHP Non Medis</div>
                       </button>
@@ -283,7 +340,7 @@ const Productpages = () => {
                     <li className="list-group-item">
                       <button
                         className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleSubcategorySelection("BHP Medis")}
+                        onClick={() => handleBHPProducts("BHP Medis")}
                       >
                         <div className="ms-2 me-auto">BHP Medis</div>
                       </button>
@@ -293,33 +350,109 @@ const Productpages = () => {
               </div>
             </div>
 
-              {filteredProducts.map((item) => (
-                <div className="col-md-3 mb-4" key={item.id}>
-                  <div className="card h-100" style={{ width: "100%" }}>
-                    <img src={item.imageUrl} className="card-img-top" alt="Product" />
-                    <div className="card-body">
-                      <h5 className="card-title" style={{ fontSize: "12px" }}>
-                        {item.name}
-                      </h5>
-                      <p className="card-text" style={{ fontSize: "10px" }}>
-                        Description: {item.description}
-                      </p>
-                      <p className="card-text" style={{ fontSize: "10px" }}>
-                        Quantity: {item.quantity}
-                      </p>
-                      <p className="card-text" style={{ fontSize: "10px" }}>
-                        Price: {item.price}
-                      </p>
-                      <p className="card-text" style={{ fontSize: "10px" }}>
-                        Status: {item.status}
-                      </p>
-                    </div>
+            {filteredProducts.map((item) => (
+              <div className="col-md-3 mb-4" key={item.id}>
+                <div className="card h-100 w-full md:w-3/4 lg:w-1/2 xl:w-1/3">
+                  <img
+                    src={item.imageUrl}
+                    className="card-img-top"
+                    alt="Product"
+                  />
+                  <div className="card-body">
+                    <h5 className="card-title" style={{ fontSize: "12px" }}>
+                      {item.name}
+                    </h5>
+                    <p className="card-text" style={{ fontSize: "10px" }}>
+                      ID: {item.id}
+                    </p>
+                    <p className="card-text" style={{ fontSize: "10px" }}>
+                      Description: {item.description}
+                    </p>
+                    <p className="card-text" style={{ fontSize: "10px" }}>
+                      Quantity: {item.quantity}
+                    </p>
+                    <p className="card-text" style={{ fontSize: "10px" }}>
+                      Price: {item.price}
+                    </p>
+                    <p className="card-text" style={{ fontSize: "10px" }}>
+                      Status: {item.status}
+                    </p>
                   </div>
+                  <button
+                    className="btn btn-dark"
+                    onClick={() => {
+                      addToCart(item);
+                      setShowToast(true);
+                    }}
+                  >
+                    Order
+                  </button>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
-        </div>            
+          <button
+            className="btn btn-light shadow"
+            style={{ marginLeft: "10px", marginTop: "15px" }}
+            onClick={placeOrder}
+          >
+            Show all orders
+          </button>
+          <button
+            className="btn btn-light shadow"
+            style={{ marginLeft: "10px", marginTop: "15px" }}
+            onClick={showModalOrder}
+          >
+            See modal
+          </button>
+        </div>
       )}
+
+      {showModalOrderedProduct && (
+        <div className="modal modal-background" style={{ display: "block" }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h3 className="modal-title">Product Details</h3>
+                <button
+                  type="button"
+                  className="close"
+                  onClick={() => setShowModalOrderedProduct(false)}
+                >
+                  <span>&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                {orderedItems.map((item) => (
+                  <div key={item.id}>
+                    <p>Name: {item.name}</p>
+                    <p>Description: {item.description}</p>
+                    <p>Quantity: {item.quantity}</p>
+                    <p>Price: {item.price}</p>
+                    <hr />
+                  </div>
+                ))}
+                <button
+                  className="btn btn-dark"
+                  style={{ marginLeft: "10px", marginTop: "15px" }}
+                  onClick={placeOrder}
+                >
+                  Place Order
+                </button>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+        <Toast show={showToast} className="toast-container fixed-top" bg="primary" autohide delay={2000} onClose={() => setShowToast(false)}>
+        <Toast.Header>
+          <strong className="me-auto">Notification</strong>
+        </Toast.Header>
+        <Toast.Body>
+          Berhasil di tambahkan ke order Details.
+        </Toast.Body>
+      </Toast>
     </div>
   );
 };

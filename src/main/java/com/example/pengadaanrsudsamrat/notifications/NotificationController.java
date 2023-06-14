@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pengadaan/dev/v1/bids/notifications")
+@RequestMapping("/pengadaan/dev/v1/notifications")
 public class NotificationController {
 
     private final NotificationsService notificationService;

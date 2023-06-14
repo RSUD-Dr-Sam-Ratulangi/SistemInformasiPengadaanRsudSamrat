@@ -1,5 +1,11 @@
 <template>
   <div class="sidenav" :class="{ open: isOpen }">
+    <RouterLink to="/notifications">
+        <div class="nav-item">
+          <FontAwesomeIcon icon="fas fa-solid fa-bell"  class="nav-icon" />
+          <p v-if="!isOpen">Orders</p>
+        </div>
+      </RouterLink>
     <div>
       <RouterLink to="/">
         <div class="nav-item">
@@ -31,6 +37,8 @@
           <p v-if="!isOpen">Orders</p>
         </div>
       </RouterLink>
+    </div>
+    <div>
     </div>
   </div>
 </template>
