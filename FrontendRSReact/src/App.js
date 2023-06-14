@@ -3,7 +3,7 @@ import Routers from './config';
 
 const App = () => {
   return (
-      <Routers />
+    <Routers />
   );
 }
 
