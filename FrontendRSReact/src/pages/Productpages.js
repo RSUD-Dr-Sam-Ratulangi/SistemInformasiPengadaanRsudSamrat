@@ -1,15 +1,20 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { Toast } from "react-bootstrap";
+import { Toast, Dropdown } from "react-bootstrap";
+
+import '../assets/css/pages/products.css';
+
+
 
 const Productpages = () => {
-  const [vendor, setVendor] = useState([]);
+  const [vendors, setVendors] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
   const [filteredPendingProducts, setFilteredPendingProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [filteredJasaProducts, setFilteredJasaProducts] = useState([]);
   const [filteredBMProducts, setFilteredBMProducts] = useState([]);
   const [filteredBHPProducts, setFilteredBHPProducts] = useState([]);
@@ -20,6 +25,8 @@ const Productpages = () => {
 
   //notif
   const [showToast, setShowToast] = useState(false);
+
+
 
   // Mengambil data Vendor
   useEffect(() => {
@@ -85,6 +92,37 @@ const Productpages = () => {
     console.log(orderedItems);
   };
 
+
+
+  const CategoryButton = ({ value }) => {
+    return (
+      // <button className={`list-group-item d-flex justify-content-between align items-start ${(selectedCategory === value) ? 'active' : ''}`} onClick={() => handleCategorySelection(value)}>
+      <button type='button' className={`btn btn-secondary ${(selectedCategory === value) ? 'active' : ''}`} onClick={() => handleCategorySelection(value)}>
+        <div className='ms-2 me-auto'>
+          <div className='fw-bold'>{value}</div>
+          Select {value} category
+        </div>
+        {/* <span className="badge bg-primary rounded-pill">10</span> */}
+      </button>
+    );
+  };
+
+  const CategorySubItemButton = ({ onClick, values }) => {
+    return (
+      <ul className='list-group mt-2'>
+        {values.map((item, index) => (
+          <li key={index} className='list-group-item'>
+            <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedSubCategory === item) ? 'active' : ''}`} onClick={() => onClick(item)}>
+              <div className='ms-2 me-auto'>{item}</div>
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
+
+
   const placeOrder = () => {
     axios.post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
     .then((res) => {
@@ -112,7 +150,7 @@ const Productpages = () => {
       const response = await axios.get(
         "http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=2&size=25"
       );
-      setVendor(response.data);
+      setVendors(response.data);
     } catch (err) {
       console.log(err);
     }
@@ -148,11 +186,13 @@ const Productpages = () => {
     setFilteredData(filteredJasaProducts);
   };
 
-  const handleBMProducts = () => {
+  const handleBMProducts = (value) => {
+    setSelectedSubCategory(value);
     setFilteredData(filteredBMProducts);
   };
 
-  const handleBHPProducts = () => {
+  const handleBHPProducts = (value) => {
+    setSelectedSubCategory(value);
     setFilteredData(filteredBHPProducts);
   };
 
@@ -189,27 +229,12 @@ const Productpages = () => {
   });
 
   return (
-    <div style={{ display: "flex" }}>
+    <div id='products-page' style={{ display: "flex" }}>
       <div style={{ paddingRight: "5px" }}>
         <h3>Choose Vendor</h3>
-        <style>
-          {`.list-group {
-            font-size: 12px;
-            width: 240px;
-          }
-
-          .vendor-item {
-            cursor: pointer;
-          }
-
-          .selected-vendor {
-            background-color: #EDEBEB;
-          }`}
-          
         
-        </style>
         <ol className="list-group">
-          {vendor.map((item) => (
+          {vendors.map((item) => (
             <li
               className={`list-group-item d-flex justify-content-between align-items-start ${
                 selectedVendor === item.vendoruuid
@@ -217,11 +242,9 @@ const Productpages = () => {
                   : "vendor-item"
               }`}
               key={item.id}
+              onClick={() => handleVendorSelection(item.vendoruuid)}
             >
-              <div
-                className="ms-2 me-auto"
-                onClick={() => handleVendorSelection(item.vendoruuid)}
-              >
+              <div className="ms-2 me-auto">
                 <div className="fw-bold">{item.name}</div>
                 {item.address}
               </div>
@@ -258,95 +281,41 @@ const Productpages = () => {
               </div>
             </div>
             <div className="col-md-12 mb-4">
-              <div className="list-group">
-                <button
-                  className={`list-group-item d-flex justify-content-between align-items-start ${
-                    selectedCategory === "Jasa" ? "active" : ""
-                  }`}
-                  onClick={() => handleJasaProducts("Jasa")}
-                >
-                  <div className="ms-2 me-auto">
-                    <div className="fw-bold">Jasa</div>
-                    Select Jasa category
+              <div className='list-group list-group-horizontal' style={{width: '100%'}}>
+                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === "Jasa") ? "active" : "light"} category-button`} onClick={() => handleCategorySelection("Jasa")}>
+                  <div className="ms-2 me-auto category-button-text">
+                    <div className="fw-bold category-button-text">Jasa</div>
+                    Jasa category
                   </div>
                   {/* <span className="badge bg-primary rounded-pill">10</span> */}
                 </button>
-                <button
-                  className={`list-group-item d-flex justify-content-between align-items-start ${
-                    selectedCategory === "BM" ? "active" : ""
-                  }`}
-                  onClick={() => handleCategorySelection("BM")}
-                >
-                  <div className="ms-2 me-auto">
-                    <div className="fw-bold">BM</div>
-                    Select BM category
-                  </div>
-                  {/* <span className="badge bg-primary rounded-pill">10</span> */}
-                </button>
-                {selectedCategory === "BM" && (
-                  <ul className="list-group mt-2">
-                    <li className="list-group-item">
-                      <button
-                        className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleBMProducts("Alkes")}
-                      >
-                        <div className="ms-2 me-auto">Alkes</div>
-                      </button>
-                    </li>
-                    <li className="list-group-item">
-                      <button
-                        className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleBMProducts("Alkon")}
-                      >
-                        <div className="ms-2 me-auto">Alkon</div>
-                      </button>
-                    </li>
-                    <li className="list-group-item">
-                      <button
-                        className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() =>
-                          handleBMProducts("Peralatan Lainnya")
-                        }
-                      >
-                        <div className="ms-2 me-auto">Peralatan Lainnya</div>
-                      </button>
-                    </li>
-                  </ul>
-                )}
-                <button
-                  className={`list-group-item d-flex justify-content-between align-items-start ${
-                    selectedCategory === "BHP" ? "active" : ""
-                  }`}
-                  onClick={() => handleCategorySelection("BHP")}
-                >
-                  <div className="ms-2 me-auto">
-                    <div className="fw-bold">BHP</div>
-                    Select BHP category
-                  </div>
-                  {/* <span className="badge bg-primary rounded-pill">10</span> */}
-                </button>
-                {selectedCategory === "BHP" && (
-                  <ul className="list-group mt-2">
-                    <li className="list-group-item">
-                      <button
-                        className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() =>
-                          handleBHPProducts("BHP Non Medis")
-                        }
-                      >
-                        <div className="ms-2 me-auto">BHP Non Medis</div>
-                      </button>
-                    </li>
-                    <li className="list-group-item">
-                      <button
-                        className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleBHPProducts("BHP Medis")}
-                      >
-                        <div className="ms-2 me-auto">BHP Medis</div>
-                      </button>
-                    </li>
-                  </ul>
-                )}
+                <Dropdown className='category-button' onClick={() => handleCategorySelection('BM')}>
+                  <Dropdown.Toggle variant={(selectedCategory === 'BM' ? 'primary' : 'light')} style={{width: '100%'}}>
+                    <div className="ms-2 me-auto">
+                      <div className="fw-bold">BM</div>
+                      Select BM category
+                    </div>
+                    {/* <span className="badge bg-primary rounded-pill">10</span> */}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item>Alkes</Dropdown.Item>
+                    <Dropdown.Item>Alkon</Dropdown.Item>
+                    <Dropdown.Item>Peralatan Lainnya</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+                <Dropdown className='category-button' onClick={() => handleCategorySelection('BHP')}>
+                  <Dropdown.Toggle variant={(selectedCategory === 'BHP' ? 'primary' : 'light')} style={{width: '100%'}}>
+                    <div className="ms-2 me-auto">
+                      <div className="fw-bold">BHP</div>
+                      Select BHP category
+                    </div>
+                    {/* <span className="badge bg-primary rounded-pill">10</span> */}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item>BHP Non Medis</Dropdown.Item>
+                    <Dropdown.Item>BHP Medis</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </div>
             </div>
 

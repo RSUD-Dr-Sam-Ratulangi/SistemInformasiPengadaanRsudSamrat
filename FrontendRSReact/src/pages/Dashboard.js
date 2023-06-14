@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import Chart from "chart.js/auto";
 // import Footer from "../components/Footer";
-import "../assets/navigation.css";
-import "../assets/dashboard.css"
+import "../assets/css/navigation.css";
+import "../assets/css/dashboard.css"
 import { useSelector } from "react-redux";
 
 
