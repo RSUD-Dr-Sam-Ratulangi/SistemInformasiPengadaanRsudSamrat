@@ -209,4 +209,10 @@ public class OrderController {
         return ResponseEntity.ok(updatedOrder);
     }
 
+    @GetMapping("/order/status")
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByStatus(@RequestParam("status") OrderModel.OrderStatus status) {
+        List<OrderResponseDTO> responseDTOs = orderService.getOrdersByStatus(status);
+        return ResponseEntity.ok(responseDTOs);
+    }
+
 }

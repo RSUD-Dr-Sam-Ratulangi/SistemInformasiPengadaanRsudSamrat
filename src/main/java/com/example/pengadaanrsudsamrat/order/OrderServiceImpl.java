@@ -217,7 +217,7 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    @CachePut(value = "orders", key = "#orderId")
+
     public OrderResponseDTO updateOrderItemsInOrder(Long orderId, Long orderItemId, OrderItemUpdateRequestDTO updateRequestDTO) {
         OrderModel orderModel = orderRepository.findById(orderId)
                 .orElseThrow(EntityNotFoundException::new);
@@ -723,6 +723,15 @@ public class OrderServiceImpl implements OrderService {
         return orderResponseDTO;
     }
 
+    @Override
+    public List<OrderResponseDTO> getOrdersByStatus(OrderModel.OrderStatus status) {
+        List<OrderModel> orders = orderRepository.findByStatus(status);
+
+        return orders.stream()
+                .map(order -> modelMapper.map(order, OrderResponseDTO.class))
+                .collect(Collectors.toList());
+    }
+
 
     private BigDecimal calculateTotalAmount(List<OrderItemModel> orderItems) {
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -734,8 +743,6 @@ public class OrderServiceImpl implements OrderService {
         }
         return totalAmount;
     }
-
-
 
 
 }
