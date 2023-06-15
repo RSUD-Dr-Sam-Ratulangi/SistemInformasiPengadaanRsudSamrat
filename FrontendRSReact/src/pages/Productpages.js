@@ -1,420 +1,363 @@
-import axios from "axios";
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Toast,
   Dropdown,
   Modal,
   Button
-} from "react-bootstrap";
+} from 'react-bootstrap';
+import axios from 'axios';
 
 import '../assets/css/pages/products.css';
 
-const Productpages = () => {
+
+
+export default function Productpages() {
   const navigate = useNavigate();
 
+  // vendor
   const [vendors, setVendors] = useState([]);
+  const [selectedVendorUUID, setSelectedVendorUUID] = useState(null);
+  
+  // product
   const [products, setProducts] = useState([]);
-  const [selectedVendor, setSelectedVendor] = useState(null);
-  const [filteredData, setFilteredData] = useState([]);
-  const [filteredPendingProducts, setFilteredPendingProducts] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  
+  // query
+  const [searchQuery, setSearchQuery] = useState('');
 
-  //order
-  const [orderedItems, setOrderedItems] = useState([]);
-  const [showModalOrderedProduct, setShowModalOrderedProduct] = useState(false);
+  // category
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
 
-  //notif
-  const [showToast, setShowToast] = useState(false);
+  // seletedProduct
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showSelectedProductModal, setShowSelectedProductModal] = useState(false);
+  const [selectedProductOrderQuantity, setSelectedProductOrderQuantity] = useState(0);
+  const [selectedProductModalErrorMessage, setSelectedProductModalErrorMessage] = useState('');
 
-  // modal
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [quantity, setQuantity] = useState(0);
-  const [modalErrorMessage, setModalErrorMessage] = useState('');
+  // cart
+  const [cart, setCart] = useState([]);
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [itemAddedToCartToast, setItemAddedToCartToast] = useState(false);
 
-  // Mengambil data Vendor
+
+
   useEffect(() => {
-    loadVendors();
+    getVendors();
   }, []);
 
-  // Mengambil data Product berdasarkan VendorUUID
   useEffect(() => {
-    if (selectedVendor) {
-      loadProducts();
+    if(selectedVendorUUID) {
+      setProducts([]);
+      setFilteredProducts([]);
+      setSearchQuery('');
+      setSelectedCategory('ALL');
+      setSelectedSubCategory(null);
+      setSelectedProduct(null);
+      setSelectedProductOrderQuantity(0);
+      setSelectedProductModalErrorMessage('');
+      setCart([]);
+      getProducts();
     }
-  }, [selectedVendor]);
+  }, [selectedVendorUUID]);
 
   useEffect(() => {
-    if (products.length > 0) {
-      const filteredPending = products.filter(
-        (item) => item.status === "PENDING"
-      );
-      setFilteredPendingProducts(filteredPending);
-    }
+    setFilteredProducts(filterProducts({}));
   }, [products]);
 
   useEffect(() => {
-    console.log(orderedItems);
-  }, [orderedItems]);
+    if(selectedCategory) setFilteredProducts(filterProducts({categoryName: selectedCategory}));
+  }, [selectedCategory]);
 
-  // Filter data produk berdasarkan status "APPROVED"
   useEffect(() => {
-    if (products.length > 0) {
-      console.log('products', products);
-      const filteredProducts = products.filter(item => (item.status === "APPROVED" && item.quantity > 0));
-      setFilteredData(filteredProducts);
-    }
-  }, [products]);
+    if(selectedSubCategory) setFilteredProducts(filterProducts({subCategoryName: selectedSubCategory}));
+  }, [selectedSubCategory]);
 
 
 
-  function showModalOrder() {
-    setShowModalOrderedProduct(true);
-  };
+  function handleSeePendingProducts(e) {
+    e.preventDefault();
 
-  //order
-  function addToCart() {
-    let isItemExist = false;
-    orderedItems.forEach(item => {
-      if(selectedItem.id === item.id) isItemExist = true;
+    setSelectedCategory(null);
+    setFilteredProducts(filterProducts({statusList: ['PENDING']}));
+  }
+  
+  function handleProductSelection(product) {
+    setSelectedProduct(product);
+    setShowSelectedProductModal(true);
+  }
+
+  function handleSelectedProductModalClose() {
+    setSelectedProduct(null);
+    setShowSelectedProductModal(false);
+    setSelectedProductOrderQuantity(0);
+    setSelectedProductModalErrorMessage('');
+  }
+
+  function handleSelectedProductOrderQuantity(e) {
+    let existingProductOrderQuantity = e.target.value;
+
+    // cek jika item sudah ada di keranjang
+    cart.forEach(product => {
+      if(selectedProduct.id === product.id) existingProductOrderQuantity = product.orderQuantity;
     });
 
-    let updatedItem;
-    if(isItemExist) {
-      updatedItem = orderedItems.map(item => {
-        if(selectedItem.id === item.id) return {...item, orderQuantity: item.orderQuantity + parseInt(quantity)};
-        else return item;
-      });
-    }
-    else {
-      updatedItem = [...orderedItems, {...selectedItem, orderQuantity: parseInt(quantity)}];
-    }
-    
-    setOrderedItems(updatedItem);
-    setSelectedItem(null);
-    setQuantity(0);
-    setModalErrorMessage('');
-    setShowModal(false);
-    setShowToast(true);
+    if(parseInt(e.target.value) > 0 && parseInt(e.target.value) <= selectedProduct.quantity - existingProductOrderQuantity) setSelectedProductModalErrorMessage('');
+    else setSelectedProductModalErrorMessage('Quantity is not valid');
 
-    console.log(orderedItems);
-  };
-
-  function placeOrder() {
-    axios
-      .post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
-      .then((res) => {
-        console.log(res.data.id);
-        const orderItem = orderedItems.map((items) => {
-          return {productId: items.id, quantity: items.orderQuantity};
-        });
-        axios
-          .post(
-            `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
-            orderItem
-          )
-          .then(() => {
-            navigate('/orders');
-            setSelectedItem(null);
-            setShowModal(false);
-            setQuantity(0);
-            setModalErrorMessage('');
-          })
-          .catch((err) => console.log(err));
-      })
-      .catch((err) => console.log(err));
-  };
-
-  // Load Vendors
-  async function loadVendors() {
-    try {
-      const response = await axios.get(
-        "http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=2&size=25"
-      );
-      setVendors(response.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  // Load Vendor Products berdasarkan yang dipilih
-  async function loadProducts() {
-    try {
-      const response = await axios.get(
-        `http://rsudsamrat.site:8080/pengadaan/dev/v1/products/vendor/${selectedVendor}`
-      );
-      setProducts(response.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  function handlePendingProducts() {
-    setFilteredData(filteredPendingProducts);
-  };
-
-  function handleVendorSelection(vendorUUID) {
-    setOrderedItems([]);
-    setSelectedVendor(vendorUUID);
-  };
-
-  function handleSearch(e) {
-    setSearchQuery(e.target.value);
-  };
-
-  function handleCategorySelection(category) {
-    filterProductOnCategory(category);
-    setSelectedCategory(category);
-  };
-
-  function handleSubCategorySelection(subCategory) {
-    filterProductOnSubCategory(subCategory);
+    setSelectedProductOrderQuantity(e.target.value);
   }
 
-  function openModal(item) {
-    setSelectedItem(item);
-    setShowModal(true);
-  };
-
-  function closeModal() {
-    setShowModal(false);
-    setQuantity(0);
-    setModalErrorMessage('');
-  };
-
-  function handleQuantity(value) {
-    let orderedItemOrderQuantity = 0;
-    orderedItems.forEach(item => {
-      if(selectedItem.id === item.id) orderedItemOrderQuantity = item.orderQuantity;
+  function handleSelectedProductModalAddToCart() {
+    let isProductExistInCart = false;
+    cart.forEach(product => {
+      if(selectedProduct.id === product.id) isProductExistInCart = true;
     });
 
-    if(parseInt(value) > 0 && parseInt(value) <= selectedItem.quantity - orderedItemOrderQuantity) setModalErrorMessage('');
-    else setModalErrorMessage('Quantity is not valid.');
-
-    setQuantity(value);
-  }
-
-  const removeItem = (itemId) => {
-    const updatedItems = orderedItems.filter((item) => item.id !== itemId);
-    setOrderedItems(updatedItems);
-  };
-
-  const handleCancelClick = () => {
-    // Menghapus semua produk yang telah dipilih (misalnya dalam sebuah array bernama 'selectedProducts')
-    setOrderedItems([]);
-
-    // Mengosongkan halaman modal dengan mengatur state 'showModalOrderedProduct' menjadi false
-    setShowModalOrderedProduct(false);
-  };
-
-  const filteredProducts = filteredData.filter((item) => {
-    const { name, description, quantity, price, id, productuuid, vendor } =
-      item;
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    return (
-      name.toLowerCase().includes(lowerCaseQuery) ||
-      description.toLowerCase().includes(lowerCaseQuery) ||
-      quantity.toString().includes(lowerCaseQuery) ||
-      price.toString().includes(lowerCaseQuery) ||
-      id.toString().includes(lowerCaseQuery) ||
-      productuuid.toLowerCase().includes(lowerCaseQuery) ||
-      vendor.name.toLowerCase().includes(lowerCaseQuery) // Menggunakan vendor.name
-    );
-  });
-
-  function filterProductOnCategory(category) {
-    let filteredProducts = [];
-    console.log('category', category);
-    
-    if(category === 'All') {
-      filteredProducts = products.filter(item => (item.status === "APPROVED" && item.quantity > 0));
-    }
-    else {
-      products.forEach(product => {
-        if(product.categories.length > 0 && product.quantity > 0) {
-          product.categories.forEach(productCategory => {
-            if(category.toLowerCase() === productCategory.name.toLowerCase()) {
-              filteredProducts.push(product);
-            }
-          });
-        }
+    let newCart = [];
+    if(isProductExistInCart) {
+      newCart = cart.map(product => {
+        if(selectedProduct.id === product.id) return {...product, orderQuantity: product.orderQuantity + parseInt(selectedProductOrderQuantity)};
+        else return product;
       });
     }
+    else newCart = [...cart, {...selectedProduct, orderQuantity: parseInt(selectedProductOrderQuantity)}];
 
-    console.log('filteredProducts category', filteredProducts);
-    setFilteredData(filteredProducts);
+    setCart(newCart);
+    setSelectedProduct(null);
+    setSelectedProductOrderQuantity(0);
+    setSelectedProductModalErrorMessage('');
+    setShowSelectedProductModal(false);
+    setItemAddedToCartToast(true);
   }
 
-  function filterProductOnSubCategory(subCategory) {
-    let filteredProducts = [];
-    console.log('subCategory', subCategory);
-    
-    products.forEach(product => {
-      if(product.subcategories.length > 0 && product.quantity > 0) {
-        product.subcategories.forEach(productSubCategory => {
-          if(subCategory.toLowerCase() === productSubCategory.name.toLowerCase()) {
-            filteredProducts.push(product);
-          }
+  function handleShowAllOrders() {
+    console.log('handleShowAllOrders');
+  }
+
+  function handleCartProductDelete(productId) {
+    const newCart = cart.filter(product => product.id !== productId);
+    setCart(newCart);
+  }
+
+  function handleCartModalCancel(e) {
+    e.preventDefault();
+
+    setCart([]);
+    setShowCartModal(false);
+  }
+
+
+
+  async function getVendors() {
+    try {
+      const res = await axios.get('http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=2&size=25');
+      setVendors(res.data);
+      console.log('vendors', res.data);
+    }
+    catch(err) {
+      console.log('Unable to get vendors', err);
+    }
+  }
+
+  async function getProducts() {
+    try {
+      const res = await axios.get(`http://rsudsamrat.site:8080/pengadaan/dev/v1/products/vendor/${selectedVendorUUID}`);
+      setProducts(res.data);
+    }
+    catch(err) {
+      console.log('Unable to get products', err);
+    }
+  }
+
+  function filterProducts(properties) {
+    const {
+      minimumQuantity=0, // must be number
+      statusList=['APPROVED'], // must be array of string
+      // statusList=null, // must be array of string
+      categoryName=null, // must be string
+      subCategoryName=null // must be string
+    } = properties;
+
+    let newFilteredProducts = products;
+
+    if(products.length > 0) {
+      // filter using quantity
+      newFilteredProducts = newFilteredProducts.filter(product => product.quantity > minimumQuantity);
+
+      // filter using status
+      if(statusList) {
+        statusList.forEach(status => {
+          newFilteredProducts = newFilteredProducts.filter(product => status === product.status);
         });
       }
-    });
 
-    console.log('filteredProducts subCategory', filteredProducts);
-    setFilteredData(filteredProducts);
+      // filter using categories
+      if(categoryName !== null && categoryName !== 'ALL') {
+        newFilteredProducts = newFilteredProducts.filter(product => product.categories.length > 0 && product.categories.some(category => category.name === categoryName));
+      }
+
+      // filter using subcategories
+      if(subCategoryName) {
+        newFilteredProducts = newFilteredProducts.filter(product => product.subcategories.length > 0 && product.subcategories.some(subCategory => subCategory.name === subCategoryName));
+      }
+    }
+
+    return newFilteredProducts;
+  }
+
+  function orderProducts() {
+    axios.post('http://rsudsamrat.site:8080/pengadaan/dev/v1/orders', {})
+      .then(res => {
+        const newCart = cart.map(product => {
+          return {productId: product.id, quantity: product.orderQuantity};
+        });
+
+        axios.post(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`, newCart)
+          .then(() => {
+            navigate('/orders');
+          })
+          .catch(err => console.log('unable to order products', err));
+      })
+      .catch(err => console.log('unable to order products', err));
   }
 
 
 
   return (
-    <div id='products-page' style={{ display: "flex" }}>
-      <div style={{ paddingRight: "5px" }}>
+    <div id='products-page' style={{display: 'flex'}}>
+      <div style={{paddingRight: '5px'}}>
         <h3>Choose Vendor</h3>
-        
-        <ol className="list-group">
-          {vendors.map((item) => (
+
+        <ol className='list-group'>
+          {(vendors.length > 0) && vendors.map(vendor => (
             <li
-              className={`list-group-item d-flex justify-content-between align-items-start ${
-                selectedVendor === item.vendoruuid
-                  ? "selected-vendor"
-                  : "vendor-item"
-              }`}
-              key={item.id}
-              onClick={() => handleVendorSelection(item.vendoruuid)}
+              key={vendor.id}
+              className={`list-group-item d-flex justify-content-between align-items-start ${(selectedVendorUUID === vendor.vendoruuid) ? 'selected-vendor' : 'vendor-item'}`}
+              onClick={() => setSelectedVendorUUID(vendor.vendoruuid)}
             >
-              <div className="ms-2 me-auto">
-                <div className="fw-bold">{item.name}</div>
-                {item.address}
+              <div className='ms-2 me-auto'>
+                <div className='fw-bold'>{vendor.name}</div>
+                {vendor.address}
               </div>
-              {/* <span className="badge bg-primary rounded-pill">10</span> */}
+              {/* <span className='badge bg-primary rounded-pill'>10</span> */}
             </li>
           ))}
         </ol>
-        {selectedVendor && (
+
+        {selectedVendorUUID && (
           <button
-            className="btn btn-light shadow"
-            style={{ marginLeft: "10px", marginTop: "15px" }}
-            onClick={handlePendingProducts}
+            className='btn btn-light shadow'
+            style={{marginLeft: '10px', marginTop: '15px'}}
+            onClick={handleSeePendingProducts}
           >
-            See Pending Product
+            See Pending Products
           </button>
         )}
       </div>
 
-      {selectedVendor && (
-        <div style={{ flex: 1 }}>
-          <div className="row justify-content-start">
-            <div className="col-md-12 mb-4">
-              <div className="input-group mb-3">
+      {selectedVendorUUID && (
+        <div style={{flex: 1}}>
+          <div className='row justify-content-start'>
+            <div className='col-md-12 mb-4'>
+              <div className='input-group mb-3'>
                 <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search..."
-                  aria-label="Search"
+                  type='text'
+                  className='form-control'
+                  placeholder='Search...'
+                  aria-label='Search'
                   value={searchQuery}
-                  onChange={handleSearch}
-                  style={{ marginTop: "40px" }}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  style={{marginTop: '40px'}}
                 />
               </div>
             </div>
-            <div className="col-md-12 mb-4">
+            <div className='col-md-12 mb-4'>
               <div className='list-group list-group-horizontal' style={{width: '100%'}}>
-                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === "All") ? "active" : "light"} category-button`} onClick={() => handleCategorySelection("All")}>
-                  <div className="ms-2 me-auto category-button-text">
-                    <div className="fw-bold category-button-text">All</div>
-                    All category
+                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === 'ALL') ? 'active' : 'light'} category-button`} onClick={() => setSelectedCategory('ALL')}>
+                  <div className='ms-2 me-auto category-button-text'>
+                    <div className='fw-bold category-button-text'>All</div>
+                    All Category
                   </div>
                 </button>
-                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === "Jasa") ? "active" : "light"} category-button`} onClick={() => handleCategorySelection("Jasa")}>
-                  <div className="ms-2 me-auto category-button-text">
-                    <div className="fw-bold category-button-text">Jasa</div>
-                    Jasa category
+
+                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === 'JASA') ? 'active' : 'light'} category-button`} onClick={() => setSelectedCategory('JASA')}>
+                  <div className='ms-2 me-auto category-button-text'>
+                    <div className='fw-bold category-button-text'>Jasa</div>
+                    Jasa Category
                   </div>
                 </button>
+
                 <Dropdown className='category-button'>
-                  <Dropdown.Toggle variant={(selectedCategory === 'BM' ? 'primary' : 'light')} style={{width: '100%'}}>
-                    <div className="ms-2 me-auto" onClick={() => handleCategorySelection('BM')}>
-                      <div className="fw-bold">BM</div>
-                      Select BM category
+                  <Dropdown.Toggle variant={(selectedCategory === 'BM') ? 'primary' : 'light'} style={{width: '100%'}}>
+                    <div className='ms-2 me-auto' onClick={() => setSelectedCategory('BM')}>
+                      <div className='fw-bold'>BM</div>
+                      Select BM Category
                     </div>
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => handleSubCategorySelection('Alkes')}>Alkes</Dropdown.Item>
-                    <Dropdown.Item onClick={() => handleSubCategorySelection('Alkon')}>Alkon</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setSelectedSubCategory('ALKES')}>Alkes</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setSelectedSubCategory('ALKON')}>Alkon</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
+
                 <Dropdown className='category-button'>
-                  <Dropdown.Toggle variant={(selectedCategory === 'BHP' ? 'primary' : 'light')} style={{width: '100%'}}>
-                    <div className="ms-2 me-auto" onClick={() => handleCategorySelection('BHP')}>
-                      <div className="fw-bold">BHP</div>
-                      Select BHP category
+                  <Dropdown.Toggle variant={(selectedCategory === 'BPH') ? 'primary' : 'light'} style={{width: '100%'}}>
+                    <div className='ms-2 me-auto' onClick={() => setSelectedCategory('BPH')}>
+                      <div className='fw-bold'>BPH</div>
+                      Select BPH Category
                     </div>
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => handleSubCategorySelection('BHP Non Medis')}>BHP Non Medis</Dropdown.Item>
-                    <Dropdown.Item onClick={() => handleSubCategorySelection('BHP Medis')}>BHP Medis</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setSelectedSubCategory('BHPNONMEDIS')}>BHP Non Medis</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setSelectedSubCategory('BHPMEDIS')}>BHP Medis</Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
             </div>
 
-            {filteredProducts.map((item) => (
-              <div className="col-md-3 mb-4" key={item.id}>
-                <div className="card h-100 w-full md:w-3/4 lg:w-1/2 xl:w-1/3">
+            {(filteredProducts.length > 0) && filteredProducts.map(product => (
+              <div key={product.id} className='col-md-3 mb-4'>
+                <div className='card h-100 w-ful md:w-3/4 lg:w-1/2 xl:w-1/3'>
                   <img
-                    src={item.imageUrl}
-                    className="card-img-top"
-                    alt="Product"
+                    src={product.imageUrl}
+                    alt='product'
+                    className='card-img-top'
                   />
-                  <div className="card-body">
-                    <h5 className="card-title" style={{ fontSize: "12px" }}>
-                      {item.name}
-                    </h5>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      ID: {item.id}
-                    </p>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      Description: {item.description}
-                    </p>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      Quantity: {item.quantity}
-                    </p>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      Price: {item.price}
-                    </p>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      Status: {item.status}
-                    </p>
+                  <div className='card-body'>
+                    <h5 className='card-title' style={{fontSize: '12px'}}>{product.name}</h5>
+                    <p className='card-title' style={{fontSize: '12px'}}>ID: {product.id}</p>
+                    <p className='card-title' style={{fontSize: '12px'}}>Description: {product.description}</p>
+                    <p className='card-title' style={{fontSize: '12px'}}>Quantity: {product.quantity}</p>
+                    <p className='card-title' style={{fontSize: '12px'}}>Price: {product.price}</p>
+                    <p className='card-title' style={{fontSize: '12px'}}>Status: {product.status}</p>
                   </div>
-                  <button
-                    className="btn btn-dark"
-                    onClick={() => openModal(item)}
-                  >
-                    Order
-                  </button>
+                  <button className='btn btn-dark' onClick={() => handleProductSelection(product)}>Order</button>
 
-                  <Modal show={showModal} onHide={closeModal}>
+                  <Modal show={showSelectedProductModal} onHide={handleSelectedProductModalClose}>
                     <Modal.Header closeButton>
                       <Modal.Title>Add Quantity</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                       <div>
-                        <label>Quantity:</label>
+                        <label>Quantity: </label>
                         <input
-                          type="number"
-                          value={quantity}
-                          onChange={e => handleQuantity(e.target.value)}
+                          type='number'
+                          value={selectedProductOrderQuantity}
+                          onChange={handleSelectedProductOrderQuantity}
                           min={1}
                         />
                       </div>
-                      <label>{modalErrorMessage}</label>
+                      <label>{selectedProductModalErrorMessage}</label>
                     </Modal.Body>
                     <Modal.Footer>
-                      <Button variant="secondary" onClick={closeModal}>
-                        Close
-                      </Button>
-                      <Button variant="primary" onClick={addToCart} disabled={(modalErrorMessage.length !== 0)}>
+                      <Button variant='secondary' onClick={handleSelectedProductModalClose}>Close</Button>
+                      <Button
+                        variant='primary'
+                        onClick={handleSelectedProductModalAddToCart}
+                        disabled={(selectedProductModalErrorMessage.length !== 0)}
+                      >
                         Add
                       </Button>
                     </Modal.Footer>
@@ -423,65 +366,68 @@ const Productpages = () => {
               </div>
             ))}
           </div>
+
           <button
-            className="btn btn-light shadow"
-            style={{ marginLeft: "10px", marginTop: "15px" }}
-            onClick={placeOrder}
+            className='btn btn-light shadow'
+            style={{marginLeft: '10px', marginTop: '15px'}}
+            onClick={handleShowAllOrders}
           >
-            Show all orders
+            Show All Orders
           </button>
           <button
-            className="btn btn-light shadow"
-            style={{ marginLeft: "10px", marginTop: "15px" }}
-            onClick={showModalOrder}
+            className='btn btn-light shadow'
+            style={{marginLeft: '10px', marginTop: '15px'}}
+            onClick={() => setShowCartModal(true)}
           >
-            See modal
+            Show Cart
           </button>
         </div>
       )}
 
-      {showModalOrderedProduct && (
-        <div className="modal modal-background" style={{ display: "block" }}>
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h3 className="modal-title">Product Details</h3>
+      {showCartModal && (
+        <div className='modal modal-background' style={{display: 'block'}}>
+          <div className='modal-dialog modal-dialog-centered'>
+            <div className='modal-content'>
+              <div className='modal-header'>
+                <h3 className='modal-title'>Product Details</h3>
                 <button
-                  type="button"
-                  className="close"
-                  onClick={() => setShowModalOrderedProduct(false)}
+                  type='button'
+                  className='close'
+                  onClick={() => setShowCartModal(false)}
                 >
                   <span>&times;</span>
                 </button>
               </div>
-              <div className="modal-body">
-                {orderedItems.map((item) => (
-                  <div key={item.id}>
-                    <p>Name: {item.name}</p>
-                    <p>Description: {item.description}</p>
-                    <p>Quantity: {item.orderQuantity}</p>
-                    <p>Price: Rp. {item.price * item.orderQuantity}</p>
+              <div className='modal-body'>
+                {(cart.length > 0) && cart.map(product => (
+                  <div key={product.id}>
+                    <p>Name: {product.name}</p>
+                    <p>Description: {product.description}</p>
+                    <p>Quantity: {product.orderQuantity}</p>
+                    <p>Price: Rp. {product.price * product.orderQuantity}</p>
                     <button
-                      className="btn btn-danger"
-                      style={{ marginRight: "10px" }}
-                      onClick={() => removeItem(item.id)}
+                      className='btn btn-danger'
+                      style={{marginRight: '10px'}}
+                      onClick={() => handleCartProductDelete(product.id)}
                     >
                       Delete
                     </button>
                     <hr />
                   </div>
                 ))}
+
                 <button
-                  className="btn btn-dark"
-                  style={{ marginLeft: "10px", marginTop: "15px" }}
-                  onClick={placeOrder}
+                  className='btn btn-dark'
+                  style={{marginLeft: '10px', marginTop: '15px'}}
+                  onClick={orderProducts}
+                  disabled={cart.length === 0}
                 >
                   Place Order
                 </button>
                 <button
-                  className="btn btn-dark"
-                  style={{ marginLeft: "10px", marginTop: "15px" }}
-                  onClick={handleCancelClick} // Menambahkan event handler pada button Cancel
+                  className='btn btn-dark'
+                  style={{marginLeft: '10px', marginTop: '15px'}}
+                  onClick={handleCartModalCancel}
                 >
                   Cancel
                 </button>
@@ -492,20 +438,18 @@ const Productpages = () => {
       )}
 
       <Toast
-        show={showToast}
-        className="toast-container fixed-top"
-        bg="primary"
+        show={itemAddedToCartToast}
+        className='toast-container fixed-top'
+        bg='primary'
         autohide
         delay={2000}
-        onClose={() => setShowToast(false)}
+        onClose={() => setItemAddedToCartToast(false)}
       >
         <Toast.Header>
-          <strong className="me-auto">Notification</strong>
+          <strong className='me-auto'>Notification</strong>
         </Toast.Header>
         <Toast.Body>Berhasil ditambahkan ke See Modal</Toast.Body>
       </Toast>
     </div>
   );
 };
-
-export default Productpages;
