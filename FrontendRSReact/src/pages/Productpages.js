@@ -1,18 +1,25 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { Toast, Button, Modal } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import {
+  Toast,
+  Dropdown,
+  Modal,
+  Button
+} from "react-bootstrap";
+
+import '../assets/css/pages/products.css';
 
 const Productpages = () => {
-  const [vendor, setVendor] = useState([]);
+  const navigate = useNavigate();
+
+  const [vendors, setVendors] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
   const [filteredPendingProducts, setFilteredPendingProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [filteredJasaProducts, setFilteredJasaProducts] = useState([]);
-  const [filteredBMProducts, setFilteredBMProducts] = useState([]);
-  const [filteredBHPProducts, setFilteredBHPProducts] = useState([]);
 
   //order
   const [orderedItems, setOrderedItems] = useState([]);
@@ -21,9 +28,11 @@ const Productpages = () => {
   //notif
   const [showToast, setShowToast] = useState(false);
 
-  const [item, setItem] = useState(null);
+  // modal
+  const [selectedItem, setSelectedItem] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
+  const [modalErrorMessage, setModalErrorMessage] = useState('');
 
   // Mengambil data Vendor
   useEffect(() => {
@@ -47,147 +56,145 @@ const Productpages = () => {
   }, [products]);
 
   useEffect(() => {
+    console.log(orderedItems);
+  }, [orderedItems]);
+
+  // Filter data produk berdasarkan status "APPROVED"
+  useEffect(() => {
     if (products.length > 0) {
-      const filteredJasa = products.filter(
-        (item) =>
-          item.categories &&
-          item.categories[0] &&
-          item.categories[0].name === "JASA"
-      );
-      setFilteredJasaProducts(filteredJasa);
+      console.log('products', products);
+      const filteredProducts = products.filter(item => (item.status === "APPROVED" && item.quantity > 0));
+      setFilteredData(filteredProducts);
     }
   }, [products]);
 
-  useEffect(() => {
-    if (products.length > 0) {
-      const filteredBM = products.filter(
-        (item) =>
-          item.categories &&
-          item.categories[0] &&
-          item.categories[0].name === "BM"
-      );
-      setFilteredBMProducts(filteredBM);
-    }
-  }, [products]);
 
-  useEffect(() => {
-    if (products.length > 0) {
-      const filteredBHP = products.filter(
-        (item) =>
-          item.categories &&
-          item.categories[0] &&
-          item.categories[0].name === "BPH"
-      );
-      setFilteredBHPProducts(filteredBHP);
-    }
-  }, [products]);
+
+  function showModalOrder() {
+    setShowModalOrderedProduct(true);
+  };
 
   //order
-  const addToCart = () => {
-    const updatedItem = { ...item, quantity };
-    setOrderedItems([...orderedItems, updatedItem]);
+  function addToCart() {
+    let isItemExist = false;
+    orderedItems.forEach(item => {
+      if(selectedItem.id === item.id) isItemExist = true;
+    });
+
+    let updatedItem;
+    if(isItemExist) {
+      updatedItem = orderedItems.map(item => {
+        if(selectedItem.id === item.id) return {...item, orderQuantity: item.orderQuantity + parseInt(quantity)};
+        else return item;
+      });
+    }
+    else {
+      updatedItem = [...orderedItems, {...selectedItem, orderQuantity: parseInt(quantity)}];
+    }
+    
+    setOrderedItems(updatedItem);
+    setSelectedItem(null);
+    setQuantity(0);
+    setModalErrorMessage('');
     setShowModal(false);
     setShowToast(true);
+
     console.log(orderedItems);
   };
 
-  const placeOrder = () => {
+  function placeOrder() {
     axios
       .post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
       .then((res) => {
         console.log(res.data.id);
         const orderItem = orderedItems.map((items) => {
-          return { productId: items.id, quantity: 1 };
+          return {productId: items.id, quantity: items.orderQuantity};
         });
         axios
           .post(
             `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
             orderItem
           )
-          .then(console.log("Berhasil"))
+          .then(() => {
+            navigate('/orders');
+            setSelectedItem(null);
+            setShowModal(false);
+            setQuantity(0);
+            setModalErrorMessage('');
+          })
           .catch((err) => console.log(err));
       })
       .catch((err) => console.log(err));
   };
 
-  useEffect(() => {
-    console.log(orderedItems);
-  }, [orderedItems]);
-  const showModalOrder = () => {
-    setShowModalOrderedProduct(true);
-  };
-
   // Load Vendors
-  const loadVendors = async () => {
+  async function loadVendors() {
     try {
       const response = await axios.get(
         "http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=2&size=25"
       );
-      setVendor(response.data);
+      setVendors(response.data);
     } catch (err) {
       console.log(err);
     }
   };
 
   // Load Vendor Products berdasarkan yang dipilih
-  const loadProducts = async () => {
+  async function loadProducts() {
     try {
-      const respone = await axios.get(
+      const response = await axios.get(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/products/vendor/${selectedVendor}`
       );
-      setProducts(respone.data);
+      setProducts(response.data);
     } catch (err) {
       console.log(err);
     }
   };
 
-  // Filter data produk berdasarkan status "APPROVED"
-  useEffect(() => {
-    if (products.length > 0) {
-      const filteredProducts = products.filter(
-        (item) => item.status === "APPROVED"
-      );
-      setFilteredData(filteredProducts);
-    }
-  }, [products]);
-
-  const handlePendingProducts = () => {
+  function handlePendingProducts() {
     setFilteredData(filteredPendingProducts);
   };
 
-  const handleJasaProducts = () => {
-    setFilteredData(filteredJasaProducts);
-  };
-
-  const handleBMProducts = () => {
-    setFilteredData(filteredBMProducts);
-  };
-
-  const handleBHPProducts = () => {
-    setFilteredData(filteredBHPProducts);
-  };
-
-  const handleVendorSelection = (vendorUUID) => {
+  function handleVendorSelection(vendorUUID) {
+    setOrderedItems([]);
     setSelectedVendor(vendorUUID);
   };
 
-  const handleSearch = (e) => {
+  function handleSearch(e) {
     setSearchQuery(e.target.value);
   };
 
-  const handleCategorySelection = (category) => {
+  function handleCategorySelection(category) {
+    filterProductOnCategory(category);
     setSelectedCategory(category);
   };
 
-  const openModal = (item) => {
-    setItem(item);
+  function handleSubCategorySelection(subCategory) {
+    filterProductOnSubCategory(subCategory);
+  }
+
+  function openModal(item) {
+    setSelectedItem(item);
     setShowModal(true);
   };
 
-  const closeModal = () => {
+  function closeModal() {
     setShowModal(false);
-    setQuantity(1);
+    setQuantity(0);
+    setModalErrorMessage('');
   };
+
+  function handleQuantity(value) {
+    let orderedItemOrderQuantity = 0;
+    orderedItems.forEach(item => {
+      if(selectedItem.id === item.id) orderedItemOrderQuantity = item.orderQuantity;
+    });
+
+    if(parseInt(value) > 0 && parseInt(value) <= selectedItem.quantity - orderedItemOrderQuantity) setModalErrorMessage('');
+    else setModalErrorMessage('Quantity is not valid.');
+
+    setQuantity(value);
+  }
 
   const removeItem = (itemId) => {
     const updatedItems = orderedItems.filter((item) => item.id !== itemId);
@@ -200,11 +207,6 @@ const Productpages = () => {
 
     // Mengosongkan halaman modal dengan mengatur state 'showModalOrderedProduct' menjadi false
     setShowModalOrderedProduct(false);
-  };
-
-  const handleSubcategorySelection = (subcategory) => {
-    // Lakukan tindakan yang sesuai dengan pemilihan subkategori
-    console.log("Selected Subcategory:", subcategory);
   };
 
   const filteredProducts = filteredData.filter((item) => {
@@ -222,34 +224,56 @@ const Productpages = () => {
     );
   });
 
+  function filterProductOnCategory(category) {
+    let filteredProducts = [];
+    console.log('category', category);
+    
+    if(category === 'All') {
+      filteredProducts = products.filter(item => (item.status === "APPROVED" && item.quantity > 0));
+    }
+    else {
+      products.forEach(product => {
+        if(product.categories.length > 0 && product.quantity > 0) {
+          product.categories.forEach(productCategory => {
+            if(category.toLowerCase() === productCategory.name.toLowerCase()) {
+              filteredProducts.push(product);
+            }
+          });
+        }
+      });
+    }
+
+    console.log('filteredProducts category', filteredProducts);
+    setFilteredData(filteredProducts);
+  }
+
+  function filterProductOnSubCategory(subCategory) {
+    let filteredProducts = [];
+    console.log('subCategory', subCategory);
+    
+    products.forEach(product => {
+      if(product.subcategories.length > 0 && product.quantity > 0) {
+        product.subcategories.forEach(productSubCategory => {
+          if(subCategory.toLowerCase() === productSubCategory.name.toLowerCase()) {
+            filteredProducts.push(product);
+          }
+        });
+      }
+    });
+
+    console.log('filteredProducts subCategory', filteredProducts);
+    setFilteredData(filteredProducts);
+  }
+
+
+
   return (
-    <div style={{ display: "flex" }}>
+    <div id='products-page' style={{ display: "flex" }}>
       <div style={{ paddingRight: "5px" }}>
         <h3>Choose Vendor</h3>
-        <style>
-          {`.list-group {
-            font-size: 12px;
-            width: 240px;
-          }
-
-          .vendor-item {
-            cursor: pointer;
-          }
-
-          // .vendor-item:hover {
-          //   background-color: #f2f2f2;
-          // }
-
-          .selected-vendor {
-            background-color: #EDEBEB;
-          }
-          
-          // .selected-vendor:hover {
-          //   background-color: #ffa800;
-          // }`}
-        </style>
+        
         <ol className="list-group">
-          {vendor.map((item) => (
+          {vendors.map((item) => (
             <li
               className={`list-group-item d-flex justify-content-between align-items-start ${
                 selectedVendor === item.vendoruuid
@@ -257,11 +281,9 @@ const Productpages = () => {
                   : "vendor-item"
               }`}
               key={item.id}
+              onClick={() => handleVendorSelection(item.vendoruuid)}
             >
-              <div
-                className="ms-2 me-auto"
-                onClick={() => handleVendorSelection(item.vendoruuid)}
-              >
+              <div className="ms-2 me-auto">
                 <div className="fw-bold">{item.name}</div>
                 {item.address}
               </div>
@@ -297,91 +319,43 @@ const Productpages = () => {
               </div>
             </div>
             <div className="col-md-12 mb-4">
-              <div className="list-group">
-                <button
-                  className={`list-group-item d-flex justify-content-between align-items-start ${
-                    selectedCategory === "Jasa" ? "active" : ""
-                  }`}
-                  onClick={() => handleJasaProducts("Jasa")}
-                >
-                  <div className="ms-2 me-auto">
-                    <div className="fw-bold">Jasa</div>
-                    Select Jasa category
+              <div className='list-group list-group-horizontal' style={{width: '100%'}}>
+                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === "All") ? "active" : "light"} category-button`} onClick={() => handleCategorySelection("All")}>
+                  <div className="ms-2 me-auto category-button-text">
+                    <div className="fw-bold category-button-text">All</div>
+                    All category
                   </div>
-                  {/* <span className="badge bg-primary rounded-pill">10</span> */}
                 </button>
-                <button
-                  className={`list-group-item d-flex justify-content-between align-items-start ${
-                    selectedCategory === "BM" ? "active" : ""
-                  }`}
-                  onClick={() => handleCategorySelection("BM")}
-                >
-                  <div className="ms-2 me-auto">
-                    <div className="fw-bold">BM</div>
-                    Select BM category
+                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === "Jasa") ? "active" : "light"} category-button`} onClick={() => handleCategorySelection("Jasa")}>
+                  <div className="ms-2 me-auto category-button-text">
+                    <div className="fw-bold category-button-text">Jasa</div>
+                    Jasa category
                   </div>
-                  {/* <span className="badge bg-primary rounded-pill">10</span> */}
                 </button>
-                {selectedCategory === "BM" && (
-                  <ul className="list-group mt-2">
-                    <li className="list-group-item">
-                      <button
-                        className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleBMProducts("Alkes")}
-                      >
-                        <div className="ms-2 me-auto">Alkes</div>
-                      </button>
-                    </li>
-                    <li className="list-group-item">
-                      <button
-                        className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleBMProducts("Alkon")}
-                      >
-                        <div className="ms-2 me-auto">Alkon</div>
-                      </button>
-                    </li>
-                    <li className="list-group-item">
-                      <button
-                        className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleBMProducts("Peralatan Lainnya")}
-                      >
-                        <div className="ms-2 me-auto">Peralatan Lainnya</div>
-                      </button>
-                    </li>
-                  </ul>
-                )}
-                <button
-                  className={`list-group-item d-flex justify-content-between align-items-start ${
-                    selectedCategory === "BHP" ? "active" : ""
-                  }`}
-                  onClick={() => handleCategorySelection("BHP")}
-                >
-                  <div className="ms-2 me-auto">
-                    <div className="fw-bold">BHP</div>
-                    Select BHP category
-                  </div>
-                  {/* <span className="badge bg-primary rounded-pill">10</span> */}
-                </button>
-                {selectedCategory === "BHP" && (
-                  <ul className="list-group mt-2">
-                    <li className="list-group-item">
-                      <button
-                        className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleBHPProducts("BHP Non Medis")}
-                      >
-                        <div className="ms-2 me-auto">BHP Non Medis</div>
-                      </button>
-                    </li>
-                    <li className="list-group-item">
-                      <button
-                        className="list-group-item d-flex justify-content-between align-items-start"
-                        onClick={() => handleBHPProducts("BHP Medis")}
-                      >
-                        <div className="ms-2 me-auto">BHP Medis</div>
-                      </button>
-                    </li>
-                  </ul>
-                )}
+                <Dropdown className='category-button'>
+                  <Dropdown.Toggle variant={(selectedCategory === 'BM' ? 'primary' : 'light')} style={{width: '100%'}}>
+                    <div className="ms-2 me-auto" onClick={() => handleCategorySelection('BM')}>
+                      <div className="fw-bold">BM</div>
+                      Select BM category
+                    </div>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item onClick={() => handleSubCategorySelection('Alkes')}>Alkes</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleSubCategorySelection('Alkon')}>Alkon</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+                <Dropdown className='category-button'>
+                  <Dropdown.Toggle variant={(selectedCategory === 'BHP' ? 'primary' : 'light')} style={{width: '100%'}}>
+                    <div className="ms-2 me-auto" onClick={() => handleCategorySelection('BHP')}>
+                      <div className="fw-bold">BHP</div>
+                      Select BHP category
+                    </div>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item onClick={() => handleSubCategorySelection('BHP Non Medis')}>BHP Non Medis</Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleSubCategorySelection('BHP Medis')}>BHP Medis</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </div>
             </div>
 
@@ -425,19 +399,22 @@ const Productpages = () => {
                       <Modal.Title>Add Quantity</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                      <label>Quantity:</label>
-                      <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        min={1}
-                      />
+                      <div>
+                        <label>Quantity:</label>
+                        <input
+                          type="number"
+                          value={quantity}
+                          onChange={e => handleQuantity(e.target.value)}
+                          min={1}
+                        />
+                      </div>
+                      <label>{modalErrorMessage}</label>
                     </Modal.Body>
                     <Modal.Footer>
                       <Button variant="secondary" onClick={closeModal}>
                         Close
                       </Button>
-                      <Button variant="primary" onClick={addToCart}>
+                      <Button variant="primary" onClick={addToCart} disabled={(modalErrorMessage.length !== 0)}>
                         Add
                       </Button>
                     </Modal.Footer>
@@ -482,8 +459,8 @@ const Productpages = () => {
                   <div key={item.id}>
                     <p>Name: {item.name}</p>
                     <p>Description: {item.description}</p>
-                    <p>Quantity: {item.quantity}</p>
-                    <p>Price: {item.price}</p>
+                    <p>Quantity: {item.orderQuantity}</p>
+                    <p>Price: Rp. {item.price * item.orderQuantity}</p>
                     <button
                       className="btn btn-danger"
                       style={{ marginRight: "10px" }}

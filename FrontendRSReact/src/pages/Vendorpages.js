@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Table, Pagination, Button, Modal, Form } from 'react-bootstrap';
-import "../assets/vendorpages.css";
+import "../assets/css/vendorpages.css";
 // import { useSelector } from "react-redux";
 import { FaPlus } from 'react-icons/fa';
 

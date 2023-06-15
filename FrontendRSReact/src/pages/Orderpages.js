@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../assets/vendorpages.css";
-
+import { useNavigate } from "react-router-dom";
+import "../assets/css/vendorpages.css";
+import {
+  FaTrash,
+  FaInfoCircle,
+  FaHandshake,
+  FaCheck,
+  FaPrint,
+} from "react-icons/fa";
+import html2pdf from "html2pdf.js";
+import logo from "../assets/images/logo.jpg";
 import { useSelector } from "react-redux";
 
 import ModalHistory from "../components/orderPages/ModalHistory";
@@ -41,9 +50,8 @@ const Orderpages = () => {
         const response = await axios.get(
           `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock?page=${page}&sort=${sort}`
         );
-
         // Filter and remove duplicate IDs
-        const uniqueData = [];
+        let uniqueData = [];
         const seenIds = new Set();
 
         response.data.content.forEach((item) => {
@@ -52,6 +60,31 @@ const Orderpages = () => {
             seenIds.add(item.orderId);
           }
         });
+
+        // Filter data based on role and status
+        if (role === "PP") {
+          uniqueData = uniqueData.filter(
+            (item) =>
+              item.status === "ORDER" ||
+              item.status === "NEGOTIATION" ||
+              item.status === "VALIDATING" ||
+              item.status === "CANCEL"
+          );
+        }
+        if (role === "PPKOM") {
+          uniqueData = uniqueData.filter(
+            (item) =>
+              item.status === "ORDER" ||
+              item.status === "NEGOTIATION" ||
+              item.status === "CANCEL" ||
+              item.status === "VALIDATING"
+          );
+        }
+        if (role === "PANPEN") {
+          uniqueData = uniqueData.filter(
+            (item) => item.status === "VALIDATING"
+          );
+        }
 
         setData(uniqueData);
         console.log("order filter: ", uniqueData);
@@ -63,19 +96,7 @@ const Orderpages = () => {
     };
 
     fetchData();
-  }, [page, sort]);
-
-  let filteredData = [];
-
-  if (role === "PPKOM") {
-    filteredData = data.filter(
-      (item) => item.status === "NEGOTIATION" || item.status === "ORDER"
-    );
-  } else if (role === "PP") {
-    filteredData = data.filter(
-      (item) => item.status === "CANCEL" || item.status === "NEGOTIATION"
-    );
-  }
+  }, [page, role, sort]);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
