@@ -1,11 +1,48 @@
-import html2pdf from 'html2pdf.js';
-import logo from '../../assets/logo.jpg';
+import html2pdf from "html2pdf.js";
+import logo from "../../assets/logo.jpg";
 
-export default function printOrderItem(selectedOrderItem) {
-  console.log('selectedOrderItem', selectedOrderItem);
-  if (selectedOrderItem) {
-    const { product, quantity, bidPrice } = selectedOrderItem;
+export default function printOrderItems(selectedOrderItems) {
+  console.log("from print", selectedOrderItems);
+  if (selectedOrderItems && selectedOrderItems.length > 0) {
     const taxRate = 0.11; // 11% tax rate
+
+    let tableRows = "";
+
+    selectedOrderItems.forEach((selectedOrderItem) => {
+      const { product, quantity, bidPrice } = selectedOrderItem;
+      const row = `
+        <tr>
+          <td>${product.name}</td>
+          <td>${product.description}</td>
+          <td>Rp.${product.price}</td>
+          <td>Rp.${bidPrice}</td>
+          <td>${quantity}</td>
+        </tr>
+      `;
+      tableRows += row;
+    });
+
+    let secondTableRows = "";
+
+    selectedOrderItems.forEach((selectedOrderItem) => {
+      const { quantity, bidPrice } = selectedOrderItem;
+      const row = `
+        <tr>
+        <td>${quantity}</td>
+          <td>Rp.${bidPrice}</td>
+        </tr>
+        `;
+      secondTableRows += row;
+    });
+
+    function calculateTotal(selectedOrderItems) {
+      let total = 0;
+      selectedOrderItems.forEach((selectedOrderItem) => {
+        const { quantity, bidPrice } = selectedOrderItem;
+        total += quantity * bidPrice;
+      });
+      return total;
+    }
 
     const letterHtml = `
       <style>
@@ -52,7 +89,7 @@ export default function printOrderItem(selectedOrderItem) {
 
       <h2 style="font-size: 20px;"><b>Menyetujui Tawaran</b></h2>
       <div>
-        <p>Kepada ${product.vendor.name},</p>
+        <p>Kepada ${selectedOrderItems[0].product.vendor.name},</p>
         <p>Kami dengan senang hati memberitahukan bahwa penawaran Anda untuk produk berikut telah diterima:</p>
         <table>
           <tr>
@@ -62,26 +99,15 @@ export default function printOrderItem(selectedOrderItem) {
             <th>Penawaran Akhir</th>
             <th>Jumlah Barang</th>
           </tr>
-          <tr>
-            <td>${product.name}</td>
-            <td>${product.description}</td>
-            <td>Rp.${product.price}</td>
-            <td>Rp.${bidPrice}</td>
-            <td>${quantity}</td>
-          </tr>
+          ${tableRows}
         </table>
 
         <table>
           <tr>
             <th>Jumlah Barang</th>
             <th>Harga Penawaran</th>
-            
           </tr>
-          <tr>
-            <td>${quantity}</td>
-            <td>Rp.${bidPrice}</td>
-            
-          </tr>
+          ${secondTableRows}
         </table>
 
         <table>
@@ -91,11 +117,13 @@ export default function printOrderItem(selectedOrderItem) {
             <th>Total Harga (termasuk Pajak)</th>
           </tr>
           <tr>
-            <td>Rp.${quantity * bidPrice}</td>
-            <td>Rp.${(quantity * bidPrice * taxRate).toFixed(2)}</td>
+            <td>Rp.${calculateTotal(selectedOrderItems)}</td>
+            <td>Rp.${(calculateTotal(selectedOrderItems) * taxRate).toFixed(
+              2
+            )}</td>
             <td>Rp.${(
-              quantity * bidPrice +
-              quantity * bidPrice * taxRate
+              calculateTotal(selectedOrderItems) +
+              calculateTotal(selectedOrderItems) * taxRate
             ).toFixed(2)}</td>
           </tr>
         </table>
@@ -112,17 +140,15 @@ export default function printOrderItem(selectedOrderItem) {
           <p style="text-align: right;"><b><span style="font-size: 12px;">VICTOR R MAUKAR</span></b></p>
           <p style="text-align: right;"><b><span style="font-size: 12px;">NIP 197504302007011009</span></b></p>
         </div>
-
-
       </div>
     </body>
     `;
 
-    const element = document.createElement('div');
+    const element = document.createElement("div");
     element.innerHTML = letterHtml;
 
     const options = {
-      margin: [20, 20, 20, 20] // Specify margins: top, left, bottom, right
+      margin: [20, 20, 20, 20], // Specify margins: top, left, bottom, right
     };
 
     html2pdf().set(options).from(element).save();
