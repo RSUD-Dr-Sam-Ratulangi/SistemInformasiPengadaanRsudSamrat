@@ -13,6 +13,16 @@
       <span class="mainTitle">SMART SAMRAT PROCUREMENT</span>
       <span class="subTitle">RUMAH SAKIT UMUM DAERAH DR SAMRATULANGI TONDANO</span>
     </div>
+
+    <div>
+      <RouterLink to="/notifications">
+        <div class="nav-item">
+          <FontAwesomeIcon icon="fas fa-solid fa-bell"  class="nav-icon" />
+          <span>1</span>
+        </div>
+      </RouterLink>
+    </div>
+    
     <div class="login">
       <button class="button is-info" @click="showmodalLogin = true" v-if="!isLoggedIn">
         <FontAwesomeIcon icon="fas fa-user" />
@@ -20,6 +30,8 @@
       <button class="button is-danger" @click="logout" v-else><FontAwesomeIcon icon="fas fa-right-from-bracket" /></button>
     </div>
   </nav>
+
+
 
   <div>
       <SideNavigationbar v-if="toggleIsActive"/> 
