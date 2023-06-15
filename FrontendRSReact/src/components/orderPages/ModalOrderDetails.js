@@ -1,7 +1,10 @@
-import React from 'react';
-import Modal from '../Modal';
-import { FaTrash, FaInfoCircle, FaHandshake, FaCheck } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import Modal from "../Modal";
+import { FaTrash, FaInfoCircle, FaHandshake, FaCheck } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import printOrderItem from "./printOrderItem";
 
 const ModalOrderDetails = ({
   onClose,
@@ -10,47 +13,63 @@ const ModalOrderDetails = ({
   handleDetailProduct,
   handleOffer,
   handleOpenSubmitModal,
-  handlePayoutDetail
+  handlePayoutDetail,
 }) => {
   const navigate = useNavigate();
+  const role = useSelector((state) => state.auth.role);
+
+  console.log("selected order", selectedOrder);
 
   const handleQuantityChange = (orderItemId, newQuantity) => {
-    console.log('quantity changed', orderItemId, newQuantity);
+    console.log("quantity changed", orderItemId, newQuantity);
   };
 
   const handleDeleteOrderItem = (orderItemId) => {
     const confirmed = window.confirm(
-      'Apakah Anda yakin ingin menghapus produk ini?'
+      "Apakah Anda yakin ingin menghapus produk ini?"
     );
 
     if (confirmed) {
       fetch(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orderitems/${orderItemId}`,
         {
-          method: 'DELETE'
+          method: "DELETE",
         }
       )
         .then((response) => {
           if (response.ok) {
             // Data berhasil dihapus, lakukan tindakan tambahan jika diperlukan
-            console.log('Data berhasil dihapus');
+            console.log("Data berhasil dihapus");
           } else {
             // Gagal menghapus data, tangani kesalahan jika diperlukan
-            console.error('Gagal menghapus data');
+            console.error("Gagal menghapus data");
           }
         })
         .catch((error) => {
           // Tangani kesalahan dalam permintaan
-          console.error('Terjadi kesalahan:', error);
+          console.error("Terjadi kesalahan:", error);
         });
     }
   };
 
+  const handleSetStatus = (status) => {
+    axios
+      .put(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
+        {
+          status: status,
+        }
+      )
+      .then((response) => {
+        console.log(response);
+      });
+  };
+
   return (
-    <Modal title='SubOrder Details' onClose={onClose} modalSize='xl'>
-      <div className='modal-body'>
+    <Modal title="SubOrder Details" onClose={onClose} modalSize="xl">
+      <div className="modal-body">
         <h4>Order Items:</h4>
-        <table className='table'>
+        <table className="table">
           <thead>
             <tr>
               <th>OrderId</th>
@@ -81,14 +100,14 @@ const ModalOrderDetails = ({
               const allItemsAccepted = [...vendorItemsMap].every(
                 ([vendorName, orderItems]) =>
                   orderItems.every(
-                    (orderItem) => orderItem.status === 'ACCEPTED'
+                    (orderItem) => orderItem.status === "ACCEPTED"
                   )
               );
 
               return [...vendorItemsMap].map(([vendorName, orderItems]) => (
                 <React.Fragment key={vendorName}>
                   <tr>
-                    <td colSpan='9'>
+                    <td colSpan="9">
                       <strong>{vendorName}</strong>
                     </td>
                   </tr>
@@ -102,54 +121,61 @@ const ModalOrderDetails = ({
                       <td>{orderItem.bidPrice}</td>
                       <td
                         onClick={() => handleHistory(orderItem.id)}
-                        className='history-click'>
+                        className="history-click"
+                      >
                         {orderItem.status}
                       </td>
                       <td>
                         <button
-                          className='btn btn-sm btn-secondary'
+                          className="btn btn-sm btn-secondary"
                           onClick={() =>
                             handleQuantityChange(
                               orderItem.id,
                               orderItem.quantity - 1
                             )
-                          }>
+                          }
+                        >
                           -
                         </button>
                         {orderItem.quantity}
                         <button
-                          className='btn btn-sm btn-secondary'
+                          className="btn btn-sm btn-secondary"
                           onClick={() =>
                             handleQuantityChange(
                               orderItem.id,
                               orderItem.quantity + 1
                             )
-                          }>
+                          }
+                        >
                           +
                         </button>
                       </td>
                       <td>
                         <button
-                          className='btn btn-sm btn-clear text-danger'
-                          onClick={() => handleDeleteOrderItem(orderItem.id)}>
+                          className="btn btn-sm btn-clear text-danger"
+                          onClick={() => handleDeleteOrderItem(orderItem.id)}
+                        >
                           <FaTrash />
                         </button>
                         <button
-                          className='btn btn-sm btn-clear text-info'
+                          className="btn btn-sm btn-clear text-info"
                           onClick={() =>
                             handleDetailProduct(orderItem.product.productuuid)
-                          }>
+                          }
+                        >
                           <FaInfoCircle />
                         </button>
                         <button
-                          className='btn btn-sm btn-clear text-success'
-                          onClick={() => handleOffer(orderItem.id)}>
+                          className="btn btn-sm btn-clear text-success"
+                          onClick={() => handleOffer(orderItem.id)}
+                        >
                           <FaHandshake />
                         </button>
-                        {orderItem.status === 'ACCEPTED' && (
+                        {orderItem.status === "ACCEPTED" && (
                           <button
-                            className='btn btn-sm btn-clear text-success'
-                            onClick={() => handleOpenSubmitModal(orderItem)}>
+                            className="btn btn-sm btn-clear text-success"
+                            onClick={() => handleOpenSubmitModal(orderItem)}
+                          >
                             <FaCheck />
                           </button>
                         )}
@@ -157,13 +183,14 @@ const ModalOrderDetails = ({
                     </tr>
                   ))}
                   {orderItems.some(
-                    (orderItem) => orderItem.status === 'ACCEPTED'
+                    (orderItem) => orderItem.status === "ACCEPTED"
                   ) && (
                     <tr>
-                      <td colSpan='9'>
+                      <td colSpan="9">
                         <button
-                          className='btn btn-sm btn-success'
-                          onClick={() => console.log(vendorItemsMap)}>
+                          className="btn btn-sm btn-success"
+                          onClick={() => console.log(vendorItemsMap)}
+                        >
                           Submit All
                         </button>
                       </td>
@@ -174,24 +201,55 @@ const ModalOrderDetails = ({
             })()}
           </tbody>
         </table>
-        <div>
+        <div className="d-flex gap-2">
           <button
-            className='btn btn-primary'
-            onClick={() => navigate('/products')}>
+            className="btn btn-primary"
+            onClick={() => navigate("/products")}
+          >
             Add Product
           </button>
+          {role === "PP" && (
+            <>
+              <button
+                className="btn btn-secondary"
+                onClick={() => handleSetStatus("NEGOTIATION")}
+              >
+                Cancel Negotiation
+              </button>
+              <button
+                className="btn btn-danger"
+                onClick={() => handleSetStatus("CANCEL")}
+              >
+                Cancel Order
+              </button>
+            </>
+          )}
         </div>
       </div>
-      <div className='modal-footer'>
+      <div className="modal-footer">
+        {/* Remove Comment to only enable Print button on 'PP' Role */}
+        {/* {role === "PP" ? ( */}
         <button
-          type='button'
-          className='btn btn-secondary'
-          onClick={handlePayoutDetail}>
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => printOrderItem(selectedOrder.orderItems)}
+        >
+          Print
+        </button>
+        {/* ) : (
+          <> */}
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={handlePayoutDetail}
+        >
           Payout Detail
         </button>
-        <button type='button' className='btn btn-secondary'>
+        <button type="button" className="btn btn-secondary">
           Check Status
         </button>
+        {/* </>
+        )} */}
       </div>
     </Modal>
   );

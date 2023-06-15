@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import "../assets/tabsnav.css";
+import "../assets/css/tabsnav.css";
 
 const TabsNav = () => {
   const location = useLocation();

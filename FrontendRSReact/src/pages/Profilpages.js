@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import "../assets/profilpages.css";
+import "../assets/css/profilpages.css";
 
 class Profilpages extends React.Component {
   render() {
