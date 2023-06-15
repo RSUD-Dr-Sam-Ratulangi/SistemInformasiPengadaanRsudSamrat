@@ -7,7 +7,7 @@ import {
   Modal,
   Button
 } from "react-bootstrap";
-
+import { BsTrashFill } from 'react-icons/bs';
 import '../assets/css/pages/products.css';
 
 const Productpages = () => {
@@ -320,20 +320,20 @@ const Productpages = () => {
             </div>
             <div className="col-md-12 mb-4">
               <div className='list-group list-group-horizontal' style={{width: '100%'}}>
-                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === "All") ? "active" : "light"} category-button`} onClick={() => handleCategorySelection("All")}>
-                  <div className="ms-2 me-auto category-button-text">
-                    <div className="fw-bold category-button-text">All</div>
+                <button type="button" class={`btn ${(selectedCategory === "All") ? "btn-light shadow" : "btn-light"} category-button`} onClick={() => handleCategorySelection("All")}>
+                  <div class="ms-2 me-auto category-button-text">
+                    <div class="fw-bold category-button-text">All</div>
                     All category
                   </div>
                 </button>
-                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === "Jasa") ? "active" : "light"} category-button`} onClick={() => handleCategorySelection("Jasa")}>
-                  <div className="ms-2 me-auto category-button-text">
-                    <div className="fw-bold category-button-text">Jasa</div>
+                <button type="button" class={`btn ${(selectedCategory === "Jasa") ? "btn-light shadow" : "btn-light"} category-button`} onClick={() => handleCategorySelection("Jasa")}>
+                  <div class="ms-2 me-auto category-button-text">
+                    <div class="fw-bold category-button-text">Jasa</div>
                     Jasa category
                   </div>
                 </button>
                 <Dropdown className='category-button'>
-                  <Dropdown.Toggle variant={(selectedCategory === 'BM' ? 'primary' : 'light')} style={{width: '100%'}}>
+                  <Dropdown.Toggle variant={(selectedCategory === 'BM' ? 'light shadow' : 'light')} style={{width: '100%'}}>
                     <div className="ms-2 me-auto" onClick={() => handleCategorySelection('BM')}>
                       <div className="fw-bold">BM</div>
                       Select BM category
@@ -345,7 +345,7 @@ const Productpages = () => {
                   </Dropdown.Menu>
                 </Dropdown>
                 <Dropdown className='category-button'>
-                  <Dropdown.Toggle variant={(selectedCategory === 'BHP' ? 'primary' : 'light')} style={{width: '100%'}}>
+                  <Dropdown.Toggle variant={(selectedCategory === 'BHP' ? 'light shadow' : 'light')} style={{width: '100%'}}>
                     <div className="ms-2 me-auto" onClick={() => handleCategorySelection('BHP')}>
                       <div className="fw-bold">BHP</div>
                       Select BHP category
@@ -462,24 +462,24 @@ const Productpages = () => {
                     <p>Quantity: {item.orderQuantity}</p>
                     <p>Price: Rp. {item.price * item.orderQuantity}</p>
                     <button
-                      className="btn btn-danger"
+                      className="btn btn-ligth shadow"
                       style={{ marginRight: "10px" }}
                       onClick={() => removeItem(item.id)}
                     >
-                      Delete
+                      <BsTrashFill />
                     </button>
                     <hr />
                   </div>
                 ))}
                 <button
-                  className="btn btn-dark"
+                  className="btn btn-light shadow"
                   style={{ marginLeft: "10px", marginTop: "15px" }}
                   onClick={placeOrder}
                 >
                   Place Order
                 </button>
                 <button
-                  className="btn btn-dark"
+                  className="btn btn-light shadow"
                   style={{ marginLeft: "10px", marginTop: "15px" }}
                   onClick={handleCancelClick} // Menambahkan event handler pada button Cancel
                 >
