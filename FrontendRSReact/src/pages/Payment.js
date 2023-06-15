@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "../assets/Payment.css"
+import "../assets/css/Payment.css"
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 
 const Payment = () => {

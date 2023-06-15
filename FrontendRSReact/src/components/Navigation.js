@@ -10,9 +10,9 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../config/auth/authSlice";
 import { useNavigate } from "react-router-dom";
-import "../assets/navigation.css";
+import "../assets/css/navigation.css";
 import TabsNav from "./TabsNav";
-import logo from "../assets/logo.jpg";
+import logo from "../assets/images/logo.jpg";
 
 
 const Navigation = () => {

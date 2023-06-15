@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../assets/vendorpages.css";
-
+import { useNavigate } from "react-router-dom";
+import "../assets/css/vendorpages.css";
+import {
+  FaTrash,
+  FaInfoCircle,
+  FaHandshake,
+  FaCheck,
+  FaPrint,
+} from "react-icons/fa";
+import html2pdf from "html2pdf.js";
+import logo from "../assets/images/logo.jpg";
 import { useSelector } from "react-redux";
 
 import ModalHistory from "../components/orderPages/ModalHistory";
