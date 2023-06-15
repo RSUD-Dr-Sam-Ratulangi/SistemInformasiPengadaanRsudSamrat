@@ -31,7 +31,7 @@ const Productpages = () => {
   // modal
   const [selectedItem, setSelectedItem] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
   const [modalErrorMessage, setModalErrorMessage] = useState('');
 
   // Mengambil data Vendor
@@ -76,13 +76,29 @@ const Productpages = () => {
 
   //order
   function addToCart() {
-    const updatedItem = { ...selectedItem, quantity: parseInt(quantity) };
-    setOrderedItems([...orderedItems, updatedItem]);
+    let isItemExist = false;
+    orderedItems.forEach(item => {
+      if(selectedItem.id === item.id) isItemExist = true;
+    });
+
+    let updatedItem;
+    if(isItemExist) {
+      updatedItem = orderedItems.map(item => {
+        if(selectedItem.id === item.id) return {...item, orderQuantity: item.orderQuantity + parseInt(quantity)};
+        else return item;
+      });
+    }
+    else {
+      updatedItem = [...orderedItems, {...selectedItem, orderQuantity: parseInt(quantity)}];
+    }
+    
+    setOrderedItems(updatedItem);
     setSelectedItem(null);
-    setQuantity(1);
+    setQuantity(0);
     setModalErrorMessage('');
     setShowModal(false);
     setShowToast(true);
+
     console.log(orderedItems);
   };
 
@@ -92,7 +108,7 @@ const Productpages = () => {
       .then((res) => {
         console.log(res.data.id);
         const orderItem = orderedItems.map((items) => {
-          return { productId: items.id, quantity: items.quantity };
+          return {productId: items.id, quantity: items.orderQuantity};
         });
         axios
           .post(
@@ -103,7 +119,7 @@ const Productpages = () => {
             navigate('/orders');
             setSelectedItem(null);
             setShowModal(false);
-            setQuantity(1);
+            setQuantity(0);
             setModalErrorMessage('');
           })
           .catch((err) => console.log(err));
@@ -164,11 +180,17 @@ const Productpages = () => {
 
   function closeModal() {
     setShowModal(false);
-    setQuantity(1);
+    setQuantity(0);
+    setModalErrorMessage('');
   };
 
   function handleQuantity(value) {
-    if(parseInt(value) > 0 && parseInt(value) <= selectedItem.quantity) setModalErrorMessage('');
+    let orderedItemOrderQuantity = 0;
+    orderedItems.forEach(item => {
+      if(selectedItem.id === item.id) orderedItemOrderQuantity = item.orderQuantity;
+    });
+
+    if(parseInt(value) > 0 && parseInt(value) <= selectedItem.quantity - orderedItemOrderQuantity) setModalErrorMessage('');
     else setModalErrorMessage('Quantity is not valid.');
 
     setQuantity(value);
@@ -437,8 +459,8 @@ const Productpages = () => {
                   <div key={item.id}>
                     <p>Name: {item.name}</p>
                     <p>Description: {item.description}</p>
-                    <p>Quantity: {item.quantity}</p>
-                    <p>Price: Rp. {item.price * item.quantity}</p>
+                    <p>Quantity: {item.orderQuantity}</p>
+                    <p>Price: Rp. {item.price * item.orderQuantity}</p>
                     <button
                       className="btn btn-danger"
                       style={{ marginRight: "10px" }}
