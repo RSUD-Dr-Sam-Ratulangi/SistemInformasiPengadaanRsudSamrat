@@ -8,6 +8,7 @@ import VendorList from "../../views/VendorList.vue";
 import VendorUpdate from "../../views/relativeViews/VendorUpdate.vue";
 import NotFoundPage from "../../views/relativeViews/NotFoundPage.vue";
 import orderDetails from "../../views/orderDetails.vue";
+import Notifications from "../../views/relativeViews/Notifications.vue";
 
 
 const router = createRouter({
@@ -50,7 +51,7 @@ const router = createRouter({
     },
     {
       path: "/notifications",
-      component: Notification,
+      component: Notifications,
     },
     {
       path: "/:catchAll(.*)",

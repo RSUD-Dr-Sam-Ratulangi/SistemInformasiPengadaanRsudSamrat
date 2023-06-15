@@ -4,7 +4,6 @@
       <RouterLink to="/">
         <div class="nav-item">
           <FontAwesomeIcon icon="fas fa-home" class="nav-icon" />
-          <p v-if="!isOpen">Home</p>
         </div>
       </RouterLink>
     </div>
@@ -12,7 +11,6 @@
       <RouterLink to="/productView">
         <div class="nav-item">
           <FontAwesomeIcon icon="fa-solid fa-list" class="nav-icon" />
-          <p v-if="!isOpen">See Product</p>
         </div>
       </RouterLink>
     </div>
@@ -20,15 +18,6 @@
       <RouterLink to="/orderDetails">
         <div class="nav-item">
           <FontAwesomeIcon icon="fas fa-solid fa-o"  class="nav-icon" />
-          <p v-if="!isOpen">Orders</p>
-        </div>
-      </RouterLink>
-    </div>
-    <div>
-      <RouterLink to="/orderDetails">
-        <div class="nav-item">
-          <FontAwesomeIcon icon="fas fa-solid fa-bell"  class="nav-icon" />
-          <p v-if="!isOpen">Orders</p>
         </div>
       </RouterLink>
     </div>
