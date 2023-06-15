@@ -82,6 +82,15 @@ export default function Productpages() {
     setSelectedCategory(null);
     setFilteredProducts(filterProducts({statusList: ['PENDING']}));
   }
+
+  function handleSearchQuery(e) {
+    setFilteredProducts(filterProducts({
+      categoryName: selectedCategory,
+      subCategoryName: selectedSubCategory,
+      searchQueryNamePrice: e.target.value
+    }));
+    setSearchQuery(e.target.value);
+  }
   
   function handleProductSelection(product) {
     setSelectedProduct(product);
@@ -154,7 +163,7 @@ export default function Productpages() {
     try {
       const res = await axios.get('http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=2&size=25');
       setVendors(res.data);
-      console.log('vendors', res.data);
+      // console.log('vendors', vendors);
     }
     catch(err) {
       console.log('Unable to get vendors', err);
@@ -165,6 +174,7 @@ export default function Productpages() {
     try {
       const res = await axios.get(`http://rsudsamrat.site:8080/pengadaan/dev/v1/products/vendor/${selectedVendorUUID}`);
       setProducts(res.data);
+      // console.log('products', products);
     }
     catch(err) {
       console.log('Unable to get products', err);
@@ -173,11 +183,12 @@ export default function Productpages() {
 
   function filterProducts(properties) {
     const {
-      minimumQuantity=0, // must be number
-      statusList=['APPROVED'], // must be array of string
-      // statusList=null, // must be array of string
-      categoryName=null, // must be string
-      subCategoryName=null // must be string
+      minimumQuantity = 0, // must be number
+      statusList = ['APPROVED'], // must be array of string
+      // statusList = null, // must be array of string
+      categoryName = null, // must be string
+      subCategoryName = null, // must be string
+      searchQueryNamePrice = '' // must be string
     } = properties;
 
     let newFilteredProducts = products;
@@ -202,7 +213,15 @@ export default function Productpages() {
       if(subCategoryName) {
         newFilteredProducts = newFilteredProducts.filter(product => product.subcategories.length > 0 && product.subcategories.some(subCategory => subCategory.name === subCategoryName));
       }
+
+      // filter using both name or price
+      if(searchQueryNamePrice.length !== 0) {
+        // newFilteredProducts = newFilteredProducts.filter(product => searchQueryNamePrice === product.name || searchQueryNamePrice === product.price.toString());
+        newFilteredProducts = newFilteredProducts.filter(product => product.name.toLowerCase().includes(searchQueryNamePrice.toLowerCase()) || product.price.toString().includes(searchQueryNamePrice));
+      }
     }
+
+    // console.log(`minimumQuantity (${minimumQuantity}) | statusList (${statusList.map(status => status)}) | categoryName (${categoryName}) | subCategoryName (${subCategoryName}) | searchQueryNamePrice (${searchQueryNamePrice})`);
 
     return newFilteredProducts;
   }
@@ -268,10 +287,11 @@ export default function Productpages() {
                   placeholder='Search...'
                   aria-label='Search'
                   value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
+                  onChange={handleSearchQuery}
                   style={{marginTop: '40px'}}
                 />
               </div>
+              <h6>Result: {filteredProducts.length}</h6>
             </div>
             <div className='col-md-12 mb-4'>
               <div className='list-group list-group-horizontal' style={{width: '100%'}}>
