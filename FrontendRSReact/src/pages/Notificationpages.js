@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
-import "../assets/notificationpages.css";
+import "../assets/css/notificationpages.css";
 
 const NotificationPages = () => {
   const [notifications, setNotifications] = useState([]);
