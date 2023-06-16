@@ -34,10 +34,10 @@ export default function Productpages() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showSelectedProductModal, setShowSelectedProductModal] = useState(false);
   const [selectedProductOrderQuantity, setSelectedProductOrderQuantity] = useState(0);
-  const [selectedProductModalErrorMessage, setSelectedProductModalErrorMessage] = useState('');
+  const [selectedProductModalErrorMessage, setSelectedProductModalErrorMessage] = useState('Quantity is not valid');
 
-  // cart
-  const [cart, setCart] = useState([]);
+  // carts
+  const [carts, setCarts] = useState(JSON.parse(localStorage.getItem('carts')));
   const [showCartModal, setShowCartModal] = useState(false);
   const [itemAddedToCartToast, setItemAddedToCartToast] = useState(false);
 
@@ -56,8 +56,7 @@ export default function Productpages() {
       setSelectedSubCategory(null);
       setSelectedProduct(null);
       setSelectedProductOrderQuantity(0);
-      setSelectedProductModalErrorMessage('');
-      setCart([]);
+      setSelectedProductModalErrorMessage('Quantity is not valid');
       getProducts();
     }
   }, [selectedVendorUUID]);
@@ -73,6 +72,20 @@ export default function Productpages() {
   useEffect(() => {
     if(selectedSubCategory) setFilteredProducts(filterProducts({subCategoryName: selectedSubCategory}));
   }, [selectedSubCategory]);
+
+  useEffect(() => {
+    if(carts) {
+      localStorage.setItem('carts', JSON.stringify(carts));
+    }
+    else if(vendors.length > 0) {
+      const newCarts = vendors.map(vendor => {
+        return {vendorUUID: vendor.vendoruuid, products: []};
+      });
+      
+      setCarts(newCarts);
+      localStorage.setItem('carts', JSON.stringify(newCarts));
+    }
+  }, [carts, vendors]);
 
 
 
@@ -101,14 +114,14 @@ export default function Productpages() {
     setSelectedProduct(null);
     setShowSelectedProductModal(false);
     setSelectedProductOrderQuantity(0);
-    setSelectedProductModalErrorMessage('');
+    setSelectedProductModalErrorMessage('Quantity is not valid');
   }
 
   function handleSelectedProductOrderQuantity(e) {
-    let existingProductOrderQuantity = e.target.value;
+    let existingProductOrderQuantity = 0;
 
     // cek jika item sudah ada di keranjang
-    cart.forEach(product => {
+    carts.forEach(product => {
       if(selectedProduct.id === product.id) existingProductOrderQuantity = product.orderQuantity;
     });
 
@@ -120,23 +133,35 @@ export default function Productpages() {
 
   function handleSelectedProductModalAddToCart() {
     let isProductExistInCart = false;
-    cart.forEach(product => {
-      if(selectedProduct.id === product.id) isProductExistInCart = true;
+
+    carts.forEach(cart => {
+      if(cart.vendorUUID === selectedVendorUUID) {
+        cart.products.forEach(product => {
+          if(selectedProduct.id === product.id) isProductExistInCart = true;
+        });
+      }
     });
 
-    let newCart = [];
-    if(isProductExistInCart) {
-      newCart = cart.map(product => {
-        if(selectedProduct.id === product.id) return {...product, orderQuantity: product.orderQuantity + parseInt(selectedProductOrderQuantity)};
-        else return product;
-      });
-    }
-    else newCart = [...cart, {...selectedProduct, orderQuantity: parseInt(selectedProductOrderQuantity)}];
+    let newCarts = [];
+    newCarts = carts.map(cart => {
+      if(selectedVendorUUID === cart.vendorUUID) {
+        return {
+          vendorUUID: cart.vendorUUID,
+          products: (isProductExistInCart)
+            ? cart.products.map(product => {
+              if(selectedProduct.id === product.id) return {...product, orderQuantity: product.orderQuantity + parseInt(selectedProductOrderQuantity)};
+              else return product;
+            })
+            : [...cart.products, {...selectedProduct, orderQuantity: parseInt(selectedProductOrderQuantity)}]
+        };
+      }
+      else return cart;
+    });
 
-    setCart(newCart);
+    setCarts(newCarts);
     setSelectedProduct(null);
     setSelectedProductOrderQuantity(0);
-    setSelectedProductModalErrorMessage('');
+    setSelectedProductModalErrorMessage('Quantity is not valid');
     setShowSelectedProductModal(false);
     setItemAddedToCartToast(true);
   }
@@ -146,24 +171,32 @@ export default function Productpages() {
   }
 
   function handleCartProductDelete(productId) {
-    const newCart = cart.filter(product => product.id !== productId);
-    setCart(newCart);
+    const newCarts = carts.map(cart => {
+      if(selectedVendorUUID === cart.vendorUUID) {
+        return {
+          vendorUUID: cart.vendorUUID,
+          products: cart.products.filter(product => product.id !== productId)
+        }
+      }
+      else return cart;
+    });
+
+    setCarts(newCarts);
   }
 
   function handleCartModalCancel(e) {
     e.preventDefault();
 
-    setCart([]);
+    setCarts([]);
     setShowCartModal(false);
   }
-
+  
 
 
   async function getVendors() {
     try {
       const res = await axios.get('http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=2&size=25');
       setVendors(res.data);
-      // console.log('vendors', vendors);
     }
     catch(err) {
       console.log('Unable to get vendors', err);
@@ -229,13 +262,25 @@ export default function Productpages() {
   function orderProducts() {
     axios.post('http://rsudsamrat.site:8080/pengadaan/dev/v1/orders', {})
       .then(res => {
-        const newCart = cart.map(product => {
-          return {productId: product.id, quantity: product.orderQuantity};
+        let orders = [];
+        carts.forEach(cart => {
+          if(selectedVendorUUID === cart.vendorUUID) {
+            cart.products.forEach(product => {
+              orders.push({productId: product.id, quantity: product.orderQuantity});
+            });
+          }
         });
 
-        axios.post(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`, newCart)
+        axios.post(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`, orders)
           .then(() => {
-            navigate('/orders');
+            const newCarts = vendors.map(vendor => {
+              return {vendorUUID: vendor.vendoruuid, products: []};
+            });
+            setCarts(newCarts);
+
+            setTimeout(() => {
+              navigate('/orders');
+            }, 100);
           })
           .catch(err => console.log('unable to order products', err));
       })
@@ -366,7 +411,7 @@ export default function Productpages() {
                           type='number'
                           value={selectedProductOrderQuantity}
                           onChange={handleSelectedProductOrderQuantity}
-                          min={1}
+                          min={0}
                         />
                       </div>
                       <label>{selectedProductModalErrorMessage}</label>
@@ -419,28 +464,30 @@ export default function Productpages() {
                 </button>
               </div>
               <div className='modal-body'>
-                {(cart.length > 0) && cart.map(product => (
-                  <div key={product.id}>
-                    <p>Name: {product.name}</p>
-                    <p>Description: {product.description}</p>
-                    <p>Quantity: {product.orderQuantity}</p>
-                    <p>Price: Rp. {product.price * product.orderQuantity}</p>
-                    <button
-                      className='btn btn-danger'
-                      style={{marginRight: '10px'}}
-                      onClick={() => handleCartProductDelete(product.id)}
-                    >
-                      Delete
-                    </button>
-                    <hr />
-                  </div>
+                {(carts.length > 0) && carts.map(cart => (
+                  (selectedVendorUUID === cart.vendorUUID) && cart.products.map(product => (
+                    <div key={product.id}>
+                      <p>Name: {product.name}</p>
+                      <p>Description: {product.description}</p>
+                      <p>Quantity: {product.orderQuantity}</p>
+                      <p>Price: Rp. {product.price * product.orderQuantity}</p>
+                      <button
+                        className='btn btn-danger'
+                        style={{marginRight: '10px'}}
+                        onClick={() => handleCartProductDelete(product.id)}
+                      >
+                        Delete
+                      </button>
+                      <hr />
+                    </div>
+                  ))
                 ))}
 
                 <button
                   className='btn btn-dark'
                   style={{marginLeft: '10px', marginTop: '15px'}}
                   onClick={orderProducts}
-                  disabled={cart.length === 0}
+                  // disabled={carts.length === 0}
                 >
                   Place Order
                 </button>
