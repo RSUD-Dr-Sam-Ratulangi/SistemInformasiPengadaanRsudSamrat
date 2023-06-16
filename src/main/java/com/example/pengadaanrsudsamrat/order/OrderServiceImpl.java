@@ -544,39 +544,38 @@ public class OrderServiceImpl implements OrderService {
 
 
 //pertukaran stock dan pembelian
-    @Override
-    public Page<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(int page, int size, String sortBy) {
-        if (sortBy == null) {
-            sortBy = "orderDate"; // Set default sort order to orderDate
-        }
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
-        Page<OrderModel> orders = orderRepository.findAll(pageable);
-
-        List<OrderItemQuantityExchangeResponseDTO> orderItemDTOList = new ArrayList<>();
-        for (OrderModel orderModel : orders) {
-            List<OrderItemModel> orderItems = orderModel.getOrderItems();
-            for (OrderItemModel orderItem : orderItems) {
-                OrderItemQuantityExchangeResponseDTO orderItemDTO = new OrderItemQuantityExchangeResponseDTO();
-                orderItemDTO.setOrderId(orderModel.getId());
-                orderItemDTO.setOrderItemId(orderItem.getId());
-                if (orderItem.getProduct() != null) {
-                    if (orderItem.getProduct().getVendor() != null) {
-                        orderItemDTO.setVendor(modelMapper.map(orderItem.getProduct().getVendor(), VendorResponseDTO.class));
-                    }
-                    orderItemDTO.setProduct(modelMapper.map(orderItem.getProduct(), ProductResponseDTO.class));
-                    orderItemDTO.setProductQuantity(orderItem.getProduct().getQuantity());
-                    orderItemDTO.setProductTotalStock(orderItem.getProduct().getQuantity() - orderItem.getQuantity());
-                }
-                orderItemDTO.setOrderItemQuantity(orderItem.getQuantity());
-                orderItemDTO.setOrderDate(orderModel.getOrderDate());
-                orderItemDTO.setStatus(orderModel.getStatus());
-                orderItemDTOList.add(orderItemDTO);
-            }
-        }
-
-        return new PageImpl<>(orderItemDTOList, pageable, orderItemDTOList.size());
+@Override
+public List<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(String sortBy) {
+    if (sortBy == null) {
+        sortBy = "orderDate"; // Set default sort order to orderDate
     }
+
+    List<OrderModel> orders = orderRepository.findAll(Sort.by(sortBy).descending());
+
+    List<OrderItemQuantityExchangeResponseDTO> orderItemDTOList = new ArrayList<>();
+    for (OrderModel orderModel : orders) {
+        List<OrderItemModel> orderItems = orderModel.getOrderItems();
+        for (OrderItemModel orderItem : orderItems) {
+            OrderItemQuantityExchangeResponseDTO orderItemDTO = new OrderItemQuantityExchangeResponseDTO();
+            orderItemDTO.setOrderId(orderModel.getId());
+            orderItemDTO.setOrderItemId(orderItem.getId());
+            if (orderItem.getProduct() != null) {
+                if (orderItem.getProduct().getVendor() != null) {
+                    orderItemDTO.setVendor(modelMapper.map(orderItem.getProduct().getVendor(), VendorResponseDTO.class));
+                }
+                orderItemDTO.setProduct(modelMapper.map(orderItem.getProduct(), ProductResponseDTO.class));
+                orderItemDTO.setProductQuantity(orderItem.getProduct().getQuantity());
+                orderItemDTO.setProductTotalStock(orderItem.getProduct().getQuantity() - orderItem.getQuantity());
+            }
+            orderItemDTO.setOrderItemQuantity(orderItem.getQuantity());
+            orderItemDTO.setOrderDate(orderModel.getOrderDate());
+            orderItemDTO.setStatus(orderModel.getStatus());
+            orderItemDTOList.add(orderItemDTO);
+        }
+    }
+
+    return orderItemDTOList;
+}
 
 
 
