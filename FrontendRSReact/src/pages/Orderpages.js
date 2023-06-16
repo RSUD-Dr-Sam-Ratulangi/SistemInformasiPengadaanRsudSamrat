@@ -51,6 +51,8 @@ const Orderpages = () => {
           }
         });
 
+        console.log("unique data", uniqueData);
+
         // Filter data based on role and status
         if (role === "PP") {
           uniqueData = uniqueData.filter(
@@ -97,6 +99,8 @@ const Orderpages = () => {
       const response = await axios.get(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${orderId}`
       );
+      console.log("orderssss", response.data);
+
       setSelectedOrder(response.data);
     } catch (error) {
       console.error(error);
