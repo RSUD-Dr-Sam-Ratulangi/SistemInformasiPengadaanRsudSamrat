@@ -62,6 +62,18 @@
                       <input type="checkbox" v-model="product.subCategoryId" :value="2">
                       MEDIS
                     </label>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.subCategoryId" :value="2">
+                      MEDIS
+                    </label>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.subCategoryId" :value="5">
+                      ALKSES
+                    </label>
+                    <label class="checkbox">
+                      <input type="checkbox" v-model="product.subCategoryId" :value="6">
+                      ALKON
+                    </label>
                   </div>
                 </div>
                 <button class="button is-primary" type="submit">Submit</button>
