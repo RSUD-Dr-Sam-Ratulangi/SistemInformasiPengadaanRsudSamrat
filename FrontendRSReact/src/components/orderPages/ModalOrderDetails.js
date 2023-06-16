@@ -63,13 +63,14 @@ const ModalOrderDetails = ({
       )
       .then((response) => {
         console.log(response);
-      }).catch(err => console.log(err));
-      onClose();
+      })
+      .catch((err) => console.log(err));
+    onClose();
   };
 
   // STATUS BERUBAH IF ALL ORDER ITEM "ACCEPTED" without button
   // useEffect((orderItems) => {
-  //   const orderItem = 
+  //   const orderItem =
   //   if(selectedOrder.orderItems.every((orderItem) => orderItem.status === "ACCEPTED")){
   //     handleSetStatus("VALIDATING");
   //   }

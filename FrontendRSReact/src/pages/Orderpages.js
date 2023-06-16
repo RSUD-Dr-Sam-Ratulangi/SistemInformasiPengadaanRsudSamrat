@@ -1,17 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import "../assets/css/vendorpages.css";
-import {
-  FaTrash,
-  FaInfoCircle,
-  FaHandshake,
-  FaCheck,
-  FaPrint,
-} from "react-icons/fa";
-import html2pdf from "html2pdf.js";
-import logo from "../assets/images/logo.jpg";
 import { useSelector } from "react-redux";
+import { DataGrid } from "@mui/x-data-grid";
 
 import ModalHistory from "../components/orderPages/ModalHistory";
 import ModalOrderItem from "../components/orderPages/ModalOrderItem";
@@ -61,6 +51,8 @@ const Orderpages = () => {
           }
         });
 
+        console.log("unique data", uniqueData);
+
         // Filter data based on role and status
         if (role === "PP") {
           uniqueData = uniqueData.filter(
@@ -107,6 +99,8 @@ const Orderpages = () => {
       const response = await axios.get(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${orderId}`
       );
+      console.log("orderssss", response.data);
+
       setSelectedOrder(response.data);
     } catch (error) {
       console.error(error);
@@ -260,6 +254,16 @@ const Orderpages = () => {
     setSubmitModalOpen(true);
   };
 
+  const getRowId = (orderItem) => orderItem.orderId;
+
+  const orderRows = data.filter((item) => item.status === "ORDER");
+  const validatingRows = data.filter((item) => item.status === "VALIDATING");
+  const negotiationRows = data.filter((item) => item.status === "NEGOTIATION");
+
+  const handleRowClick = (selectedOrder) => {
+    openModal(selectedOrder.orderId);
+  };
+
   return (
     <div className="container">
       {loading ? (
@@ -276,7 +280,7 @@ const Orderpages = () => {
           </div>
 
           {/* Main Table */}
-          <table className="table">
+          {/* <table className="table">
             <thead className="thead-dark">
               <tr>
                 <th>Order ID</th>
@@ -302,7 +306,73 @@ const Orderpages = () => {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table> */}
+
+          <div className="d-flex flex-column gap-3">
+            {/* ORDER Table */}
+            <div>
+              <h2>ORDER Table</h2>
+              {orderRows.length > 0 ? (
+                <DataGrid
+                  rows={orderRows}
+                  columns={[
+                    { field: "orderId", headerName: "Order ID", flex: 1 },
+                    { field: "orderDate", headerName: "Order Date", flex: 1 },
+                    // Additional columns as needed
+                  ]}
+                  getRowId={getRowId}
+                  onRowClick={(params) => handleRowClick(params.row)}
+                  autoHeight
+                  // Add other DataGrid props and customization options
+                  className="data-grid"
+                />
+              ) : (
+                <div>NO DATA</div>
+              )}
+            </div>
+
+            {/* VALIDATING Table */}
+            <div>
+              <h2>VALIDATING Table</h2>
+              {validatingRows.length > 0 ? (
+                <DataGrid
+                  rows={validatingRows}
+                  columns={[
+                    { field: "orderId", headerName: "Order ID", flex: 1 },
+                    { field: "orderDate", headerName: "Order Date", flex: 1 },
+                    // Additional columns as needed
+                  ]}
+                  getRowId={getRowId}
+                  onRowClick={(params) => handleRowClick(params.row)}
+                  // Add other DataGrid props and customization options
+                  className="data-grid"
+                />
+              ) : (
+                <div>NO DATA</div>
+              )}
+            </div>
+
+            {/* NEGOTIATION Table */}
+            <div>
+              <h2>NEGOTIATION Table</h2>
+              {negotiationRows.length > 0 ? (
+                <DataGrid
+                  rows={negotiationRows}
+                  columns={[
+                    { field: "orderId", headerName: "Order ID", flex: 1 },
+                    { field: "orderDate", headerName: "Order Date", flex: 1 },
+                    // Additional columns as needed
+                  ]}
+                  getRowId={getRowId}
+                  onRowClick={(params) => handleRowClick(params.row)}
+                  // Add other DataGrid props and customization options
+                  className="data-grid"
+                />
+              ) : (
+                <div>NO DATA</div>
+              )}
+            </div>
+          </div>
 
           {/* Order Details Modal */}
           {selectedOrder && (
