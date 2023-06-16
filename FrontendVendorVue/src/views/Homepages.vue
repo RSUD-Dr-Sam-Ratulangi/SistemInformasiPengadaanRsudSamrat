@@ -76,6 +76,7 @@ export default {
         this.orders = res.data;
         console.log(res.data);
       }).catch(err => console.log(err));
+    
   },
   methods: {
     searchOrders() {

@@ -54,10 +54,24 @@
           </div>
 
         </div>
-        <button style="display: flex; justify-content: flex-end; margin-top: 10px" class="button is-warning"
-          @click="closeModal">
-          Tutup
-        </button>
+        <div class="footer-modals">
+          <button class="button is-warning" @click="closeModal">
+            Tutup
+          </button>
+          <div class="file">
+            <label class="file-label">
+              <input class="file-input" type="file" name="resume">
+              <span class="file-cta">
+                <span class="file-icon">
+                  <FontAwesomeIcon icon="fas fa-upload" />
+                </span>
+                <span class="file-label">
+                  Choose a file…
+                </span>
+              </span>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   </Transition>
@@ -126,126 +140,128 @@
 </template>
 
 <script>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import axios from 'axios';
 import { mapGetters } from "vuex";
 
 export default {
-  props: {
-    show: Boolean,
-    orders: Object,
-  },
-  emits: ['close'],
-
-  data() {
-    return {
-      history: [],
-      selectedItem: null,
-      accepted: "ACCEPTED",
-      rejected: "REJECTED",
-      showRejectModal: false,
-      showHistoryModal: false,
-      fileName: "",
-      rejectBidInputBid: "",
-    };
-  },
-
-  computed: {
-    getUniqueVendors() {
-      const vendors = [];
-      for (const orderItem of this.orders.orderItems) {
-        const vendorName = orderItem.product.vendor.name;
-        if (!vendors.includes(vendorName)) {
-          vendors.push(vendorName);
-        }
-      }
-      return vendors;
+    props: {
+        show: Boolean,
+        orders: Object,
     },
-    ...mapGetters(["message", "username", "vendoruuid", "vendorid"]),
-  },
-
-  methods: {
-    selectItem(orderItem) {
-      this.selectedItem = orderItem;
-      axios.get(`http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${this.orders.id}/${this.selectedItem.id}`)
-        .then((res) => {
-          this.history = res.data;
-          console.log(this.history);
-        }).catch((err) => {
-          console.log(err)
-        })
+    emits: ["close"],
+    data() {
+        return {
+            history: [],
+            selectedItem: null,
+            accepted: "ACCEPTED",
+            rejected: "REJECTED",
+            showRejectModal: false,
+            showHistoryModal: false,
+            fileName: "",
+            rejectBidInputBid: "",
+        };
     },
-    acceptBid() {
-      axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
-        orderItemId: this.selectedItem.id,
-        status: this.accepted
-      })
-        .then((response) => {
-          console.log(response.data);
-          axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-            sender: this.username,
-            senderId: this.vendorid,
-            receiver: this.selectedItem.product.vendor.name,
-            receiverId: this.selectedItem.product.vendor.vendorid,
-            message: `Your Product Is Accepted `
-          }).then((res) => console.log(res.data)).catch(err => console.log(err))
-          this.$emit('close')
-          location.reload();
-        })
-        .catch(err => console.log(err));
+    computed: {
+        getUniqueVendors() {
+            const vendors = [];
+            for (const orderItem of this.orders.orderItems) {
+                const vendorName = orderItem.product.vendor.name;
+                if (!vendors.includes(vendorName)) {
+                    vendors.push(vendorName);
+                }
+            }
+            return vendors;
+        },
+        ...mapGetters(["message", "username", "vendoruuid", "vendorid"]),
     },
-    showModalRejected() {
-      this.showRejectModal = true
+    methods: {
+        selectItem(orderItem) {
+            this.selectedItem = orderItem;
+            axios.get(`http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${this.orders.id}/${this.selectedItem.id}`)
+                .then((res) => {
+                this.history = res.data;
+                console.log(this.history);
+            }).catch((err) => {
+                console.log(err);
+            });
+        },
+        acceptBid() {
+            axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
+                orderItemId: this.selectedItem.id,
+                status: this.accepted
+            })
+                .then((response) => {
+                console.log(response.data);
+                axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+                    sender: this.username,
+                    senderId: this.vendorid,
+                    receiver: this.selectedItem.product.vendor.name,
+                    receiverId: this.selectedItem.product.vendor.vendorid,
+                    message: `Your Product Is Accepted `
+                }).then((res) => console.log(res.data)).catch(err => console.log(err));
+                this.$emit("close");
+                location.reload();
+            })
+                .catch(err => console.log(err));
+        },
+        showModalRejected() {
+            this.showRejectModal = true;
+        },
+        showModalHistory() {
+            this.showHistoryModal = true;
+        },
+        closeRejectModal() {
+            this.showRejectModal = false;
+        },
+        closeHistoryModal() {
+            this.showHistoryModal = false;
+        },
+        rejectBid() {
+            axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
+                orderItemId: this.selectedItem.id,
+                bidPrice: this.rejectBidInputBid,
+                status: this.rejected
+            }).then((response) => {
+                console.log(response.data);
+                this.showRejectModal = false;
+                axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+                    sender: this.username,
+                    senderId: this.vendorid,
+                    receiver: this.selectedItem.product.vendor.name,
+                    receiverId: this.selectedItem.product.vendor.vendorid,
+                    message: `Rejected from Vendor : ${this.username}`
+                }).then((res) => {
+                    this.$emit("close");
+                }).catch(err => console.log(err));
+                // this.$emit('close')
+            }).catch(err => console.log(err));
+        },
+        closeModal() {
+            this.$emit("close"); // Mengemisikan event 'close' ke komponen induk
+            this.selectedItem = null;
+            location.reload();
+        },
+        uploadFaktur(event) {
+            const file = event.target.files[0];
+            this.fileName = file.name;
+            console.log("Uploading file", file.name);
+        },
+        getItemsByVendor(vendor) {
+            return this.orders.orderItems.filter(orderItem => orderItem.product.vendor.name === vendor);
+        },
     },
-    showModalHistory() {
-      this.showHistoryModal = true;
-    },
-    closeRejectModal() {
-      this.showRejectModal = false;
-    },
-    closeHistoryModal() {
-      this.showHistoryModal = false;
-    },
-    rejectBid() {
-      axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
-        orderItemId: this.selectedItem.id,
-        bidPrice: this.rejectBidInputBid,
-        status: this.rejected
-      }).then((response) => {
-        console.log(response.data);
-        this.showRejectModal = false;
-        axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-          sender: this.username,
-          senderId: this.vendorid,
-          receiver: this.selectedItem.product.vendor.name,
-          receiverId: this.selectedItem.product.vendor.vendorid,
-          message: `Rejected from Vendor : ${this.username}`
-        }).then((res) => {
-          this.$emit('close')
-        }).catch(err => console.log(err))
-        // this.$emit('close')
-      }).catch(err => console.log(err));
-    },
-    closeModal() {
-      this.$emit('close'); // Mengemisikan event 'close' ke komponen induk
-      this.selectedItem = null;
-      location.reload();
-    },
-    uploadFaktur(event) {
-      const file = event.target.files[0]
-      this.fileName = file.name
-      console.log('Uploading file', file.name)
-    },
-    getItemsByVendor(vendor) {
-      return this.orders.orderItems.filter(orderItem => orderItem.product.vendor.name === vendor);
-    },
-  },
-
+    components: { FontAwesomeIcon }
 };
 </script>
 
 <style scoped>
 .buttons {
   margin-right: 0.5em;
+}
+
+.footer-modals {
+  justify-content: flex-end;
 }
 
 /* Modals */

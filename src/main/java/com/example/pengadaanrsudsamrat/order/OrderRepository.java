@@ -26,4 +26,6 @@ public interface OrderRepository extends JpaRepository<OrderModel,Long> {
     List<OrderModel> findByOrderItemsProductNameContainingIgnoreCase(String productName);
 
     List<OrderModel> findByOrderItemsProductVendorNameContainingIgnoreCase(String vendorName);
+
+    List<OrderModel> findByStatus(OrderModel.OrderStatus status);
 }

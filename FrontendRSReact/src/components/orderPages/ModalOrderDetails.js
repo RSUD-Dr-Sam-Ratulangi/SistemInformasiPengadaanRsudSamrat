@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import printOrderItem from "./printOrderItem";
+import { useEffect } from "react";
 
 const ModalOrderDetails = ({
   onClose,
@@ -62,8 +63,18 @@ const ModalOrderDetails = ({
       )
       .then((response) => {
         console.log(response);
-      });
+      })
+      .catch((err) => console.log(err));
+    onClose();
   };
+
+  // STATUS BERUBAH IF ALL ORDER ITEM "ACCEPTED" without button
+  // useEffect((orderItems) => {
+  //   const orderItem =
+  //   if(selectedOrder.orderItems.every((orderItem) => orderItem.status === "ACCEPTED")){
+  //     handleSetStatus("VALIDATING");
+  //   }
+  // }, [selectedOrder.Order])
 
   return (
     <Modal title="SubOrder Details" onClose={onClose} modalSize="xl">
@@ -182,16 +193,16 @@ const ModalOrderDetails = ({
                       </td>
                     </tr>
                   ))}
-                  {orderItems.some(
+                  {orderItems.every(
                     (orderItem) => orderItem.status === "ACCEPTED"
                   ) && (
                     <tr>
                       <td colSpan="9">
                         <button
                           className="btn btn-sm btn-success"
-                          onClick={() => console.log(vendorItemsMap)}
+                          onClick={() => handleSetStatus("VALIDATING")}
                         >
-                          Submit All
+                          Change Status
                         </button>
                       </td>
                     </tr>

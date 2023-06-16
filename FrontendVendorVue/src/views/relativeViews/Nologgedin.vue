@@ -26,24 +26,6 @@
 </template>
 
 <script>
-// import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-// export default {
-//   components: {FontAwesomeIcon},
-//   data() {
-//     return {
-//       isActive: false,
-//       selectedOption : null,
-//     };
-//   },
-//   methods: {
-//     toggleDropdown() {
-//       this.isActive = !this.isActive;
-//     },
-//     selectOption(kategori) {
-//       this.selectedOption = kategori
-//     }
-//   },
-// }
 </script>
 
 <style scoped>
