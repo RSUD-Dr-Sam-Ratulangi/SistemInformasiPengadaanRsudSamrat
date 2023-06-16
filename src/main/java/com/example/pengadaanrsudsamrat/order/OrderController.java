@@ -143,15 +143,11 @@ public class OrderController {
     }
 
     @GetMapping("/orders/items/product-stock")
-    public ResponseEntity<Page<OrderItemQuantityExchangeResponseDTO>> getAllOrderItemsWithProductStock(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String sortBy) {
-
-        Page<OrderItemQuantityExchangeResponseDTO> orderItemDTOPage = orderService.getAllOrderItemsWithProductStock(page, size, sortBy);
-
-        return ResponseEntity.ok().body(orderItemDTOPage);
+    public ResponseEntity<List<OrderItemQuantityExchangeResponseDTO>> getAllOrderItemsWithProductStock() {
+        List<OrderItemQuantityExchangeResponseDTO> orderItemDTOList = orderService.getAllOrderItemsWithProductStock(null);
+        return ResponseEntity.ok().body(orderItemDTOList);
     }
+    
 
 
     @GetMapping("/revenue-and-stock")
@@ -207,6 +203,12 @@ public class OrderController {
     public ResponseEntity<OrderResponseDTO> updatePaymentForOrder(@PathVariable Long orderId, @PathVariable Long orderItemId ) {
         OrderResponseDTO updatedOrder = orderService.updatePaymentForOrder(orderId,orderItemId);
         return ResponseEntity.ok(updatedOrder);
+    }
+
+    @GetMapping("/order/status")
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByStatus(@RequestParam("status") OrderModel.OrderStatus status) {
+        List<OrderResponseDTO> responseDTOs = orderService.getOrdersByStatus(status);
+        return ResponseEntity.ok(responseDTOs);
     }
 
 }

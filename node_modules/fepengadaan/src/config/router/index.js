@@ -8,7 +8,8 @@ import VendorList from "../../views/VendorList.vue";
 import VendorUpdate from "../../views/relativeViews/VendorUpdate.vue";
 import NotFoundPage from "../../views/relativeViews/NotFoundPage.vue";
 import orderDetails from "../../views/orderDetails.vue";
-import Notification from "../../views/relativeViews/Notifications.vue"
+//import Notification from "../../views/relativeViews/Notifications.vue"
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
