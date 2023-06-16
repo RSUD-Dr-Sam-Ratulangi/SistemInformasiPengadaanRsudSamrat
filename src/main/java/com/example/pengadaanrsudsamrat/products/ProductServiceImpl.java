@@ -11,6 +11,8 @@ import com.example.pengadaanrsudsamrat.vendor.VendorRepository;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 @Service
 public class ProductServiceImpl implements ProductService {
 
+    private final CacheManager cacheManager;
     private final ProductRepository productRepository;
     private final VendorRepository vendorRepository;
     private final ModelMapper modelMapper;
@@ -39,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
     /**
      * Instantiates a new Product service.
      *
+     * @param cacheManager
      * @param productRepository     the product repository
      * @param vendorRepository      the vendor repository
      * @param modelMapper           the model mapper
@@ -46,7 +50,8 @@ public class ProductServiceImpl implements ProductService {
      * @param subCategoryRepository
      */
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, VendorRepository vendorRepository, ModelMapper modelMapper, CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository) {
+    public ProductServiceImpl(CacheManager cacheManager, ProductRepository productRepository, VendorRepository vendorRepository, ModelMapper modelMapper, CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository) {
+        this.cacheManager = cacheManager;
         this.productRepository = productRepository;
         this.vendorRepository = vendorRepository;
         this.modelMapper = modelMapper;
@@ -109,6 +114,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
+    @Cacheable(value = "productsByVendor", key = "#vendorUuid")
     public List<ProductResponseDTO> findAllProductsByVendorUuid(String vendorUuid) {
         List<ProductModel> products = productRepository.findByVendorVendoruuid(vendorUuid);
         return products.stream()

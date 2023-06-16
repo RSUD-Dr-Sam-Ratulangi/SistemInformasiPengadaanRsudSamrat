@@ -90,5 +90,6 @@ public interface OrderService {
     OrderResponseDTO updateOrderStatus(Long orderId, OrderModel.OrderStatus status);
     OrderResponseDTO updatePaymentForOrder(Long orderId, Long orderItemId);
     //OrderItemResponseDTO createOrderItem(OrderItemRequestDTO orderItemRequestDTO);
+    List<OrderResponseDTO> getOrdersByStatus(OrderModel.OrderStatus status);
 }
 
