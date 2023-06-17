@@ -42,6 +42,7 @@ const Orderpages = () => {
         );
         console.log(response.data);
         // Filter and remove duplicate IDs
+        console.log(response.data)
         let uniqueData = [];
         const seenIds = new Set();
 
@@ -89,7 +90,7 @@ const Orderpages = () => {
     };
 
     fetchData();
-  }, [page, role, sort]);
+  }, [role]);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -179,7 +180,7 @@ const Orderpages = () => {
           senderId: idUser,
           receiver: selectedOrderItem.product.vendor.name,
           receiverId: selectedOrderItem.product.vendor.id,
-          message: `OFFER PRODUCT FROM ${role}`,
+          message: `OFFER PRODUCT FROM ${role}, Product ${selectedOrderItem.product.name}, QUANTITY : ${selectedOrderItem.quantity} `,
         });
       })
       .catch((error) => {
