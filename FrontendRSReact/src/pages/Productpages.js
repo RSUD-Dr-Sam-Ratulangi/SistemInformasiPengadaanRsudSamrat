@@ -7,8 +7,12 @@ import {
   Button
 } from 'react-bootstrap';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
 
 import '../assets/css/pages/products.css';
+
+import ProductPlaceholderImage from '../assets/images/product-placeholder.png';
 
 
 
@@ -39,6 +43,8 @@ export default function Productpages() {
   // carts
   const [carts, setCarts] = useState(JSON.parse(localStorage.getItem('carts')));
   const [showCartModal, setShowCartModal] = useState(false);
+  const [cartSelectedProductDetail, setCartSelectedProductDetail] = useState(null);
+  const [showCartSelectedProductDetailModal, setShowCartSelectedProductDetailModal] = useState(false);
   const [itemAddedToCartToast, setItemAddedToCartToast] = useState(false);
 
 
@@ -63,6 +69,7 @@ export default function Productpages() {
 
   useEffect(() => {
     setFilteredProducts(filterProducts({}));
+    console.log('products', products);
   }, [products]);
 
   useEffect(() => {
@@ -78,12 +85,8 @@ export default function Productpages() {
       localStorage.setItem('carts', JSON.stringify(carts));
     }
     else if(vendors.length > 0) {
-      const newCarts = vendors.map(vendor => {
-        return {vendorUUID: vendor.vendoruuid, products: []};
-      });
-      
-      setCarts(newCarts);
-      localStorage.setItem('carts', JSON.stringify(newCarts));
+      setCarts(cartsInitialValues());
+      localStorage.setItem('carts', JSON.stringify(cartsInitialValues()));
     }
   }, [carts, vendors]);
 
@@ -97,11 +100,20 @@ export default function Productpages() {
   }
 
   function handleSearchQuery(e) {
-    setFilteredProducts(filterProducts({
-      categoryName: selectedCategory,
-      subCategoryName: selectedSubCategory,
-      searchQueryNamePrice: e.target.value
-    }));
+    setSelectedCategory('ALL');
+    setSelectedSubCategory(null);
+    if(e.target.value.length === 0) {
+      setFilteredProducts(filterProducts({}));
+    }
+    else {
+      setFilteredProducts(filterProducts({
+        minimumQuantity: null,
+        statusList: 0,
+        categoryName: 'ALL',
+        subCategoryName: null,
+        searchQueryNamePrice: e.target.value
+      }));
+    }
     setSearchQuery(e.target.value);
   }
   
@@ -121,8 +133,12 @@ export default function Productpages() {
     let existingProductOrderQuantity = 0;
 
     // cek jika item sudah ada di keranjang
-    carts.forEach(product => {
-      if(selectedProduct.id === product.id) existingProductOrderQuantity = product.orderQuantity;
+    carts.forEach(cart => {
+      if(selectedVendorUUID === cart.vendorUUID) {
+        cart.products.forEach(product => {
+          if(selectedProduct.id === product.id) existingProductOrderQuantity = product.orderQuantity;
+        });
+      }
     });
 
     if(parseInt(e.target.value) > 0 && parseInt(e.target.value) <= selectedProduct.quantity - existingProductOrderQuantity) setSelectedProductModalErrorMessage('');
@@ -184,10 +200,34 @@ export default function Productpages() {
     setCarts(newCarts);
   }
 
+  function handleCartProductSeeDetails(productId) {
+    let newCartSelectedProductDetail = null;
+    carts.forEach(cart => {
+      if(selectedVendorUUID === cart.vendorUUID) {
+        cart.products.forEach(product => {
+          if(productId === product.id) newCartSelectedProductDetail = product;
+        });
+      }
+    });
+
+    setCartSelectedProductDetail(newCartSelectedProductDetail);
+    setShowCartSelectedProductDetailModal(true);
+  }
+
+  function handleCartProductSeeDetailsClose() {
+    setCartSelectedProductDetail(null);
+    setShowCartSelectedProductDetailModal(false);
+  }
+
   function handleCartModalCancel(e) {
     e.preventDefault();
 
-    setCarts([]);
+    const newCarts = carts.map(cart => {
+      if(selectedVendorUUID === cart.vendorUUID) return {vendorUUID: cart.vendorUUID, products: []};
+      else return cart;
+    });
+    setCarts(newCarts);
+
     setShowCartModal(false);
   }
   
@@ -203,11 +243,18 @@ export default function Productpages() {
     }
   }
 
+  function cartsInitialValues() {
+    const newCarts = vendors.map(vendor => {
+      return {vendorUUID: vendor.vendoruuid, products: []};
+    });
+
+    return newCarts;
+  }
+
   async function getProducts() {
     try {
       const res = await axios.get(`http://rsudsamrat.site:8080/pengadaan/dev/v1/products/vendor/${selectedVendorUUID}`);
       setProducts(res.data);
-      // console.log('products', products);
     }
     catch(err) {
       console.log('Unable to get products', err);
@@ -228,7 +275,9 @@ export default function Productpages() {
 
     if(products.length > 0) {
       // filter using quantity
-      newFilteredProducts = newFilteredProducts.filter(product => product.quantity > minimumQuantity);
+      if(minimumQuantity) {
+        newFilteredProducts = newFilteredProducts.filter(product => product.quantity > minimumQuantity);
+      }
 
       // filter using status
       if(statusList) {
@@ -273,14 +322,10 @@ export default function Productpages() {
 
         axios.post(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`, orders)
           .then(() => {
-            const newCarts = vendors.map(vendor => {
-              return {vendorUUID: vendor.vendoruuid, products: []};
-            });
-            setCarts(newCarts);
-
+            setCarts(cartsInitialValues());
             setTimeout(() => {
               navigate('/orders');
-            }, 100);
+            }, 150);
           })
           .catch(err => console.log('unable to order products', err));
       })
@@ -340,22 +385,26 @@ export default function Productpages() {
             </div>
             <div className='col-md-12 mb-4'>
               <div className='list-group list-group-horizontal' style={{width: '100%'}}>
-                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === 'ALL') ? 'active' : 'light'} category-button`} onClick={() => setSelectedCategory('ALL')}>
-                  <div className='ms-2 me-auto category-button-text'>
-                    <div className='fw-bold category-button-text'>All</div>
-                    All Category
+                <button className={`list-group-item justify-content-between align-items-start ${(selectedCategory === 'ALL') ? 'active' : 'light'} category-button`} onClick={() => setSelectedCategory('ALL')}>
+                  <div className='category-button-text-wrapper'>
+                    <div className='category-button-text'><b>All</b></div>
+                    <div className='category-button-text'>All Category</div>
                   </div>
                 </button>
 
-                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === 'JASA') ? 'active' : 'light'} category-button`} onClick={() => setSelectedCategory('JASA')}>
-                  <div className='ms-2 me-auto category-button-text'>
-                    <div className='fw-bold category-button-text'>Jasa</div>
-                    Jasa Category
+                <button className={`list-group-item justify-content-between align-items-start ${(selectedCategory === 'JASA') ? 'active' : 'light'} category-button`} onClick={() => setSelectedCategory('JASA')}>
+                <div className='category-button-text-wrapper'>
+                    <div className='category-button-text'><b>Jasa</b></div>
+                    <div className='category-button-text'>Jasa Category</div>
                   </div>
                 </button>
 
                 <Dropdown className='category-button'>
-                  <Dropdown.Toggle variant={(selectedCategory === 'BM') ? 'primary' : 'light'} style={{width: '100%'}}>
+                  <Dropdown.Toggle
+                    className='list-group-item'
+                    variant={(selectedCategory === 'BM') ? 'primary' : 'light'}
+                    style={{width: '100%'}}
+                  >
                     <div className='ms-2 me-auto' onClick={() => setSelectedCategory('BM')}>
                       <div className='fw-bold'>BM</div>
                       Select BM Category
@@ -368,7 +417,11 @@ export default function Productpages() {
                 </Dropdown>
 
                 <Dropdown className='category-button'>
-                  <Dropdown.Toggle variant={(selectedCategory === 'BPH') ? 'primary' : 'light'} style={{width: '100%'}}>
+                <Dropdown.Toggle
+                    className='list-group-item'
+                    variant={(selectedCategory === 'BPH') ? 'primary' : 'light'}
+                    style={{width: '100%'}}
+                  >
                     <div className='ms-2 me-auto' onClick={() => setSelectedCategory('BPH')}>
                       <div className='fw-bold'>BPH</div>
                       Select BPH Category
@@ -382,13 +435,31 @@ export default function Productpages() {
               </div>
             </div>
 
+            <div className='col-md-12 mb-4'>
+              <button
+                className='btn btn-light shadow'
+                style={{marginLeft: '10px', marginTop: '15px'}}
+                onClick={handleShowAllOrders}
+              >
+                Show All Orders
+              </button>
+              <button
+                className='btn btn-light shadow'
+                style={{marginLeft: '10px', marginTop: '15px'}}
+                onClick={() => setShowCartModal(true)}
+              >
+                Show Cart
+                <FontAwesomeIcon icon={faCartShopping} style={{marginLeft: '10px'}} />
+              </button>
+            </div>
+
             {(filteredProducts.length > 0) && filteredProducts.map(product => (
               <div key={product.id} className='col-md-3 mb-4'>
                 <div className='card h-100 w-ful md:w-3/4 lg:w-1/2 xl:w-1/3'>
                   <img
-                    src={product.imageUrl}
+                    src={(product.imageUrl) ? product.imageUrl : ProductPlaceholderImage}
                     alt='product'
-                    className='card-img-top'
+                    className='card-img-top product-image'
                   />
                   <div className='card-body'>
                     <h5 className='card-title' style={{fontSize: '12px'}}>{product.name}</h5>
@@ -431,21 +502,6 @@ export default function Productpages() {
               </div>
             ))}
           </div>
-
-          <button
-            className='btn btn-light shadow'
-            style={{marginLeft: '10px', marginTop: '15px'}}
-            onClick={handleShowAllOrders}
-          >
-            Show All Orders
-          </button>
-          <button
-            className='btn btn-light shadow'
-            style={{marginLeft: '10px', marginTop: '15px'}}
-            onClick={() => setShowCartModal(true)}
-          >
-            Show Cart
-          </button>
         </div>
       )}
 
@@ -471,13 +527,52 @@ export default function Productpages() {
                       <p>Description: {product.description}</p>
                       <p>Quantity: {product.orderQuantity}</p>
                       <p>Price: Rp. {product.price * product.orderQuantity}</p>
-                      <button
-                        className='btn btn-danger'
-                        style={{marginRight: '10px'}}
-                        onClick={() => handleCartProductDelete(product.id)}
-                      >
-                        Delete
-                      </button>
+                      <div>
+                        <button
+                          className='btn btn-danger'
+                          style={{marginRight: '10px'}}
+                          onClick={() => handleCartProductDelete(product.id)}
+                        >
+                          Delete
+                        </button>
+                        <button
+                          className='btn btn-secondary'
+                          style={{marginRight: '10px'}}
+                          onClick={() => handleCartProductSeeDetails(product.id)}
+                        >
+                          See Details
+                        </button>
+
+                        {cartSelectedProductDetail && (
+                          <Modal show={showCartSelectedProductDetailModal} onHide={handleCartProductSeeDetailsClose}>
+                            <Modal.Header closeButton>
+                              <Modal.Title>Product Details</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                              <div>
+                                <p>Name: {cartSelectedProductDetail.name}</p>
+                                <p>Description: {cartSelectedProductDetail.description}</p>
+                                <p>Quantity: {cartSelectedProductDetail.quantity}</p>
+                                <p>Order Quantity: {cartSelectedProductDetail.orderQuantity}</p>
+                                <p>Price: Rp. {cartSelectedProductDetail.price}</p>
+                                <p>Status: {cartSelectedProductDetail.status}</p>
+                                <p>Category: {cartSelectedProductDetail.categories?.map(category => category.name)}</p>
+                                <p>Sub Category: {cartSelectedProductDetail.subcategories?.map(subCategory => subCategory.name)}</p>
+                                <p>Vendor Name: {cartSelectedProductDetail.vendor.name}</p>
+                              </div>
+                            </Modal.Body>
+                            <Modal.Footer>
+                              <button
+                                className='btn btn-secondary'
+                                style={{marginRight: '10px'}}
+                                onClick={handleCartProductSeeDetailsClose}
+                              >
+                                Close
+                              </button>
+                            </Modal.Footer>
+                          </Modal>
+                        )}
+                      </div>
                       <hr />
                     </div>
                   ))
@@ -487,7 +582,6 @@ export default function Productpages() {
                   className='btn btn-dark'
                   style={{marginLeft: '10px', marginTop: '15px'}}
                   onClick={orderProducts}
-                  // disabled={carts.length === 0}
                 >
                   Place Order
                 </button>
