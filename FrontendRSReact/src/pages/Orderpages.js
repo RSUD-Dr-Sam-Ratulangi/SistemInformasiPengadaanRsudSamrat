@@ -180,7 +180,7 @@ const Orderpages = () => {
           senderId: idUser,
           receiver: selectedOrderItem.product.vendor.name,
           receiverId: selectedOrderItem.product.vendor.id,
-          message: `OFFER PRODUCT FROM ${role}`,
+          message: `OFFER PRODUCT FROM ${role}, Product ${selectedOrderItem.product.name}, QUANTITY : ${selectedOrderItem.quantity} `,
         });
       })
       .catch((error) => {
