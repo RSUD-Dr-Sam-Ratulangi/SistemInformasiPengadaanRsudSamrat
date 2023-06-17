@@ -13,11 +13,12 @@ import { useNavigate } from "react-router-dom";
 import "../assets/css/navigation.css";
 import TabsNav from "./TabsNav";
 import logo from "../assets/images/logo.jpg";
+import axios from 'axios';
 
 
 const Navigation = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const [notificationCount, setNotificationCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(1);
   const [isSticky, setIsSticky] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const Navigation = () => {
   
 
   const handleNotificationClick = () => {
-    setNotificationCount(0);
+    // setNotificationCount(0);
   };
 
   const handleProfileClick = () => {
@@ -46,6 +47,8 @@ const Navigation = () => {
   const isSignInPage = location.pathname === "/signIn";
 
   useEffect(() => {
+    getNotificationsCount();
+
     const handleScroll = () => {
       const sticky = window.pageYOffset > 0;
       setIsSticky(sticky);
@@ -57,6 +60,18 @@ const Navigation = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+
+
+  function getNotificationsCount() {
+    try {
+      axios.get('http://rsudsamrat.site:8990/api/v1/notifikasi')
+      .then(res => setNotificationCount(res.data.content.length));
+    }
+    catch(e) {
+      console.log('failed to get notifications. ', e);
+    }
+  }
 
   return (
     <div>
