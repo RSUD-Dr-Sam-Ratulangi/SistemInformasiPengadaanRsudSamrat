@@ -20,11 +20,11 @@ import com.example.pengadaanrsudsamrat.products.ProductRepository;
 import com.example.pengadaanrsudsamrat.vendor.DTO.VendorResponseDTO;
 import com.example.pengadaanrsudsamrat.vendor.VendorModel;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Cacheable;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -545,6 +545,7 @@ public class OrderServiceImpl implements OrderService {
 
 //pertukaran stock dan pembelian
 @Override
+
 public List<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(String sortBy) {
     if (sortBy == null) {
         sortBy = "orderDate"; // Set default sort order to orderDate
