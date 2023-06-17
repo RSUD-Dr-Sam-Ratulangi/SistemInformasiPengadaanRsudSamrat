@@ -39,22 +39,22 @@
 <table>
   <tr>
     <th>Nama</th>
-    <th>Jabatan</th>
+    <th>Poksi</th>
     <th>Username GitHub</th>
   </tr>
   <tr>
     <td>Victor R Maukar</td>
-    <td>Kepala UPTIRS</td>
+    <td>Kepala UPTIRS/PJ Proyek</td>
     <td>-</td>
   </tr>
   <tr>
     <td>KorompisZusana</td>
-    <td>Data Analyst/Designer</td>
+    <td>Data Analyst/UI-UX/Legal</td>
     <td><a href="https://github.com/KorompisZusana"><img src="https://avatars.githubusercontent.com/KorompisZusana" alt="KorompisZusana's Avatar" width="50" height="50"></a></td>
   </tr>
   <tr>
     <td>devaliel</td>
-    <td>Lead Backend Developer</td>
+    <td>Lead Backend Developer/PM/DevOps</td>
     <td><a href="https://github.com/Devaliel"><img src="https://avatars.githubusercontent.com/Devaliel" alt="Devaliel's Avatar" width="50" height="50"></a></td>
   </tr>
   <tr>
