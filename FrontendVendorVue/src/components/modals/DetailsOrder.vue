@@ -198,7 +198,7 @@ export default {
                     senderId: this.vendorid,
                     receiver: this.selectedItem.product.vendor.name,
                     receiverId: this.selectedItem.product.vendor.vendorid,
-                    message: `Your Product Is Accepted `
+                    message: `Your Product Is Accepted `  
                 }).then((res) => console.log(res.data)).catch(err => console.log(err));
                 this.$emit("close");
                 location.reload();

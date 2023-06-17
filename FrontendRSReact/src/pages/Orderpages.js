@@ -38,9 +38,10 @@ const Orderpages = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock?page=${page}&sort=${sort}`
+          `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock`
         );
         // Filter and remove duplicate IDs
+        console.log(response.data)
         let uniqueData = [];
         const seenIds = new Set();
 
@@ -88,7 +89,7 @@ const Orderpages = () => {
     };
 
     fetchData();
-  }, [page, role, sort]);
+  }, [role]);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
