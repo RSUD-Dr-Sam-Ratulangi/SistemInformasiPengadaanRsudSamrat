@@ -8,6 +8,7 @@ import com.example.pengadaanrsudsamrat.order.ReportServiceDTO.BidExchangeHistory
 import com.example.pengadaanrsudsamrat.order.ReportServiceDTO.BidExchangeHistoryResponseDTO;
 import com.example.pengadaanrsudsamrat.order.ReportServiceDTO.BidItemDTO;
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemRequestDTO;
+import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemResponseDTO;
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemUpdateRequestDTO;
 import com.example.pengadaanrsudsamrat.orderitem.OrderItemModel;
 import com.example.pengadaanrsudsamrat.orderitem.OrderItemRepository;
@@ -337,24 +338,32 @@ public class OrderServiceImpl implements OrderService {
         OrderModel orderModel = orderRepository.findById(orderId)
                 .orElseThrow(EntityNotFoundException::new);
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (OrderItemModel orderItemModel : orderModel.getOrderItems()) {
-            BigDecimal bidPrice = BigDecimal.valueOf(orderItemModel.getBidPrice());
-            BigDecimal quantity = BigDecimal.valueOf(orderItemModel.getQuantity());
-            BigDecimal itemTotalAmount = bidPrice.multiply(quantity);
-            totalAmount = totalAmount.add(itemTotalAmount);
-        }
-
         PaymentModel paymentModel = orderModel.getPayment();
         if (paymentModel == null) {
             throw new EntityNotFoundException("Payment not found for this order.");
         }
 
-        PaymentDTO paymentDTO = modelMapper.map(paymentModel, PaymentDTO.class);
-        paymentDTO.setAmount(totalAmount);
-
         OrderResponseDTO orderResponseDTO = modelMapper.map(orderModel, OrderResponseDTO.class);
-        orderResponseDTO.setPayment(paymentDTO);
+        orderResponseDTO.setPayment(modelMapper.map(paymentModel, PaymentDTO.class));
+
+        List<OrderItemResponseDTO> orderItemResponseDTOs = orderModel.getOrderItems().stream()
+                .map(orderItemModel -> {
+                    ProductModel productModel = orderItemModel.getProduct();
+                    VendorModel vendorModel = productModel.getVendor();
+
+                    ProductResponseDTO productResponseDTO = modelMapper.map(productModel, ProductResponseDTO.class);
+                    VendorResponseDTO vendorResponseDTO = modelMapper.map(vendorModel, VendorResponseDTO.class);
+
+                    productResponseDTO.setVendor(vendorResponseDTO);
+
+                    OrderItemResponseDTO orderItemResponseDTO = modelMapper.map(orderItemModel, OrderItemResponseDTO.class);
+                    orderItemResponseDTO.setProduct(productResponseDTO);
+
+                    return orderItemResponseDTO;
+                })
+                .collect(Collectors.toList());
+
+        orderResponseDTO.setOrderItems(orderItemResponseDTOs);
 
         return orderResponseDTO;
     }
