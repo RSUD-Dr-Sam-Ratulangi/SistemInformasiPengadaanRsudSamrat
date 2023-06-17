@@ -40,12 +40,13 @@ const Orderpages = () => {
         const response = await axios.get(
           `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock`
         );
+        console.log(response.data);
         // Filter and remove duplicate IDs
         console.log(response.data)
         let uniqueData = [];
         const seenIds = new Set();
 
-        response.data.content.forEach((item) => {
+        response.data.forEach((item) => {
           if (!seenIds.has(item.orderId)) {
             uniqueData.push(item);
             seenIds.add(item.orderId);
@@ -272,13 +273,13 @@ const Orderpages = () => {
       ) : (
         <>
           {/* Sort */}
-          <div className="mb-3">
+          {/* <div className="mb-3">
             <label htmlFor="sort">Sort By:</label>
             <select id="sort" className="form-control">
               <option value="orderDate">Order Status</option>
               <option value="orderId">Order ID</option>
             </select>
-          </div>
+          </div> */}
 
           {/* Main Table */}
           {/* <table className="table">
@@ -326,6 +327,11 @@ const Orderpages = () => {
                   autoHeight
                   // Add other DataGrid props and customization options
                   className="data-grid"
+                  initialState={{
+                    ...orderRows.initialState,
+                    pagination: { paginationModel: { pageSize: 5 } },
+                  }}
+                  pageSizeOptions={[5, 10, 25]}
                 />
               ) : (
                 <div>NO DATA</div>
@@ -347,6 +353,11 @@ const Orderpages = () => {
                   onRowClick={(params) => handleRowClick(params.row)}
                   // Add other DataGrid props and customization options
                   className="data-grid"
+                  initialState={{
+                    ...validatingRows.initialState,
+                    pagination: { paginationModel: { pageSize: 5 } },
+                  }}
+                  pageSizeOptions={[5, 10, 25]}
                 />
               ) : (
                 <div>NO DATA</div>
@@ -368,6 +379,11 @@ const Orderpages = () => {
                   onRowClick={(params) => handleRowClick(params.row)}
                   // Add other DataGrid props and customization options
                   className="data-grid"
+                  initialState={{
+                    ...negotiationRows.initialState,
+                    pagination: { paginationModel: { pageSize: 5 } },
+                  }}
+                  pageSizeOptions={[5, 10, 25]}
                 />
               ) : (
                 <div>NO DATA</div>
@@ -447,23 +463,6 @@ const Orderpages = () => {
               onClose={() => setShowHistoryModal(null)}
             />
           )}
-
-          {/* Pagination */}
-          <div className="pagination">
-            <button
-              className="btn btn-secondary"
-              disabled={page === 0}
-              onClick={() => handlePageChange(page - 1)}
-            >
-              Previous
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => handlePageChange(page + 1)}
-            >
-              Next
-            </button>
-          </div>
         </>
       )}
     </div>
