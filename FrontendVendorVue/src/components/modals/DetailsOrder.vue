@@ -145,114 +145,131 @@ import axios from 'axios';
 import { mapGetters } from "vuex";
 
 export default {
-    props: {
-        show: Boolean,
-        orders: Object,
+  props: {
+    show: Boolean,
+    orders: Object,
+  },
+  emits: ["close"],
+  data() {
+    return {
+      history: [],
+      employee: [],
+      selectedItem: null,
+      accepted: "ACCEPTED",
+      rejected: "REJECTED",
+      showRejectModal: false,
+      showHistoryModal: false,
+      fileName: "",
+      rejectBidInputBid: "",
+    };
+  },
+  created() {
+    this.getEmployee();
+  },
+  computed: {
+    getUniqueVendors() {
+      const vendors = [];
+      for (const orderItem of this.orders.orderItems) {
+        const vendorName = orderItem.product.vendor.name;
+        if (!vendors.includes(vendorName)) {
+          vendors.push(vendorName);
+        }
+      }
+      return vendors;
     },
-    emits: ["close"],
-    data() {
-        return {
-            history: [],
-            selectedItem: null,
-            accepted: "ACCEPTED",
-            rejected: "REJECTED",
-            showRejectModal: false,
-            showHistoryModal: false,
-            fileName: "",
-            rejectBidInputBid: "",
-        };
+    ...mapGetters(["message", "username", "vendoruuid", "vendorid"]),
+  },
+  methods: {
+    selectItem(orderItem) {
+      this.selectedItem = orderItem;
+      axios.get(`http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${this.orders.id}/${this.selectedItem.id}`)
+        .then((res) => {
+          const employeePP = this.employee.
+            this.history = res.data;
+          console.log(this.history);
+        }).catch((err) => {
+          console.log(err);
+        });
     },
-    computed: {
-        getUniqueVendors() {
-            const vendors = [];
-            for (const orderItem of this.orders.orderItems) {
-                const vendorName = orderItem.product.vendor.name;
-                if (!vendors.includes(vendorName)) {
-                    vendors.push(vendorName);
-                }
-            }
-            return vendors;
-        },
-        ...mapGetters(["message", "username", "vendoruuid", "vendorid"]),
+    acceptBid() {
+      axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
+        orderItemId: this.selectedItem.id,
+        status: this.accepted
+      })
+        .then((response) => {
+          const ppRole = this.employee[1].role
+          const ppIds = this.employee[1].id
+          console.log(response.data);
+          axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+            sender: this.username,
+            senderId: this.vendorid,
+            receiver: ppRole,
+            receiverId: ppIds,
+            message: `Your Product ${this.selectedItem.product.name} Is Accepted `
+          }).then((res) => alert(`Your Product ${this.selectedItem.product.name} Is Accepted `)).catch(err => console.log(err));
+          this.$emit("close");
+          location.reload();
+        })
+        .catch(err => console.log(err));
     },
-    methods: {
-        selectItem(orderItem) {
-            this.selectedItem = orderItem;
-            axios.get(`http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${this.orders.id}/${this.selectedItem.id}`)
-                .then((res) => {
-                this.history = res.data;
-                console.log(this.history);
-            }).catch((err) => {
-                console.log(err);
-            });
-        },
-        acceptBid() {
-            axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
-                orderItemId: this.selectedItem.id,
-                status: this.accepted
-            })
-                .then((response) => {
-                console.log(response.data);
-                axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-                    sender: this.username,
-                    senderId: this.vendorid,
-                    receiver: this.selectedItem.product.vendor.name,
-                    receiverId: this.selectedItem.product.vendor.vendorid,
-                    message: `Your Product Is Accepted `
-                }).then((res) => console.log(res.data)).catch(err => console.log(err));
-                this.$emit("close");
-                location.reload();
-            })
-                .catch(err => console.log(err));
-        },
-        showModalRejected() {
-            this.showRejectModal = true;
-        },
-        showModalHistory() {
-            this.showHistoryModal = true;
-        },
-        closeRejectModal() {
-            this.showRejectModal = false;
-        },
-        closeHistoryModal() {
-            this.showHistoryModal = false;
-        },
-        rejectBid() {
-            axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
-                orderItemId: this.selectedItem.id,
-                bidPrice: this.rejectBidInputBid,
-                status: this.rejected
-            }).then((response) => {
-                console.log(response.data);
-                this.showRejectModal = false;
-                axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-                    sender: this.username,
-                    senderId: this.vendorid,
-                    receiver: this.selectedItem.product.vendor.name,
-                    receiverId: this.selectedItem.product.vendor.vendorid,
-                    message: `Rejected from Vendor : ${this.username}`
-                }).then((res) => {
-                    this.$emit("close");
-                }).catch(err => console.log(err));
-                // this.$emit('close')
-            }).catch(err => console.log(err));
-        },
-        closeModal() {
-            this.$emit("close"); // Mengemisikan event 'close' ke komponen induk
-            this.selectedItem = null;
-            location.reload();
-        },
-        uploadFaktur(event) {
-            const file = event.target.files[0];
-            this.fileName = file.name;
-            console.log("Uploading file", file.name);
-        },
-        getItemsByVendor(vendor) {
-            return this.orders.orderItems.filter(orderItem => orderItem.product.vendor.name === vendor);
-        },
+    showModalRejected() {
+      this.showRejectModal = true;
     },
-    components: { FontAwesomeIcon }
+    showModalHistory() {
+      this.showHistoryModal = true;
+    },
+    closeRejectModal() {
+      this.showRejectModal = false;
+    },
+    closeHistoryModal() {
+      this.showHistoryModal = false;
+    },
+    rejectBid() {
+      axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
+        orderItemId: this.selectedItem.id,
+        bidPrice: this.rejectBidInputBid,
+        status: this.rejected
+      }).then((response) => {
+        const ppRole = this.employee[1].role
+        const ppIds = this.employee[1].id
+        console.log(response.data);
+        this.showRejectModal = false;
+        axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+          sender: this.username,
+          senderId: this.vendorid,
+          receiver: ppRole,
+          receiverId: ppIds,
+          message: `Your Product ${this.selectedItem.product.name} Rejected `
+        }).then((res) => confirm(`This Product ${this.selectedItem.product.name} will be Rejected, Are you suer? `)).catch(err => console.log(err));
+        // this.$emit('close')
+      }).catch(err => console.log(err));
+    },
+    closeModal() {
+      this.$emit("close"); // Mengemisikan event 'close' ke komponen induk
+      this.selectedItem = null;
+      location.reload();
+    },
+    uploadFaktur(event) {
+      const file = event.target.files[0];
+      this.fileName = file.name;
+      console.log("Uploading file", file.name);
+    },
+    getItemsByVendor(vendor) {
+      return this.orders.orderItems.filter(orderItem => orderItem.product.vendor.name === vendor);
+    },
+    async getEmployee() {
+      try {
+        const response = await axios.get("http://rsudsamrat.site:8080/employee")
+        this.employee = response.data;
+        console.log(response.data)
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  },
+  components: { FontAwesomeIcon }
 };
+
 </script>
 
 <style scoped>

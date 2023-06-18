@@ -112,9 +112,9 @@ public class ProductServiceImpl implements ProductService {
 
 
 
-
+    //Todo Bug not auto Refresh when the user refresh the data or add the data
     @Override
-    @Cacheable(value = "productsByVendor", key = "#vendorUuid")
+   // @Cacheable(value = "productsByVendor", key = "#vendorUuid")
     public List<ProductResponseDTO> findAllProductsByVendorUuid(String vendorUuid) {
         List<ProductModel> products = productRepository.findByVendorVendoruuid(vendorUuid);
         return products.stream()

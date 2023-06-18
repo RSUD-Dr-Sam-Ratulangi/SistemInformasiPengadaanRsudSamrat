@@ -1,14 +1,24 @@
 #products-page .category-button {
   flex: 1;
   font-size: 16px;
-  display: flex;
+  border-radius: 6px;
 }
-/* #products-page .category-button .div {
+#products-page .category-button:hover {
+  background-color: #0d6efd;
+}
+
+#products-page .category-button-text-wrapper {
   text-align: center;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: red;
-} */
+  width: 100%;
+}
+
+#products-page .category-button-text {
+  width: 100%;
+}
 
 #products-page .category-dropdown-button {
   /* flex: 1;
@@ -27,4 +37,12 @@
 
 #products-page .selected-vendor {
   background-color: #EDEBEB;
+}
+
+#products-page .product-image {
+  max-height: 250px;
+}
+
+#products-page .carts-product-detail-image {
+  border: 1px solid red;
 }
