@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Modal from "../Modal";
 import { FaTrash, FaInfoCircle, FaHandshake, FaCheck } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +18,16 @@ const ModalOrderDetails = ({
 }) => {
   const navigate = useNavigate();
   const role = useSelector((state) => state.auth.role);
+  const [negotiable, setNegotiable] = useState(true);
+
+  useEffect(() => {
+    if (
+      selectedOrder.orderItems.every((order) => order.status === "OFFER") ||
+      selectedOrder.orderItems.every((order) => order.status === "ACCEPTED")
+    ) {
+      setNegotiable(false);
+    }
+  }, [selectedOrder]);
 
   console.log("selected order", selectedOrder);
 
@@ -176,12 +186,14 @@ const ModalOrderDetails = ({
                         >
                           <FaInfoCircle />
                         </button>
-                        <button
-                          className="btn btn-sm btn-clear text-success"
-                          onClick={() => handleOffer(orderItem.id)}
-                        >
-                          <FaHandshake />
-                        </button>
+                        {negotiable && (
+                          <button
+                            className="btn btn-sm btn-clear text-success"
+                            onClick={() => handleOffer(orderItem.id)}
+                          >
+                            <FaHandshake />
+                          </button>
+                        )}
                         {orderItem.status === "ACCEPTED" && (
                           <button
                             className="btn btn-sm btn-clear text-success"

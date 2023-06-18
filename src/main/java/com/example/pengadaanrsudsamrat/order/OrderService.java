@@ -78,7 +78,7 @@ public interface OrderService {
     Page<OrderItemInOrderResponseDTO> getAllOrderItemsInOrders(int page, int size, String sortBy);
     Page<OrderItemInOrderDetailResponseDTO> getAllOrderItemsInOrderDetails(int page, int size, String sortBy);
 
-    List<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(String sortBy)
+    List<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(String sortBy);
     List<OrderItemProductInOrderRavanueAndStockResponseDTO> getOrderItemProductInOrderRevenueAndStock(Long productId);
     List<OrderItemProductInOrderRavanueAndStockResponseDTO> getVendorProductRevenue(String vendorUUID);
     List<OrderModel> searchOrderItems(String keyword);
