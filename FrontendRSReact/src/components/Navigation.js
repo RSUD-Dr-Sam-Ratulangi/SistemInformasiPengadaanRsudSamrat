@@ -13,8 +13,7 @@ import { useNavigate } from "react-router-dom";
 import "../assets/css/navigation.css";
 import TabsNav from "./TabsNav";
 import logo from "../assets/images/logo.jpg";
-import axios from 'axios';
-
+import axios from "axios";
 
 const Navigation = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -23,7 +22,6 @@ const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
 
   const handleNotificationClick = () => {
     // setNotificationCount(0);
@@ -36,11 +34,11 @@ const Navigation = () => {
   const handleLogoutClick = () => {
     // Tambahkan fungsi yang ingin dilakukan saat ikon logout diklik
     dispatch(logout());
-    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem("isLoggedIn");
     console.log("Berhasil Logout");
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role');
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("user");
+    localStorage.removeItem("role");
     navigate("/signIn");
   };
 
@@ -61,16 +59,18 @@ const Navigation = () => {
     };
   }, []);
 
-
-
   function getNotificationsCount() {
     try {
-      axios.get('http://rsudsamrat.site:8990/api/v1/notifikasi')
-      .then(res => setNotificationCount(res.data.content.length));
+      axios
+        .get("http://rsudsamrat.site:8990/api/v1/notifikasi")
+        .then((res) => setNotificationCount(res.data.content.length));
+    } catch (e) {
+      console.log("failed to get notifications. ", e);
     }
-    catch(e) {
-      console.log('failed to get notifications. ', e);
-    }
+  }
+
+  if (isSignInPage) {
+    return null;
   }
 
   return (

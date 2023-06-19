@@ -31,7 +31,7 @@ const Routers = () => {
 
   return (
     <Router>
-      {/* <Navigation /> */}
+      <Navigation />
       <Routes>
         {!isLoggedIn ? (
           <Route path="/*" element={<Navigate to="/signIn" replace />} />
@@ -50,7 +50,7 @@ const Routers = () => {
         )}
         <Route path="/signIn" element={<SignInpages />} />
       </Routes>
-      {/* <Footer /> */}
+      <Footer />
     </Router>
   );
 };
