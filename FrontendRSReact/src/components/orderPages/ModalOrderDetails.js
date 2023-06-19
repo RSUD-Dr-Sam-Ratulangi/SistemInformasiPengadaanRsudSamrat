@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Modal from "../Modal";
 import { FaTrash, FaInfoCircle, FaHandshake, FaCheck } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import axios from "axios";
+import axios, { all } from "axios";
 import printOrderItem from "./printOrderItem";
 import { useEffect } from "react";
 
@@ -18,7 +18,13 @@ const ModalOrderDetails = ({
 }) => {
   const navigate = useNavigate();
   const role = useSelector((state) => state.auth.role);
+  const id = useSelector((state) => state.auth.id);
   const [negotiable, setNegotiable] = useState(true);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+
+  const allItemsAccepted = selectedOrder.orderItems.every(
+    (orderItem) => orderItem.status === "ACCEPTED"
+  );
 
   useEffect(() => {
     if (
@@ -63,7 +69,7 @@ const ModalOrderDetails = ({
     }
   };
 
-  const handleSetStatus = (status) => {
+  const handleSetStatusNego = (status) => {
     axios
       .put(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
@@ -76,6 +82,68 @@ const ModalOrderDetails = ({
       })
       .catch((err) => console.log(err));
     onClose();
+  };
+
+  const handleSetStatusCancel = (status) => {
+    axios
+      .put(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
+        {
+          status: status,
+        }
+      )
+      .then((response) => {
+        axios
+          .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+            sender: role,
+            senderId: id,
+            receiver: selectedOrder.vendor.name,
+            receiverId: selectedOrder.vendor.id,
+            message: `THIS ORDER IS CANCELED, BY ${role}`,
+          })
+          .catch((err) => console.log(err));
+        console.log(response);
+      })
+      .catch((err) => console.log(err));
+    onClose();
+  };
+
+  const handleSetStatusValidating = (status) => {
+    axios
+      .put(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
+        {
+          status: status,
+        }
+      )
+      .then((response) => {
+        axios
+          .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+            sender: role,
+            senderId: id,
+            receiver: selectedOrder.orderItems.product.vendor.name,
+            receiverId: selectedOrder.orderItems.product.vendor.name,
+            message: `ALL PRODUCT IN THIS ORDER IS ACCEPTED BY ${role}`,
+          })
+          .catch((err) => console.log(err));
+        console.log(response);
+      })
+      .catch((err) => console.log(err));
+    onClose();
+  };
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    // Save the selected file to array
+    setSelectedFiles([...selectedFiles, selectedFile]);
+
+    // Reset the input value to allow selecting the same file again
+    event.target.value = null;
   };
 
   // STATUS BERUBAH IF ALL ORDER ITEM "ACCEPTED" without button
@@ -118,13 +186,6 @@ const ModalOrderDetails = ({
                 }
               });
 
-              const allItemsAccepted = [...vendorItemsMap].every(
-                ([vendorName, orderItems]) =>
-                  orderItems.every(
-                    (orderItem) => orderItem.status === "ACCEPTED"
-                  )
-              );
-
               return [...vendorItemsMap].map(([vendorName, orderItems]) => (
                 <React.Fragment key={vendorName}>
                   <tr>
@@ -138,7 +199,7 @@ const ModalOrderDetails = ({
                       <td>{orderItem.product.productuuid}</td>
                       <td>{vendorName}</td>
                       <td>{orderItem.product.name}</td>
-                      <td>{orderItem.product.price}</td>
+                      <td>{orderItem.product.price * orderItem.quantity}</td>
                       <td>{orderItem.bidPrice}</td>
                       <td
                         onClick={() => handleHistory(orderItem.id)}
@@ -146,31 +207,7 @@ const ModalOrderDetails = ({
                       >
                         {orderItem.status}
                       </td>
-                      <td>
-                        <button
-                          className="btn btn-sm btn-secondary"
-                          onClick={() =>
-                            handleQuantityChange(
-                              orderItem.id,
-                              orderItem.quantity - 1
-                            )
-                          }
-                        >
-                          -
-                        </button>
-                        {orderItem.quantity}
-                        <button
-                          className="btn btn-sm btn-secondary"
-                          onClick={() =>
-                            handleQuantityChange(
-                              orderItem.id,
-                              orderItem.quantity + 1
-                            )
-                          }
-                        >
-                          +
-                        </button>
-                      </td>
+                      <td>{orderItem.quantity}</td>
                       <td>
                         <button
                           className="btn btn-sm btn-clear text-danger"
@@ -194,14 +231,14 @@ const ModalOrderDetails = ({
                             <FaHandshake />
                           </button>
                         )}
-                        {orderItem.status === "ACCEPTED" && (
+                        {/* {orderItem.status === "ACCEPTED" && (
                           <button
                             className="btn btn-sm btn-clear text-success"
                             onClick={() => handleOpenSubmitModal(orderItem)}
                           >
                             <FaCheck />
                           </button>
-                        )}
+                        )} */}
                       </td>
                     </tr>
                   ))}
@@ -212,7 +249,9 @@ const ModalOrderDetails = ({
                       <td colSpan="9">
                         <button
                           className="btn btn-sm btn-success"
-                          onClick={() => handleSetStatus("VALIDATING")}
+                          onClick={() =>
+                            handleSetStatusValidating("VALIDATING")
+                          }
                         >
                           Change Status
                         </button>
@@ -225,23 +264,17 @@ const ModalOrderDetails = ({
           </tbody>
         </table>
         <div className="d-flex gap-2">
-          <button
-            className="btn btn-primary"
-            onClick={() => navigate("/products")}
-          >
-            Add Product
-          </button>
           {role === "PP" && (
             <>
               <button
                 className="btn btn-secondary"
-                onClick={() => handleSetStatus("NEGOTIATION")}
+                onClick={() => handleSetStatusNego("NEGOTIATION")}
               >
                 Cancel Negotiation
               </button>
               <button
                 className="btn btn-danger"
-                onClick={() => handleSetStatus("CANCEL")}
+                onClick={() => handleSetStatusCancel("CANCEL")}
               >
                 Cancel Order
               </button>
@@ -252,13 +285,32 @@ const ModalOrderDetails = ({
       <div className="modal-footer">
         {/* Remove Comment to only enable Print button on 'PP' Role */}
         {/* {role === "PP" ? ( */}
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={() => printOrderItem(selectedOrder.orderItems)}
-        >
-          Print
-        </button>
+        {allItemsAccepted && (
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => printOrderItem(selectedOrder.orderItems)}
+          >
+            Print
+          </button>
+        )}
+        {allItemsAccepted && (
+          <div>
+            <input
+              type="file"
+              style={{ display: "none" }}
+              ref={fileInputRef}
+              onChange={handleFileChange}
+            />
+            <button
+              onClick={handleButtonClick}
+              className="btn btn-secondary"
+              disabled={selectedFiles.length === 1}
+            >
+              Upload Surat
+            </button>
+          </div>
+        )}
         {/* ) : (
           <> */}
         <button
@@ -274,6 +326,16 @@ const ModalOrderDetails = ({
         {/* </>
         )} */}
       </div>
+      {selectedFiles && (
+        <div>
+          {selectedFiles.map((file, index) => (
+            <div style={{ display: "flex" }}>
+              <p key={index}>{file.name}</p>
+              <button className="btn btn-secondary">Upload</button>
+            </div>
+          ))}
+        </div>
+      )}
     </Modal>
   );
 };
