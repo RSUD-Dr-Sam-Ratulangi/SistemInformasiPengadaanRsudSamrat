@@ -1,5 +1,6 @@
 package com.example.beckendreportingpengadaan.BidHistory;
 
+import com.example.beckendreportingpengadaan.BidItems.BidItemModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,14 +22,17 @@ public class BidExchangeHistoryModel {
     private List<BidItemModel> bidItems;
     private OrderStatus status;
 
+
     // ... getters and setters
 
     public enum OrderStatus {
         NEGOTIATION,
         CHECKING,
         VALIDATING,
+        SHIPING,
         PAYMENT,
         CANCEL,
+        COMPLETE,
     }
 }
 

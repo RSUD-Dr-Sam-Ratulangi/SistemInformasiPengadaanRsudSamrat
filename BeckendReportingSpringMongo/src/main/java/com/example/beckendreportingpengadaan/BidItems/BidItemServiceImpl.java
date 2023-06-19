@@ -1,4 +1,4 @@
-package com.example.beckendreportingpengadaan.BidHistory;
+package com.example.beckendreportingpengadaan.BidItems;
 
 import org.springframework.stereotype.Service;
 

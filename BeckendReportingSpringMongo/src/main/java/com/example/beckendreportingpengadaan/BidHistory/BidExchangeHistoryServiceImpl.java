@@ -1,11 +1,16 @@
 package com.example.beckendreportingpengadaan.BidHistory;
 
+import com.example.beckendreportingpengadaan.BidHistory.DTO.BidExchangeHistoryRequestDTO;
+import com.example.beckendreportingpengadaan.BidHistory.DTO.BidExchangeHistoryResponseDTO;
+import com.example.beckendreportingpengadaan.BidItems.BidItemDTO;
+import com.example.beckendreportingpengadaan.BidItems.BidItemModel;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,10 +30,18 @@ public class BidExchangeHistoryServiceImpl implements BidExchangeHistoryService 
         // Map the request DTO to the bid exchange history model
         BidExchangeHistoryModel bidExchangeHistoryModel = modelMapper.map(requestDTO, BidExchangeHistoryModel.class);
 
+        // Generate a unique ID for the bidExchangeHistoryModel
+        String uniqueId = UUID.randomUUID().toString();
+        bidExchangeHistoryModel.setId(uniqueId);
+
         // Retrieve the existing bidItems from the database
-        BidExchangeHistoryModel existingBidExchangeHistory = bidExchangeHistoryRepository.findById(bidExchangeHistoryModel.getId())
-                .orElse(null);
-        List<BidItemModel> existingBidItems = (existingBidExchangeHistory != null) ? existingBidExchangeHistory.getBidItems() : new ArrayList<>();
+        BidExchangeHistoryModel existingBidExchangeHistory = bidExchangeHistoryRepository.findById(uniqueId)
+                .orElse(new BidExchangeHistoryModel());
+
+        List<BidItemModel> existingBidItems = existingBidExchangeHistory.getBidItems();
+        if (existingBidItems == null) {
+            existingBidItems = new ArrayList<>();
+        }
 
         // Add all the bidItems from the request to the existingBidItems list
         List<BidItemDTO> bidItemsDTO = requestDTO.getBidItems();
@@ -48,6 +61,8 @@ public class BidExchangeHistoryServiceImpl implements BidExchangeHistoryService 
 
         return responseDTO;
     }
+
+
 
     @Override
     public List<BidItemDTO> getBidItemsByOrderIdAndBidItemId(Long orderId, Long bidItemId) {
