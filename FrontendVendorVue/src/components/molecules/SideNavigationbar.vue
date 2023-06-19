@@ -17,22 +17,19 @@
     <div>
       <RouterLink to="/orderDetails">
         <div class="nav-item">
-          <FontAwesomeIcon icon="fas fa-solid fa-o"  class="nav-icon" />
-          <p v-if="!isOpen">Orders</p>
+          <FontAwesomeIcon icon="fas fa-solid fa-o" class="nav-icon" />
         </div>
       </RouterLink>
-    </div>
-    <div>
     </div>
   </div>
 </template>
 
 <script>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "SideNavigationBar",
-  
+
   data() {
     return {
       isOpen: true,
@@ -57,7 +54,6 @@ export default {
   transform: translateX(-100%);
   margin-top: 15px;
   border-right: 2px solid rgb(206, 206, 206);
-
 }
 
 .sidenav.open {
@@ -83,9 +79,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction:row;
+  flex-direction: row;
 }
-
 
 .nav-icon {
   font-size: 20px;
@@ -94,6 +89,7 @@ export default {
 
 @media screen and (min-width: 768px) {
   .sidenav {
-    top: 50px
+    top: 50px;
   }
-}</style>
+}
+</style>

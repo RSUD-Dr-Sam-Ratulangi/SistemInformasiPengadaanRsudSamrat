@@ -123,8 +123,7 @@ export default {
         description: "",
         imageUrl: "",
         categoryIds: [],
-        subCategoryId: [],
-        status: "PENDING"
+        subCategoryId: []
       },
       message: "",
     };
