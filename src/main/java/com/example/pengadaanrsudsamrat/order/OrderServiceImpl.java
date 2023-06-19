@@ -301,6 +301,7 @@ public class OrderServiceImpl implements OrderService {
                     bidItemDTO.setBidPrice(orderItem.getBidPrice());
                     bidItemDTO.setBidPriceChange(orderItem.getBidPrice() - orderItem.getProduct().getPrice());
                     bidItemDTO.setStatus(orderItem.getStatus().toString());
+                    bidItemDTO.setMessage(updateRequestDTO.getMessage()); // Set the message
                     return bidItemDTO;
                 })
                 .collect(Collectors.toList());
@@ -308,8 +309,7 @@ public class OrderServiceImpl implements OrderService {
         requestDTO.setBidItems(bidItems);
         requestDTO.setStatus(savedOrderModel.getStatus().toString());
 
-
-        String otherEndpointUrl = "http://rsudsamrat.site:8090/api/bid-exchange/history"; //
+        String otherEndpointUrl = "http://rsudsamrat.site:8090/api/bid-exchange/history";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
@@ -324,9 +324,7 @@ public class OrderServiceImpl implements OrderService {
                 BidExchangeHistoryResponseDTO.class
         );
 
-
         BidExchangeHistoryResponseDTO responseDTO = responseEntity.getBody();
-
 
         return modelMapper.map(savedOrderModel, OrderResponseDTO.class);
     }
