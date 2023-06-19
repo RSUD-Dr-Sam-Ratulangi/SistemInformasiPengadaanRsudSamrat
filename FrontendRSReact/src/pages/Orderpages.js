@@ -40,9 +40,8 @@ const Orderpages = () => {
         const response = await axios.get(
           `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock`
         );
-        console.log(response.data);
         // Filter and remove duplicate IDs
-        console.log(response.data)
+        console.log(response.data);
         let uniqueData = [];
         const seenIds = new Set();
 
@@ -175,13 +174,15 @@ const Orderpages = () => {
         // Update the state to show the success modal
         setIsOfferSubmitted(true);
         //send notif
-        axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-          sender: role,
-          senderId: idUser,
-          receiver: selectedOrderItem.product.vendor.name,
-          receiverId: selectedOrderItem.product.vendor.id,
-          message: `OFFER PRODUCT FROM ${role}, Product ${selectedOrderItem.product.name}, QUANTITY : ${selectedOrderItem.quantity} `,
-        });
+        axios
+          .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+            sender: role,
+            senderId: idUser,
+            receiver: selectedOrderItem.product.vendor.name,
+            receiverId: selectedOrderItem.product.vendor.id,
+            message: `OFFER PRODUCT FROM ${role}, Product ${selectedOrderItem.product.name}, QUANTITY : ${selectedOrderItem.quantity} `,
+          })
+          .catch((err) => console.log(err));
       })
       .catch((error) => {
         // Handle any error that occurred during the API call
@@ -396,6 +397,7 @@ const Orderpages = () => {
             <ModalOrderDetails
               onClose={() => setSelectedOrder(null)}
               selectedOrder={selectedOrder}
+              selectedOrderItem={selectedOrderItem}
               handleHistory={handleHistory}
               handleDetailProduct={handleDetailProduct}
               handleOffer={handleOffer}
