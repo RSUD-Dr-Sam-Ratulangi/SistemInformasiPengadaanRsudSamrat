@@ -24,14 +24,18 @@
 
 <script>
 import axios from 'axios';
+import { mapGetters } from 'vuex';
 export default {
     data() {
         return {
             notif: [],
         }
     },
+    computed : {
+        ...mapGetters(["vendoruuid", "vendorid"])
+    },
     created() {
-      axios.get("http://rsudsamrat.site:8990/api/v1/notifikasi").then((res) => {
+      axios.get(`http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/${this.vendorid}`).then((res) => {
         console.log(res.data);
         this.notif = res.data.content;
       });

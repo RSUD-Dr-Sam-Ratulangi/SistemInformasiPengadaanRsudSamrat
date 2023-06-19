@@ -1,5 +1,10 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import Productpages from "../pages/Productpages";
 import Dashboard from "../pages/Dashboard";
 import Navigation from "../components/Navigation";
@@ -15,7 +20,6 @@ import CommingSoon from "../pages/CommingSoon";
 import Payment from "../pages/Payment";
 import { useSelector } from "react-redux";
 
-
 const Routers = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
@@ -27,7 +31,7 @@ const Routers = () => {
 
   return (
     <Router>
-      <Navigation />
+      {/* <Navigation /> */}
       <Routes>
         {!isLoggedIn ? (
           <Route path="/*" element={<Navigate to="/signIn" replace />} />
@@ -46,7 +50,7 @@ const Routers = () => {
         )}
         <Route path="/signIn" element={<SignInpages />} />
       </Routes>
-      <Footer />
+      {/* <Footer /> */}
     </Router>
   );
 };

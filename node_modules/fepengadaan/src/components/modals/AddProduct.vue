@@ -5,7 +5,7 @@
         <div class="modal-header">
           <h1 style="font-style: italic; font-weight: bolder">
             Add Product
-            <span class="close-button" @click="$emit('close')">
+            <span class="close-button" @click="handleCloseClick()">
               <FontAwesomeIcon icon="fas fa-xmark" />
             </span>
           </h1>
@@ -17,63 +17,72 @@
                 <div class="field">
                   <label class="label">Product Name</label>
                   <div class="control">
-                    <input class="input" type="text" placeholder="Product Name" v-model="product.name">
+                    <input class="input" type="text" placeholder="Product Name" v-model="product.name" required>
                   </div>
                 </div>
                 <div class="field">
                   <label class="label">Price</label>
                   <div class="control">
-                    <input class="input" type="number" placeholder="Price" v-model="product.price">
+                    <input class="input" type="number" placeholder="Price" v-model="product.price" required>
                   </div>
                 </div>
                 <div class="field">
                   <label class="label">Quantity</label>
                   <div class="control">
-                    <input class="input" type="number" placeholder="Quantity" v-model="product.quantity">
+                    <input class="input" type="number" placeholder="Quantity" v-model="product.quantity" required>
                   </div>
                 </div>
                 <div class="field">
                   <label class="label">Description</label>
                   <div class="control">
-                    <input class="input is-large" type="text" placeholder="Description" v-model="product.description">
+                    <input class="input is-large" type="text" placeholder="Description" v-model="product.description"
+                      required>
                   </div>
                   <div class="field">
                     <p>Categories</p>
                     <label class="checkbox">
-                      <input type="checkbox" v-model="product.categoryIds" :value="3">
-                      BPH
+                      <input type="checkbox" v-model="product.categoryIds" :value="3"
+                        @change="handleCheckboxChangeCategory(3)" required>
+                      BHP
                     </label>
                     <label class="checkbox">
-                      <input type="checkbox" v-model="product.categoryIds" :value="4">
+                      <input type="checkbox" v-model="product.categoryIds" :value="4"
+                        @change="handleCheckboxChangeCategory(4)" required>
                       BM
                     </label>
                     <label class="checkbox">
-                      <input type="checkbox" v-model="product.categoryIds" :value="5">
+                      <input type="checkbox" v-model="product.categoryIds" :value="5"
+                        @change="handleCheckboxChangeCategory(5)" required>
                       JASA
                     </label>
                   </div>
                   <div class="field">
-                    <p>Sub Categories</p>
-                    <label class="checkbox">
-                      <input type="checkbox" v-model="product.subCategoryId" :value="1">
-                      NON MEDIS    
-                    </label>
-                    <label class="checkbox">
-                      <input type="checkbox" v-model="product.subCategoryId" :value="2">
-                      MEDIS
-                    </label>
-                    <label class="checkbox">
-                      <input type="checkbox" v-model="product.subCategoryId" :value="2">
-                      MEDIS
-                    </label>
-                    <label class="checkbox">
-                      <input type="checkbox" v-model="product.subCategoryId" :value="5">
-                      ALKSES
-                    </label>
-                    <label class="checkbox">
-                      <input type="checkbox" v-model="product.subCategoryId" :value="6">
-                      ALKON
-                    </label>
+                    <div v-show="product.categoryIds.includes(3)">
+                      <p>Sub Categories</p>
+                      <label class="checkbox">
+                        <input type="checkbox" v-model="product.subCategoryId" :value="1"
+                          @change="handleCheckboxChangeSubCategory(1)" required>
+                        NON MEDIS
+                      </label>
+                      <label class="checkbox">
+                        <input type="checkbox" v-model="product.subCategoryId" :value="2"
+                          @change="handleCheckboxChangeSubCategory(2)" required>
+                        MEDIS
+                      </label>
+                    </div>
+                    <div v-show="product.categoryIds.includes(4)">
+                      <p>Sub Categories</p>
+                      <label class="checkbox">
+                        <input type="checkbox" v-model="product.subCategoryId" :value="5"
+                          @change="handleCheckboxChangeSubCategory(5)" required>
+                        ALKSES
+                      </label>
+                      <label class="checkbox">
+                        <input type="checkbox" v-model="product.subCategoryId" :value="6"
+                          @change="handleCheckboxChangeSubCategory(6)" required>
+                        ALKON
+                      </label>
+                    </div>
                   </div>
                 </div>
                 <button class="button is-primary" type="submit">Submit</button>
@@ -106,6 +115,7 @@ export default {
     return {
       isActive: false,
       isLoading: false,
+      chekedBox: null,
       product: {
         name: "",
         price: "",
@@ -120,7 +130,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["vendoruuid"])
+    ...mapGetters(["vendoruuid"]),
   },
   components: { FontAwesomeIcon },
   methods: {
@@ -146,6 +156,19 @@ export default {
           console.log(err);
         })
     },
+    handleCheckboxChangeCategory(checkedCategoryId) {
+      this.product.categoryIds = [checkedCategoryId];
+      this.product.subCategoryId = null;
+    },
+    handleCheckboxChangeSubCategory(checkedSubCategoryId) {
+      this.product.subCategoryId = [checkedSubCategoryId];
+    },
+    handleCloseClick() {
+      this.product.categoryIds = [],
+        this.product.subCategoryId = null,
+
+        this.$emit('close');
+    }
   }
 }
 </script>
@@ -180,5 +203,4 @@ export default {
 
 .dropdown {
   padding-top: 10px;
-}
-</style>
+}</style>

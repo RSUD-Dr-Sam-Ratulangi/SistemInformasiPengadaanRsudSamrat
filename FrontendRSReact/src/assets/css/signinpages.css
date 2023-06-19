@@ -1,4 +1,4 @@
-.container {
+/* .container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,7 +32,7 @@ label {
 .button {
   width: 100%;
   padding: 10px;
-  background-color: #007bff;
+  background-color: #abdfa0;
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -40,15 +40,14 @@ label {
 }
 
 .button:hover {
-  background-color: #0069d9;
+  background-color: #abdfa0;
 }
 
 p {
   color: red;
   margin-top: 10px;
   text-align: center;
-}
-
+} */
 
 /* .container {
     display: flex;
@@ -114,3 +113,9 @@ p {
   }
   
    */
+
+.signin {
+  display: flex;
+  justify-content: space-between;
+  color
+}
