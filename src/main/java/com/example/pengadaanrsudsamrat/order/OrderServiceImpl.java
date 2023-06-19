@@ -308,8 +308,8 @@ public class OrderServiceImpl implements OrderService {
         requestDTO.setBidItems(bidItems);
         requestDTO.setStatus(savedOrderModel.getStatus().toString());
 
-        // Save the updated order to the other Spring Boot backend endpoint
-        String otherEndpointUrl = "http://rsudsamrat.site:8090/api/bid-exchange/history"; // Replace with the actual URL of the other endpoint
+
+        String otherEndpointUrl = "http://rsudsamrat.site:8090/api/bid-exchange/history"; //
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
