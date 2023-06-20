@@ -1,10 +1,9 @@
 .footer {
-  
-    background-color: #f8f9fa;
-    padding: 10px;
-    text-align: center;
-    position: relative;
-    margin-top: 50px; 
+  background-color: #f8f9fa;
+  padding: 10px;
+  text-align: center;
+  position: relative;
+  margin-top: 50px;
 
   /* background-color: #ffffff;
   font-size: smaller;
@@ -23,14 +22,14 @@
 
 .footer-text-bold {
   font-weight: bold;
-  font-size:15px;
-  color: #000000;
+  font-size: 15px;
+  color: #1c1c1c;
   /* margin-right: 200px; */
 }
 
 .footer-text-small {
-  font-size:10px;
-  color: #000000;
+  font-size: 10px;
+  color: #1c1c1c;
   /* margin-right: 300px; */
 }
 
@@ -41,7 +40,7 @@
 }
 
 .footer-text {
-  color: #000000;
+  color: #1c1c1c;
   font-size: 10px;
 }
 

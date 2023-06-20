@@ -15,6 +15,10 @@ const ModalOrderDetails = ({
   handleOffer,
   handleOpenSubmitModal,
   handlePayoutDetail,
+  setShowActionToast,
+  setActionToastHeader,
+  setActionToastBody,
+  fetchData
 }) => {
   const navigate = useNavigate();
   const role = useSelector((state) => state.auth.role);
@@ -54,17 +58,30 @@ const ModalOrderDetails = ({
         }
       )
         .then((response) => {
+          setShowActionToast(true);
+
           if (response.ok) {
             // Data berhasil dihapus, lakukan tindakan tambahan jika diperlukan
             console.log("Data berhasil dihapus");
+            setActionToastHeader("Berhasil");
+            setActionToastBody("Data berhasil dihapus");
+            fetchData();
           } else {
             // Gagal menghapus data, tangani kesalahan jika diperlukan
             console.error("Gagal menghapus data");
+            setActionToastHeader("Gagal");
+            setActionToastBody("Gagal menghapus data");
           }
+
+          onClose();
         })
         .catch((error) => {
+          setShowActionToast(true);
           // Tangani kesalahan dalam permintaan
           console.error("Terjadi kesalahan:", error);
+          setActionToastHeader("Gagal");
+          setActionToastBody("Terjadi Kesalahan");
+          onClose();
         });
     }
   };
@@ -331,7 +348,12 @@ const ModalOrderDetails = ({
           {selectedFiles.map((file, index) => (
             <div style={{ display: "flex" }}>
               <p key={index}>{file.name}</p>
-              <button className="btn btn-secondary">Upload</button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => console.log(`Upload File ${file.name} sukses`)}
+              >
+                Upload
+              </button>
             </div>
           ))}
         </div>

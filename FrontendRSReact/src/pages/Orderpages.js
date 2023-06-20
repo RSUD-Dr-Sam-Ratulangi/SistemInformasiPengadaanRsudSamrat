@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
+import { Toast } from 'react-bootstrap';
 
 import ModalHistory from "../components/orderPages/ModalHistory";
 import ModalOrderItem from "../components/orderPages/ModalOrderItem";
@@ -25,6 +26,7 @@ const Orderpages = () => {
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [selectedOrderItem, setSelectedOrderItem] = useState(null);
   const [bidPrice, setBidPrice] = useState("");
+  const [message, setMessage] = useState("");
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
   const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
@@ -33,63 +35,68 @@ const Orderpages = () => {
   const role = useSelector((state) => state.auth.role);
   const idUser = useSelector((state) => state.auth.id);
 
+  // action toast
+  const [showActionToast, setShowActionToast] = useState(false);
+  const [actionToastHeader, setActionToastHeader] = useState('');
+  const [actionToastBody, setActionToastBody] = useState('');
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(
-          `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock`
-        );
-        // Filter and remove duplicate IDs
-        console.log(response.data);
-        let uniqueData = [];
-        const seenIds = new Set();
-
-        response.data.forEach((item) => {
-          if (!seenIds.has(item.orderId)) {
-            uniqueData.push(item);
-            seenIds.add(item.orderId);
-          }
-        });
-
-        console.log("unique data", uniqueData);
-
-        // Filter data based on role and status
-        if (role === "PP") {
-          uniqueData = uniqueData.filter(
-            (item) =>
-              item.status === "ORDER" ||
-              item.status === "NEGOTIATION" ||
-              item.status === "VALIDATING" ||
-              item.status === "CANCEL"
-          );
-        }
-        if (role === "PPKOM") {
-          uniqueData = uniqueData.filter(
-            (item) =>
-              item.status === "ORDER" ||
-              item.status === "NEGOTIATION" ||
-              item.status === "CANCEL" ||
-              item.status === "VALIDATING"
-          );
-        }
-        if (role === "PANPEN") {
-          uniqueData = uniqueData.filter(
-            (item) => item.status === "VALIDATING"
-          );
-        }
-
-        setData(uniqueData);
-        console.log("order filter: ", uniqueData);
-        console.log("order: ", response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     fetchData();
   }, [role]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock`
+      );
+      // Filter and remove duplicate IDs
+      console.log(response.data);
+      let uniqueData = [];
+      const seenIds = new Set();
+
+      response.data.forEach((item) => {
+        if (!seenIds.has(item.orderId)) {
+          uniqueData.push(item);
+          seenIds.add(item.orderId);
+        }
+      });
+
+      console.log("unique data", uniqueData);
+
+      // Filter data based on role and status
+      if (role === "PP") {
+        uniqueData = uniqueData.filter(
+          (item) =>
+            item.status === "ORDER" ||
+            item.status === "NEGOTIATION" ||
+            item.status === "VALIDATING" ||
+            item.status === "CANCEL"
+        );
+      }
+      if (role === "PPKOM") {
+        uniqueData = uniqueData.filter(
+          (item) =>
+            item.status === "ORDER" ||
+            item.status === "NEGOTIATION" ||
+            item.status === "CANCEL" ||
+            item.status === "VALIDATING"
+        );
+      }
+      if (role === "PANPEN") {
+        uniqueData = uniqueData.filter(
+          (item) => item.status === "VALIDATING"
+        );
+      }
+
+      setData(uniqueData);
+      console.log("order filter: ", uniqueData);
+      console.log("order: ", response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -164,6 +171,7 @@ const Orderpages = () => {
           orderItemId: selectedOrderItem.id,
           bidPrice: parseFloat(bidPrice),
           status: status,
+          message: message,
         }
       )
       .then((response) => {
@@ -266,6 +274,15 @@ const Orderpages = () => {
   const handleRowClick = (selectedOrder) => {
     openModal(selectedOrder.orderId);
   };
+
+  function handleModalOrderDetailsOnClose() {
+    setTimeout(() => {
+      setShowActionToast(false);
+      setActionToastHeader('');
+      setActionToastBody('');
+    }, 3000);
+    setSelectedOrder(null);
+  }
 
   return (
     <div className="container">
@@ -395,7 +412,7 @@ const Orderpages = () => {
           {/* Order Details Modal */}
           {selectedOrder && (
             <ModalOrderDetails
-              onClose={() => setSelectedOrder(null)}
+              onClose={handleModalOrderDetailsOnClose}
               selectedOrder={selectedOrder}
               selectedOrderItem={selectedOrderItem}
               handleHistory={handleHistory}
@@ -403,6 +420,10 @@ const Orderpages = () => {
               handleOffer={handleOffer}
               handleOpenSubmitModal={handleOpenSubmitModal}
               handlePayoutDetail={handlePayoutDetail}
+              setShowActionToast={setShowActionToast}
+              setActionToastHeader={setActionToastHeader}
+              setActionToastBody={setActionToastBody}
+              fetchData={fetchData}
             />
           )}
 
@@ -430,6 +451,8 @@ const Orderpages = () => {
               onSubmit={handleOfferSubmit}
               bidPrice={bidPrice}
               setBidPrice={setBidPrice}
+              message={message}
+              setMessage={setMessage}
               selectedOrderItem={selectedOrderItem}
             />
           )}
@@ -467,6 +490,18 @@ const Orderpages = () => {
           )}
         </>
       )}
+
+      {/* Action Toast */}
+      <Toast
+        show={showActionToast}
+        className='toast-container fixed-top'
+        bg='primary'
+      >
+        <Toast.Header>
+          <strong>{actionToastHeader}</strong>
+        </Toast.Header>
+        <Toast.Body>{actionToastBody}</Toast.Body>
+      </Toast>
     </div>
   );
 };
