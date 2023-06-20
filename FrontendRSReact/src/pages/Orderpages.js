@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
-import { Toast } from 'react-bootstrap';
+import { Toast } from "react-bootstrap";
 
 import ModalHistory from "../components/orderPages/ModalHistory";
 import ModalOrderItem from "../components/orderPages/ModalOrderItem";
@@ -26,6 +26,7 @@ const Orderpages = () => {
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [selectedOrderItem, setSelectedOrderItem] = useState(null);
   const [bidPrice, setBidPrice] = useState("");
+  const [message, setMessage] = useState("");
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
   const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
@@ -36,8 +37,8 @@ const Orderpages = () => {
 
   // action toast
   const [showActionToast, setShowActionToast] = useState(false);
-  const [actionToastHeader, setActionToastHeader] = useState('');
-  const [actionToastBody, setActionToastBody] = useState('');
+  const [actionToastHeader, setActionToastHeader] = useState("");
+  const [actionToastBody, setActionToastBody] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -83,9 +84,7 @@ const Orderpages = () => {
         );
       }
       if (role === "PANPEN") {
-        uniqueData = uniqueData.filter(
-          (item) => item.status === "VALIDATING"
-        );
+        uniqueData = uniqueData.filter((item) => item.status === "VALIDATING");
       }
 
       setData(uniqueData);
@@ -170,6 +169,7 @@ const Orderpages = () => {
           orderItemId: selectedOrderItem.id,
           bidPrice: parseFloat(bidPrice),
           status: status,
+          message: message,
         }
       )
       .then((response) => {
@@ -276,8 +276,8 @@ const Orderpages = () => {
   function handleModalOrderDetailsOnClose() {
     setTimeout(() => {
       setShowActionToast(false);
-      setActionToastHeader('');
-      setActionToastBody('');
+      setActionToastHeader("");
+      setActionToastBody("");
     }, 3000);
     setSelectedOrder(null);
   }
@@ -418,10 +418,10 @@ const Orderpages = () => {
               handleOffer={handleOffer}
               handleOpenSubmitModal={handleOpenSubmitModal}
               handlePayoutDetail={handlePayoutDetail}
-              setShowActionToast={setShowActionToast}
-              setActionToastHeader={setActionToastHeader}
-              setActionToastBody={setActionToastBody}
-              fetchData={fetchData}
+              // setShowActionToast={setShowActionToast}
+              // setActionToastHeader={setActionToastHeader}
+              // setActionToastBody={setActionToastBody}
+              // fetchData={fetchData}
             />
           )}
 
@@ -449,6 +449,8 @@ const Orderpages = () => {
               onSubmit={handleOfferSubmit}
               bidPrice={bidPrice}
               setBidPrice={setBidPrice}
+              message={message}
+              setMessage={setMessage}
               selectedOrderItem={selectedOrderItem}
             />
           )}
@@ -490,8 +492,8 @@ const Orderpages = () => {
       {/* Action Toast */}
       <Toast
         show={showActionToast}
-        className='toast-container fixed-top'
-        bg='primary'
+        className="toast-container fixed-top"
+        bg="primary"
       >
         <Toast.Header>
           <strong>{actionToastHeader}</strong>
