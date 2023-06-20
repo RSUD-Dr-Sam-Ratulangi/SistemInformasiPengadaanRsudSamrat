@@ -331,7 +331,12 @@ const ModalOrderDetails = ({
           {selectedFiles.map((file, index) => (
             <div style={{ display: "flex" }}>
               <p key={index}>{file.name}</p>
-              <button className="btn btn-secondary">Upload</button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => console.log(`Upload File ${file.name} sukses`)}
+              >
+                Upload
+              </button>
             </div>
           ))}
         </div>

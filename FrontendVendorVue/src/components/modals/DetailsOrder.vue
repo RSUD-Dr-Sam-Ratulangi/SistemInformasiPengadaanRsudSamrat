@@ -315,10 +315,6 @@ export default {
           console.log(response.data);
           this.showRejectModal = false;
           //Post history
-          axios.post(
-            "http://rsudsamrat.site:8090/api/bid-exchange/history",
-            {}
-          );
           //Post notif
           axios
             .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
