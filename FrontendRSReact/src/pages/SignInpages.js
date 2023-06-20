@@ -1,50 +1,47 @@
 import * as React from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import {
-  Avatar,
-  Button,
-  CssBaseline,
-  TextField,
-  FormControlLabel,
-  Checkbox,
-  Link,
-  Grid,
-  Box,
-  Typography,
-  Container,
-  createTheme,
-  ThemeProvider,
-} from "@mui/material";
+  FaInstagram,
+  FaFacebook,
+  FaGlobe,
+  FaEnvelope,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { login } from "../config/auth/authSlice";
-
+import logo128 from "../assets/images/logo128.png";
+import vector from "../assets/images/vector.svg";
 
 const SignInpages = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [userName, setUserName] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const [usernameInput, setUsernameInput] = React.useState("");
+  const [passwordInput, setPasswordInput] = React.useState("");
 
   const handleChangeUsername = (e) => {
-    setUserName(e.target.value);
+    setUsernameInput(e.target.value);
   };
   const handleChangePassword = (e) => {
-    setPassword(e.target.value);
+    setPasswordInput(e.target.value);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     try {
-      const loginResponse = await axios.post("http://rsudsamrat.site:8080/employee/login", {
-        username: userName,
-        password: password,
-      });
-  
+      const loginResponse = await axios.post(
+        "http://rsudsamrat.site:8080/employee/login",
+        {
+          username: usernameInput,
+          password: passwordInput,
+        }
+      );
+
       const { username, id } = loginResponse.data;
-      const userResponse = await axios.get(`http://rsudsamrat.site:8080/employee/${id}`);
+      const userResponse = await axios.get(
+        `http://rsudsamrat.site:8080/employee/${id}`
+      );
       const { role } = userResponse.data;
       console.log(id);
       dispatch(login({ username, id, role }));
@@ -54,109 +51,97 @@ const SignInpages = () => {
     }
   };
 
-  const theme = createTheme({
-    palette: {
-      background: {
-        default: "#CDE0C9",
-      },
-    },
-  });
-
   return (
-    <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            backgroundColor: "background.default",
-            position: "relative",
-            overflow: "hidden",
-          }}
-          >
-          <div
-            className="background-animation"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              zIndex: -1,
-              opacity: 0.5,
-              // background: "linear-gradient(45deg, #fff 10%, transparent 90%)",
-              backgroundImage:
-                "url('/path/to/your/illustration-or-animated-image.gif')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              animation: "animateBackground 10s linear infinite",
-            }}
-            ></div>
-          <Avatar sx={{ m: 1, bgcolor: 'success.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            SIGN IN
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Username"
-            value={userName}
-            onChange={handleChangeUsername}
-            autoComplete="email"
-            autoFocus
-            sx={{ bgcolor: "white" }}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            value={password}
-            onChange={handleChangePassword}
-            id="password"
-            autoComplete="current-password"
-            sx={{ bgcolor: "white" }}
-          />
+    <>
+      {/* Vector BG */}
+      <img
+        src={vector}
+        alt="bg"
+        className="absolute w-screen -translate-x-1/2 -translate-y-1/2 pointer-events-none user-select-none left-1/2 top-1/2"
+      />
 
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
+      {/* Form */}
+      <div className="absolute flex flex-col items-center -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 w-max">
+        <div className="mb-3">
+          <img src={logo128} alt="Logo" />
+        </div>
+        <h1 className="m-0 fs-4 fw-bold">Smart Samrat Procurement</h1>
+        <p className="fs-6 fw-medium">RSUD DR SAM RATULANGI TONDANO</p>
+        <form onSubmit={handleSubmit} className="w-full">
+          <div className="flex flex-col gap-2 mb-3">
+            <label htmlFor="username">
+              Username<span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={usernameInput}
+              onChange={handleChangeUsername}
+              placeholder="Username"
+              className="w-full input input-primary"
             />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2, bgcolor: "black", color: "white" }}
-            >
-              Sign In
-            </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2" sx={{ color: "black" }}>
-                {/* Forgot password? */}
-              </Link>
-            </Grid>
-            <Grid item>
-              {/* Don't have an account?{" "} */}
-              {/* <Link href="#" variant="body2" sx={{ color: "black" }}>
-                Sign Up
-              </Link> */}
-            </Grid>
-          </Grid>
-          </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+          </div>
+          <div className="flex flex-col gap-2 mb-3">
+            <label htmlFor="password">
+              Password<span className="text-red-500">*</span>
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={passwordInput}
+              onChange={handleChangePassword}
+              placeholder="•••••••"
+              className="w-full input input-primary"
+            />
+          </div>
+          <div className="flex items-center justify-start gap-2 mb-2">
+            <input
+              type="checkbox"
+              className="checkbox checkbox-primary"
+              id="remember"
+            />
+            <label htmlFor="remember" className="cursor-pointer">
+              Remember me
+            </label>
+          </div>
+          <button type="submit" className="w-full btn btn-success">
+            Sign in
+          </button>
+        </form>
+      </div>
+
+      {/* Footer */}
+      <div className="absolute bottom-0 flex flex-col items-center justify-between w-full p-6 md:flex-row">
+        <div className="mb-2 text-center">
+          © 2023 UPTI RSUD DR SAM RATULANGI TONDANO. Hak Cipta Dilindungi
+        </div>
+        <div className="flex gap-3">
+          <a
+            href="https://instagram.com/rsud_samrat_tondano?igshid=OGQ5ZDc2ODk2ZA=="
+            className="text-dark"
+          >
+            <FaInstagram className="scale-125" />
+          </a>
+          <a
+            href="https://www.facebook.com/PageOfficialRSUDSamRatulangi?mibextid=LQQJ4d"
+            className="text-dark"
+          >
+            <FaFacebook className="scale-125" />
+          </a>
+          <a href="https://rsudsamrat.site/epasien/" className="text-dark">
+            <FaGlobe className="scale-125" />
+          </a>
+          <a href="mailto:samratulangirsud@gmail.com" className="text-dark">
+            <FaEnvelope className="scale-125" />
+          </a>
+          <a href="https://goo.gl/maps/dcuTHTNYtmFDfkxA7" className="text-dark">
+            <FaMapMarkerAlt className="scale-125" />
+          </a>
+        </div>
+      </div>
+    </>
   );
 };
 

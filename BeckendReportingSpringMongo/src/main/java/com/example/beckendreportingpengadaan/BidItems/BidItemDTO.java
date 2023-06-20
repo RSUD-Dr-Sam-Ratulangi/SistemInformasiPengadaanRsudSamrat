@@ -1,4 +1,4 @@
-package com.example.beckendreportingpengadaan.BidHistory;
+package com.example.beckendreportingpengadaan.BidItems;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BidItemModel {
+public class BidItemDTO {
     private Long id;
     private String productName;
     private String vendorName;
@@ -15,14 +15,7 @@ public class BidItemModel {
     private Double bidPrice;
     private Double bidPriceChange;
     private Double totalBidPrice;
-    private BidItemStatus status;
-
-
-    public enum BidItemStatus {
-        PENDING,
-        OFFER,
-        REJECTED,
-        ACCEPTED
-    }
-    // ... getters and setters
+    private String status;
+    private String message;
 }
+

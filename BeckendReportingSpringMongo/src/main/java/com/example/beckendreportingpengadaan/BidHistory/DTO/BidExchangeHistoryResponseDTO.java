@@ -1,5 +1,6 @@
-package com.example.beckendreportingpengadaan.BidHistory;
+package com.example.beckendreportingpengadaan.BidHistory.DTO;
 
+import com.example.beckendreportingpengadaan.BidItems.BidItemDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,4 +16,5 @@ public class BidExchangeHistoryResponseDTO {
     private String orderDate;
     private List<BidItemDTO> bidItems;
     private String status;
+
 }

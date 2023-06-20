@@ -6,17 +6,23 @@ import {
   FaEnvelope,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import "./Footer.css";
 
 const Footer = () => {
+  const location = useLocation();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   // const activeTab = window.location.pathname;
 
   const handleTabClick = (tab) => {
     // Handle tab click logic here
   };
+
+  const isSignInPage = location.pathname === "/signIn";
+  if (isSignInPage) {
+    return null;
+  }
 
   return (
     <div className="footer">
