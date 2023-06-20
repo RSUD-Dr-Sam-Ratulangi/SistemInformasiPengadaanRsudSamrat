@@ -33,8 +33,6 @@
     </div>
   </nav>
 
-
-
   <div>
     <SideNavigationbar v-if="toggleIsActive" />
   </div>

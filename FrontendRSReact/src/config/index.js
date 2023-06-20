@@ -1,5 +1,10 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import Productpages from "../pages/Productpages";
 import Dashboard from "../pages/Dashboard";
 import Navigation from "../components/Navigation";
@@ -14,7 +19,6 @@ import Vendors from "../pages/Vendor";
 import CommingSoon from "../pages/CommingSoon";
 import Payment from "../pages/Payment";
 import { useSelector } from "react-redux";
-
 
 const Routers = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
