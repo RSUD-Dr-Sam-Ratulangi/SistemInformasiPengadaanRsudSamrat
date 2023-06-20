@@ -95,6 +95,15 @@
               </span>
             </label>
           </div>
+          <div v-if="selectedFile" style="display: flex">
+            <p v-if="selectedFile.length > 0">{{ selectedFile[0].name }}</p>
+            <button
+              v-if="selectedFile.length > 0"
+              @click.prevent="uploadFaktur"
+            >
+              Upload
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -314,7 +323,6 @@ export default {
           const ppIds = this.employee[1].id;
           console.log(response.data);
           this.showRejectModal = false;
-          //Post history
           //Post notif
           axios
             .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
@@ -339,10 +347,31 @@ export default {
       this.selectedItem = null;
       location.reload();
     },
-    uploadFaktur(event) {
-      const file = event.target.files[0];
-      this.fileName = file.name;
-      console.log("Uploading file", file.name);
+    uploadFaktur() {
+      const ppRole = this.employee[1].role;
+      const ppIds = this.employee[1].id;
+      console.log(`File ${this.selectedFile} berhasil di upload`);
+      axios
+        .put(
+          `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/status`,
+          {
+            status: "SHIPPING",
+          }
+        )
+        .then((res) => {
+          console.log(res.data);
+          axios
+            .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+              sender: this.username,
+              senderId: this.vendorid,
+              receiver: ppRole,
+              receiverId: ppIds,
+              message: `FAKTUR TELAH DIKIRIM BERSAMA FILE ${this.selectedFile}. `,
+            })
+            .then((res) => console.log(res))
+            .catch((err) => console.log(err));
+        })
+        .catch((err) => console.log(err));
     },
     getItemsByVendor(vendor) {
       return this.orders.orderItems.filter(
@@ -361,10 +390,11 @@ export default {
       }
     },
     handleFileChange(event) {
-      const selectedFiles = event.target.value[0];
+      const selectedFile = event.target.files[0];
 
       // Save the selected file to the array
-      this.selectedFile.console.log(this.selectedFile);
+      this.selectedFile.push(selectedFile);
+      console.log(this.selectedFile);
 
       // Reset the input value to allow selecting the same file again
       event.target.value = "";
