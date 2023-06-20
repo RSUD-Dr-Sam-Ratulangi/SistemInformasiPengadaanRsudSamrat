@@ -25,6 +25,7 @@ const Orderpages = () => {
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [selectedOrderItem, setSelectedOrderItem] = useState(null);
   const [bidPrice, setBidPrice] = useState("");
+  const [message, setMessage] = useState("");
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [isOfferAccepted, setIsOfferAccepted] = useState(false);
   const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
@@ -164,6 +165,7 @@ const Orderpages = () => {
           orderItemId: selectedOrderItem.id,
           bidPrice: parseFloat(bidPrice),
           status: status,
+          message: message,
         }
       )
       .then((response) => {
@@ -430,6 +432,8 @@ const Orderpages = () => {
               onSubmit={handleOfferSubmit}
               bidPrice={bidPrice}
               setBidPrice={setBidPrice}
+              message={message}
+              setMessage={setMessage}
               selectedOrderItem={selectedOrderItem}
             />
           )}
