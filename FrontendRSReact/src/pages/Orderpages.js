@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { DataGrid } from "@mui/x-data-grid";
-import { Toast } from "react-bootstrap";
+// import { Toast } from "react-bootstrap";
 
 import ModalHistory from "../components/orderPages/ModalHistory";
 import ModalOrderItem from "../components/orderPages/ModalOrderItem";
@@ -181,8 +181,10 @@ const Orderpages = () => {
         // setIsOfferSubmitted(true);
 
         setShowActionToast(true);
-        setActionToastHeader('Berhasil');
-        setActionToastBody(`Your offer for the product ${selectedOrderItem.product.name} has been successfully submitted..`);
+        setActionToastHeader("Berhasil");
+        setActionToastBody(
+          `Your offer for the product ${selectedOrderItem.product.name} has been successfully submitted..`
+        );
         handleModalOfferOnClose();
 
         //send notif
@@ -200,8 +202,10 @@ const Orderpages = () => {
         // Handle any error that occurred during the API call
         console.error("Error updating offer:", error);
         setShowActionToast(true);
-        setActionToastHeader('Gagal');
-        setActionToastBody(`Your offer for the product ${selectedOrderItem.product.name} has failed.`);
+        setActionToastHeader("Gagal");
+        setActionToastBody(
+          `Your offer for the product ${selectedOrderItem.product.name} has failed.`
+        );
         handleModalOfferOnClose();
       });
   };
@@ -223,8 +227,10 @@ const Orderpages = () => {
         // setIsOfferAccepted(true);
 
         setShowActionToast(true);
-        setActionToastHeader('Berhasil');
-        setActionToastBody(`Your offer for the product ${selectedOrderItem.product.name} has been accepted.`);
+        setActionToastHeader("Berhasil");
+        setActionToastBody(
+          `Your offer for the product ${selectedOrderItem.product.name} has been accepted.`
+        );
         handleModalOfferOnClose();
 
         axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
@@ -239,8 +245,10 @@ const Orderpages = () => {
         // Handle any error that occurred during the API call
         console.error("Error accepting offer:", error);
         setShowActionToast(true);
-        setActionToastHeader('Gagal');
-        setActionToastBody(`Your offer for the product ${selectedOrderItem.product.name} has failed.`);
+        setActionToastHeader("Gagal");
+        setActionToastBody(
+          `Your offer for the product ${selectedOrderItem.product.name} has failed.`
+        );
         handleModalOfferOnClose();
       });
   };
@@ -352,7 +360,7 @@ const Orderpages = () => {
             </tbody>
           </table> */}
 
-          <div className="d-flex flex-column gap-3">
+          <div className="gap-3 d-flex flex-column">
             {/* ORDER Table */}
             <div>
               <h2>ORDER Table</h2>
@@ -516,7 +524,7 @@ const Orderpages = () => {
       )}
 
       {/* Action Toast */}
-      <Toast
+      {/* <Toast
         show={showActionToast}
         className="toast-container fixed-top"
         bg="primary"
@@ -525,7 +533,7 @@ const Orderpages = () => {
           <strong>{actionToastHeader}</strong>
         </Toast.Header>
         <Toast.Body>{actionToastBody}</Toast.Body>
-      </Toast>
+      </Toast> */}
     </div>
   );
 };
