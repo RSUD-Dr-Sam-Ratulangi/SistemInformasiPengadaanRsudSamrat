@@ -1,18 +1,19 @@
-import React from 'react';
-import Modal from '../Modal';
+import React from "react";
+import Modal from "../Modal";
 
 const ModalHistory = ({ onClose, history }) => {
   return (
-    <Modal title='History' onClose={onClose}>
-      <div className='modal-body'>
+    <Modal title="History" onClose={onClose}>
+      <div className="modal-body">
         <p>See your History</p>
-        <table className='table'>
+        <table className="table">
           <thead>
             <tr>
               <th>Product Name</th>
               <th>Bid Price</th>
               <th>Price Change</th>
               <th>Status</th>
+              <th>Messages</th>
             </tr>
           </thead>
           <tbody>
@@ -22,12 +23,13 @@ const ModalHistory = ({ onClose, history }) => {
                 <td>{e.bidPrice}</td>
                 <td>{e.bidPriceChange}</td>
                 <td>{e.status}</td>
+                <td>{e.message}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div className='modal-footer'>
+      <div className="modal-footer">
         <p>See Your history Order</p>
       </div>
     </Modal>
