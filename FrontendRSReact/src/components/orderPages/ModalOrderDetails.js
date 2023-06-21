@@ -147,6 +147,7 @@ const ModalOrderDetails = ({
       })
       .catch((err) => console.log(err));
     onClose();
+    window.location.reload();
   };
   const fileInputRef = useRef(null);
 
