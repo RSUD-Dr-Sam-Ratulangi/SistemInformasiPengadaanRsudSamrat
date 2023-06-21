@@ -78,7 +78,15 @@
           <div class="footer-modals">
             <button class="button is-warning" @click="closeModal">Tutup</button>
           </div>
-          <div v-if="allItemsAccepted" class="file" style="padding-left: 10px">
+          <div
+            v-if="
+              orders.status !== 'SHIPPING' &&
+              orders.status !== 'NEGOTIATION' &&
+              allItemsAccepted
+            "
+            class="file"
+            style="padding-left: 10px"
+          >
             <label class="file-label">
               <input
                 class="file-input"

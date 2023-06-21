@@ -17,7 +17,7 @@ const NotificationPages = () => {
     try {
       axios
         .get(`http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/${id}`)
-        .then((res) => setNotifications(res.data.content));
+        .then((res) => setNotifications(res.data));
     } catch (e) {
       console.log("failed to get notifications. ", e);
     }
