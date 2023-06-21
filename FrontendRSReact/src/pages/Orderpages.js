@@ -178,7 +178,13 @@ const Orderpages = () => {
         // Close the offer modal
         setShowOfferModal(false);
         // Update the state to show the success modal
-        setIsOfferSubmitted(true);
+        // setIsOfferSubmitted(true);
+
+        setShowActionToast(true);
+        setActionToastHeader('Berhasil');
+        setActionToastBody(`Your offer for the product ${selectedOrderItem.product.name} has been successfully submitted..`);
+        handleModalOfferOnClose();
+
         //send notif
         axios
           .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
@@ -193,6 +199,10 @@ const Orderpages = () => {
       .catch((error) => {
         // Handle any error that occurred during the API call
         console.error("Error updating offer:", error);
+        setShowActionToast(true);
+        setActionToastHeader('Gagal');
+        setActionToastBody(`Your offer for the product ${selectedOrderItem.product.name} has failed.`);
+        handleModalOfferOnClose();
       });
   };
 
@@ -210,7 +220,12 @@ const Orderpages = () => {
         // Close the offer modal
         setShowOfferModal(false);
         // Update the state to show the success modal
-        setIsOfferAccepted(true);
+        // setIsOfferAccepted(true);
+
+        setShowActionToast(true);
+        setActionToastHeader('Berhasil');
+        setActionToastBody(`Your offer for the product ${selectedOrderItem.product.name} has been accepted.`);
+        handleModalOfferOnClose();
 
         axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
           sender: role,
@@ -223,6 +238,10 @@ const Orderpages = () => {
       .catch((error) => {
         // Handle any error that occurred during the API call
         console.error("Error accepting offer:", error);
+        setShowActionToast(true);
+        setActionToastHeader('Gagal');
+        setActionToastBody(`Your offer for the product ${selectedOrderItem.product.name} has failed.`);
+        handleModalOfferOnClose();
       });
   };
 
@@ -280,6 +299,13 @@ const Orderpages = () => {
       setActionToastBody("");
     }, 3000);
     setSelectedOrder(null);
+  }
+
+  function handleModalOfferOnClose() {
+    setShowOfferModal(false);
+    setBidPrice("");
+    setMessage("");
+    handleModalOrderDetailsOnClose();
   }
 
   return (
@@ -418,10 +444,10 @@ const Orderpages = () => {
               handleOffer={handleOffer}
               handleOpenSubmitModal={handleOpenSubmitModal}
               handlePayoutDetail={handlePayoutDetail}
-              // setShowActionToast={setShowActionToast}
-              // setActionToastHeader={setActionToastHeader}
-              // setActionToastBody={setActionToastBody}
-              // fetchData={fetchData}
+              setShowActionToast={setShowActionToast}
+              setActionToastHeader={setActionToastHeader}
+              setActionToastBody={setActionToastBody}
+              fetchData={fetchData}
             />
           )}
 
@@ -444,7 +470,7 @@ const Orderpages = () => {
           {/* Offer Modal */}
           {showOfferModal && selectedOrderItem && (
             <ModalOffer
-              onClose={() => setShowOfferModal(false)}
+              onClose={handleModalOfferOnClose}
               onAccept={handleOfferAccepted}
               onSubmit={handleOfferSubmit}
               bidPrice={bidPrice}
@@ -456,20 +482,20 @@ const Orderpages = () => {
           )}
 
           {/* Submitted Offer Modal */}
-          {isOfferSubmitted && (
+          {/* {isOfferSubmitted && (
             <ModalSubmittedOffer
               onClose={() => setIsOfferSubmitted(false)}
               product={selectedOrderItem.product.name}
             />
-          )}
+          )} */}
 
           {/* Accepted Offer Modal */}
-          {isOfferAccepted && (
+          {/* {isOfferAccepted && (
             <ModalAcceptedOffer
               product={selectedOrderItem.product.name}
               onClose={() => setIsOfferAccepted(false)}
             />
-          )}
+          )} */}
 
           {/* Order Item Modal */}
           {selectedOrderItem && submitModalOpen && (
