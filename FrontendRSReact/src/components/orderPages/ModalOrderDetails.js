@@ -160,6 +160,15 @@ const ModalOrderDetails = ({
     // Save the selected file to array
     setSelectedFiles([...selectedFiles, selectedFile]);
 
+    setShowActionToast(true);
+    setActionToastHeader("Berhasil");
+    setActionToastBody("File siap untuk diupload.");
+    setTimeout(() => {
+      setShowActionToast(false);
+      setActionToastHeader("");
+      setActionToastBody("");
+    }, 3000);
+
     // Reset the input value to allow selecting the same file again
     event.target.value = null;
   };
