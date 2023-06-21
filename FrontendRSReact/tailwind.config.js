@@ -9,6 +9,12 @@ module.exports = {
       fontFamily: {
         sans: ["Poppins", ...defaultTheme.fontFamily.sans],
       },
+      colors: {
+        primary: {
+          1: "#68B2A0",
+          2: "#81B4A7",
+        },
+      },
     },
   },
   plugins: [require("daisyui")],

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Table, Pagination, Button, Modal, Form } from 'react-bootstrap';
+// import { Container, Table, Pagination, Button, Modal, Form } from 'react-bootstrap';
 import "../assets/css/vendorpages.css";
 // import { useSelector } from "react-redux";
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus } from "react-icons/fa";
 
 const Vendorpages = () => {
   const [productList, setProductList] = useState([]);
@@ -19,7 +19,7 @@ const Vendorpages = () => {
     price: "",
     quantity: "",
     imageUrl: "",
-    status: ""
+    status: "",
   });
 
   useEffect(() => {
@@ -59,11 +59,14 @@ const Vendorpages = () => {
     );
   });
 
-   // Get current products
-   const indexOfLastProduct = currentPage * productsPerPage;
-   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-   const totalPages = Math.ceil(filteredProducts.length / productsPerPage); // Defining totalPages
+  // Get current products
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage); // Defining totalPages
 
   // Change page
   const handlePageChange = (pageNumber) => {
@@ -73,8 +76,8 @@ const Vendorpages = () => {
   // Calculate total pages
   // const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
-   // Modal
-   const handleCloseModal = () => {
+  // Modal
+  const handleCloseModal = () => {
     setShowModal(false);
   };
 
@@ -90,7 +93,7 @@ const Vendorpages = () => {
     const { name, value } = event.target;
     setNewProduct((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -98,11 +101,14 @@ const Vendorpages = () => {
     event.preventDefault();
     setShowConfirmModal(true); // Show confirmation modal when submitting the form
   };
-  
+
   const handleConfirmCreate = () => {
     // Perform API call to create the new product request
     axios
-      .post("http://rsudsamrat.site:8080/pengadaan/dev/v1//product-requests", newProduct)
+      .post(
+        "http://rsudsamrat.site:8080/pengadaan/dev/v1//product-requests",
+        newProduct
+      )
       .then((response) => {
         console.log("New product request created:", response.data);
         // Reset the form and close the modal
@@ -112,7 +118,7 @@ const Vendorpages = () => {
           price: "",
           quantity: "",
           imageUrl: "",
-          status: ""
+          status: "",
         });
         setShowModal(false);
         setShowConfirmModal(false);
@@ -120,121 +126,121 @@ const Vendorpages = () => {
       .catch((error) => {
         console.log("Error creating new product request:", error);
       });
-  };  
+  };
 
-  return (
-    <Container>
+  //   return (
+  //     <Container>
 
-      {/* <h2>Selamat Datang , {username}</h2> */}
-      {/* <h2>Request Product List</h2> */}
-      {/* <p>Request Product List</p> */}
-      <Button variant="primary" onClick={handleShowModal} style={{ backgroundColor: '#ccc', border: 'none' }}>
-        <FaPlus style={{ fontSize: '15px', color: '#000' }} />
-      </Button>
+  //       {/* <h2>Selamat Datang , {username}</h2> */}
+  //       {/* <h2>Request Product List</h2> */}
+  //       {/* <p>Request Product List</p> */}
+  //       <Button variant="primary" onClick={handleShowModal} style={{ backgroundColor: '#ccc', border: 'none' }}>
+  //         <FaPlus style={{ fontSize: '15px', color: '#000' }} />
+  //       </Button>
 
-      <div className="my-4">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Search by Name, Description, Price, Quantity, Image URL, or Status"
-          value={searchTerm}
-          onChange={handleSearch}
-        />
-      </div>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Image URL</th>
-            <th>Status</th>
-          </tr>
-          </thead>
-        <tbody>
-          {currentProducts.map((product) => (
-            <tr key={product.id}>
-              <td>{product.name}</td>
-              <td>{product.description}</td>
-              <td>{product.price}</td>
-              <td>{product.quantity}</td>
-              <td>
-                <img src={product.imageUrl} alt={product.name} style={{ width: '100px' }} />
-              </td>
-              <td>{product.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-      <Pagination>
-        {Array.from({ length: totalPages }, (_, index) => (
-          <Pagination.Item
-            key={index + 1}
-            active={index + 1 === currentPage}
-            onClick={() => handlePageChange(index + 1)}
-          >
-            {index + 1}
-          </Pagination.Item>
-        ))}
-      </Pagination>
+  //       <div className="my-4">
+  //         <input
+  //           type="text"
+  //           className="form-control"
+  //           placeholder="Search by Name, Description, Price, Quantity, Image URL, or Status"
+  //           value={searchTerm}
+  //           onChange={handleSearch}
+  //         />
+  //       </div>
+  //       <Table striped bordered hover>
+  //         <thead>
+  //           <tr>
+  //             <th>Name</th>
+  //             <th>Description</th>
+  //             <th>Price</th>
+  //             <th>Quantity</th>
+  //             <th>Image URL</th>
+  //             <th>Status</th>
+  //           </tr>
+  //           </thead>
+  //         <tbody>
+  //           {currentProducts.map((product) => (
+  //             <tr key={product.id}>
+  //               <td>{product.name}</td>
+  //               <td>{product.description}</td>
+  //               <td>{product.price}</td>
+  //               <td>{product.quantity}</td>
+  //               <td>
+  //                 <img src={product.imageUrl} alt={product.name} style={{ width: '100px' }} />
+  //               </td>
+  //               <td>{product.status}</td>
+  //             </tr>
+  //           ))}
+  //         </tbody>
+  //       </Table>
+  //       <Pagination>
+  //         {Array.from({ length: totalPages }, (_, index) => (
+  //           <Pagination.Item
+  //             key={index + 1}
+  //             active={index + 1 === currentPage}
+  //             onClick={() => handlePageChange(index + 1)}
+  //           >
+  //             {index + 1}
+  //           </Pagination.Item>
+  //         ))}
+  //       </Pagination>
 
-      <Modal show={showModal} onHide={handleCloseModal} className="modal-background">
-  <Modal.Header closeButton>
-    <Modal.Title>Create Request Product</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <Form onSubmit={handleSubmitNewProduct}>
-      <Form.Group controlId="name">
-        <Form.Label>Name</Form.Label>
-        <Form.Control type="text" name="name" value={newProduct.name} onChange={handleChangeNewProduct} />
-      </Form.Group>
-      <Form.Group controlId="description">
-        <Form.Label>Description</Form.Label>
-        <Form.Control type="text" name="description" value={newProduct.description} onChange={handleChangeNewProduct} />
-      </Form.Group>
-      <Form.Group controlId="price">
-  <Form.Label>Price</Form.Label>
-  <Form.Control type="number" name="price" value={newProduct.price} onChange={handleChangeNewProduct} required />
-</Form.Group>
-<Form.Group controlId="quantity">
-  <Form.Label>Quantity</Form.Label>
-  <Form.Control type="number" name="quantity" value={newProduct.quantity} onChange={handleChangeNewProduct} required />
-</Form.Group>
+  //       <Modal show={showModal} onHide={handleCloseModal} className="modal-background">
+  //   <Modal.Header closeButton>
+  //     <Modal.Title>Create Request Product</Modal.Title>
+  //   </Modal.Header>
+  //   <Modal.Body>
+  //     <Form onSubmit={handleSubmitNewProduct}>
+  //       <Form.Group controlId="name">
+  //         <Form.Label>Name</Form.Label>
+  //         <Form.Control type="text" name="name" value={newProduct.name} onChange={handleChangeNewProduct} />
+  //       </Form.Group>
+  //       <Form.Group controlId="description">
+  //         <Form.Label>Description</Form.Label>
+  //         <Form.Control type="text" name="description" value={newProduct.description} onChange={handleChangeNewProduct} />
+  //       </Form.Group>
+  //       <Form.Group controlId="price">
+  //   <Form.Label>Price</Form.Label>
+  //   <Form.Control type="number" name="price" value={newProduct.price} onChange={handleChangeNewProduct} required />
+  // </Form.Group>
+  // <Form.Group controlId="quantity">
+  //   <Form.Label>Quantity</Form.Label>
+  //   <Form.Control type="number" name="quantity" value={newProduct.quantity} onChange={handleChangeNewProduct} required />
+  // </Form.Group>
 
-      <Form.Group controlId="imageUrl">
-        <Form.Label>Image URL</Form.Label>
-        <Form.Control type="text" name="imageUrl" value={newProduct.imageUrl} onChange={handleChangeNewProduct} />
-      </Form.Group>
-      <Form.Group controlId="status">
-        <Form.Label>Status</Form.Label>
-        <Form.Control as="select" name="status" value={newProduct.status} onChange={handleChangeNewProduct}>
-          <option value="">Select Status</option>
-          <option value="OPEN">OPEN</option>
-          <option value="CLOSED">CLOSED</option>
-          <option value="FULFILLED">FULFILLED</option>
-        </Form.Control>
-      </Form.Group>
-      <Button variant="primary" type="submit">Create</Button>
-    </Form>
-  </Modal.Body>
-</Modal>
-  {/* Confirmation Modal */}
-  <Modal show={showConfirmModal} onHide={handleCloseConfirmModal}>
-    <Modal.Header closeButton>
-      <Modal.Title>Confirm Create Request Product</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      <p>Are you sure you want to create this product request?</p>
-    </Modal.Body>
-    <Modal.Footer>
-      <Button variant="secondary" onClick={handleCloseConfirmModal}>Cancel</Button>
-      <Button variant="primary" onClick={handleConfirmCreate}>Create</Button>
-    </Modal.Footer>
-  </Modal>
-</Container>
+  //       <Form.Group controlId="imageUrl">
+  //         <Form.Label>Image URL</Form.Label>
+  //         <Form.Control type="text" name="imageUrl" value={newProduct.imageUrl} onChange={handleChangeNewProduct} />
+  //       </Form.Group>
+  //       <Form.Group controlId="status">
+  //         <Form.Label>Status</Form.Label>
+  //         <Form.Control as="select" name="status" value={newProduct.status} onChange={handleChangeNewProduct}>
+  //           <option value="">Select Status</option>
+  //           <option value="OPEN">OPEN</option>
+  //           <option value="CLOSED">CLOSED</option>
+  //           <option value="FULFILLED">FULFILLED</option>
+  //         </Form.Control>
+  //       </Form.Group>
+  //       <Button variant="primary" type="submit">Create</Button>
+  //     </Form>
+  //   </Modal.Body>
+  // </Modal>
+  //   {/* Confirmation Modal */}
+  //   <Modal show={showConfirmModal} onHide={handleCloseConfirmModal}>
+  //     <Modal.Header closeButton>
+  //       <Modal.Title>Confirm Create Request Product</Modal.Title>
+  //     </Modal.Header>
+  //     <Modal.Body>
+  //       <p>Are you sure you want to create this product request?</p>
+  //     </Modal.Body>
+  //     <Modal.Footer>
+  //       <Button variant="secondary" onClick={handleCloseConfirmModal}>Cancel</Button>
+  //       <Button variant="primary" onClick={handleConfirmCreate}>Create</Button>
+  //     </Modal.Footer>
+  //   </Modal>
+  // </Container>
 
-  );
+  //   );
 };
 
 export default Vendorpages;

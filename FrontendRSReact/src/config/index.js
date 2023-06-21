@@ -9,7 +9,7 @@ import Productpages from "../pages/Productpages";
 import Dashboard from "../pages/Dashboard";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
-import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/css/bootstrap.min.css";
 import Vendorpages from "../pages/Vendorpages";
 import Orderpages from "../pages/Orderpages";
 import Notificationpages from "../pages/Notificationpages";
@@ -19,6 +19,7 @@ import Vendors from "../pages/Vendor";
 import CommingSoon from "../pages/CommingSoon";
 import Payment from "../pages/Payment";
 import { useSelector } from "react-redux";
+import ProductPagesNew from "../pages/ProductPagesNew";
 
 const Routers = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -39,6 +40,7 @@ const Routers = () => {
           <>
             <Route path="/" element={<Dashboard />} />
             <Route path="/products" element={<Productpages />} />
+            <Route path="/productsNew" element={<ProductPagesNew />} />
             <Route path="/vendor" element={<Vendorpages />} />
             <Route path="/orders" element={<Orderpages />} />
             <Route path="/notifications" element={<Notificationpages />} />
