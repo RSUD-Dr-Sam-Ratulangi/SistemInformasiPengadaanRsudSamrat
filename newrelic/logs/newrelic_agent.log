@@ -1,0 +1,16 @@
+2023-06-20T15:48:26,730+0800 [27684 1] com.newrelic INFO: Writing to New Relic log file: C:\Users\LENOVO\Desktop\SistemPengadaanRsudSamrat\devalielSisteminformasiPengadaanRsudSamrat\SistemInformasiPengadaanRsudSamrat\newrelic\logs\newrelic_agent.log
+2023-06-20T15:48:26,730+0800 [27684 1] com.newrelic INFO: JRE vendor BellSoft version 17.0.5
+2023-06-20T15:48:26,730+0800 [27684 1] com.newrelic INFO: JVM vendor BellSoft OpenJDK 64-Bit Server VM version 17.0.5+8-LTS
+2023-06-20T15:48:26,730+0800 [27684 1] com.newrelic INFO: OS Windows 11 version 10.0 arch amd64
+2023-06-20T15:48:26,730+0800 [27684 1] com.newrelic INFO: Agent Host: darkzill IP: 192.168.10.1
+2023-06-20T15:48:26,732+0800 [27684 1] com.newrelic INFO: New Relic Agent v8.4.0 is initializing...
+2023-06-20T15:48:27,170+0800 [27684 32] com.newrelic INFO: Instrumentation com.newrelic.instrumentation.jdbc-resultset is disabled. Skipping.
+2023-06-20T15:48:28,462+0800 [27684 1] com.newrelic.agent.RPMServiceManagerImpl INFO: Configured to connect to New Relic at collector.newrelic.com:443
+2023-06-20T15:48:28,774+0800 [27684 1] com.newrelic INFO: Setting audit_mode to false
+2023-06-20T15:48:28,900+0800 [27684 1] com.newrelic.agent.config.ConfigServiceImpl INFO: Configuration file is C:\Users\LENOVO\Desktop\SistemPengadaanRsudSamrat\devalielSisteminformasiPengadaanRsudSamrat\SistemInformasiPengadaanRsudSamrat\newrelic\.\newrelic.yml
+2023-06-20T15:48:28,905+0800 [27684 1] com.newrelic INFO: New Relic Agent v8.4.0 has started
+2023-06-20T15:48:28,905+0800 [27684 1] com.newrelic INFO: Agent class loader: com.newrelic.bootstrap.BootstrapAgent$JVMAgentClassLoader@762efe5d
+2023-06-20T15:48:28,905+0800 [27684 1] com.newrelic INFO: Premain startup complete in 2,836ms
+2023-06-20T15:48:28,907+0800 [27684 1] com.newrelic WARN: New Relic Security is completely disabled by one of the user provided config `security.enabled`, `security.agent.enabled` or `high_security`. Not loading security capabilities.
+2023-06-20T15:48:28,920+0800 [27684 24] com.newrelic.agent.core.CoreServiceImpl INFO: JVM is shutting down
+2023-06-20T15:48:28,921+0800 [27684 24] com.newrelic.agent.core.CoreServiceImpl INFO: New Relic Agent has shutdown
