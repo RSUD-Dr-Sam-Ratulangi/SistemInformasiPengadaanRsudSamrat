@@ -20,6 +20,7 @@ import CommingSoon from "../pages/CommingSoon";
 import Payment from "../pages/Payment";
 import { useSelector } from "react-redux";
 import ProductPagesNew from "../pages/ProductPagesNew";
+import PageContainer from "../components/PageContainer";
 
 const Routers = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -32,27 +33,27 @@ const Routers = () => {
 
   return (
     <Router>
-      <Navigation />
-      <Routes>
-        {!isLoggedIn ? (
-          <Route path="/*" element={<Navigate to="/signIn" replace />} />
-        ) : (
-          <>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/products" element={<Productpages />} />
-            <Route path="/productsNew" element={<ProductPagesNew />} />
-            <Route path="/vendor" element={<Vendorpages />} />
-            <Route path="/orders" element={<Orderpages />} />
-            <Route path="/notifications" element={<Notificationpages />} />
-            <Route path="/profile" element={<Profilpages />} />
-            <Route path="/Vendors" element={<Vendors />} />
-            <Route path="/CommingSoon" element={<CommingSoon />} />
-            <Route path="/Payments" element={<Payment />} />
-          </>
-        )}
-        <Route path="/signIn" element={<SignInpages />} />
-      </Routes>
-      <Footer />
+      <PageContainer>
+        <Routes>
+          {!isLoggedIn ? (
+            <Route path="/*" element={<Navigate to="/signIn" replace />} />
+          ) : (
+            <>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/products" element={<Productpages />} />
+              <Route path="/productsNew" element={<ProductPagesNew />} />
+              <Route path="/vendor" element={<Vendorpages />} />
+              <Route path="/orders" element={<Orderpages />} />
+              <Route path="/notifications" element={<Notificationpages />} />
+              <Route path="/profile" element={<Profilpages />} />
+              <Route path="/Vendors" element={<Vendors />} />
+              <Route path="/CommingSoon" element={<CommingSoon />} />
+              <Route path="/Payments" element={<Payment />} />
+            </>
+          )}
+          <Route path="/signIn" element={<SignInpages />} />
+        </Routes>
+      </PageContainer>
     </Router>
   );
 };
