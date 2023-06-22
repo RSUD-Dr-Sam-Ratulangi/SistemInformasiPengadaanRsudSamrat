@@ -29,7 +29,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public ResponseImageDTO createImages(CreateImageDTO createImageDTO) {
+    public ResponseImageDTO createImages(CreateImageDTO createImageDTO) throws IOException {
         List<Binary> imageList = new ArrayList<>();
 
         for (MultipartFile imageFile : createImageDTO.getImages()) {
@@ -61,20 +61,35 @@ public class ImageServiceImpl implements ImageService {
         List<String> imageUrls = imageProcessor.generateImageUrls(image.getImages());
 
         // Store images in the specified directory
+        List<String> storedImageNames = new ArrayList<>();
         for (int i = 0; i < imageList.size(); i++) {
             Binary imageBinary = imageList.get(i);
             String imageName = imageUrls.get(i);
-            imageProcessor.storeImage(imageBinary, imageName);
+            try {
+                String storedImageName = imageProcessor.storeImage(imageBinary, imageName);
+                storedImageNames.add(storedImageName);
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Handle the exception as per your requirements
+            }
+        }
+
+        List<String> responseImageUrls = new ArrayList<>();
+        for (String storedImageName : storedImageNames) {
+            String imageUrl = ImageProcessor.BASE_URL + storedImageName;
+            responseImageUrls.add(imageUrl);
         }
 
         ResponseImageDTO response = new ResponseImageDTO();
         response.setId(image.getId());
         response.setProductId(image.getProductId());
         response.setProductUuid(image.getProductUuid());
-        response.setImageUrls(imageUrls);
+        response.setImageUrls(responseImageUrls);
 
         return response;
     }
+
+
 
 
 

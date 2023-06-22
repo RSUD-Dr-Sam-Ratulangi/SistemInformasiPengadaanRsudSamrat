@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -24,7 +25,7 @@ public class ImageController {
     @PostMapping
     public ResponseEntity<ResponseImageDTO> createImages(@RequestParam("product_id") String productId,
                                                          @RequestParam("product_uuid") String productUuid,
-                                                         @RequestParam("images") MultipartFile[] images) {
+                                                         @RequestParam("images") MultipartFile[] images) throws IOException {
         CreateImageDTO createImageDTO = new CreateImageDTO(productId, productUuid, List.of(images));
         ResponseImageDTO responseDTO = imageService.createImages(createImageDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
