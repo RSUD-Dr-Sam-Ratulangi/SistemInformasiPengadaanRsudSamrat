@@ -18,7 +18,7 @@ const ModalOrderDetails = ({
   setShowActionToast,
   setActionToastHeader,
   setActionToastBody,
-  fetchData
+  fetchData,
 }) => {
   const navigate = useNavigate();
   const role = useSelector((state) => state.auth.role);
@@ -39,7 +39,7 @@ const ModalOrderDetails = ({
     }
   }, [selectedOrder]);
 
-  console.log("selected order", selectedOrder);
+  console.log("selected order", selectedOrder.orderItems);
 
   const handleQuantityChange = (orderItemId, newQuantity) => {
     console.log("quantity changed", orderItemId, newQuantity);
@@ -139,7 +139,7 @@ const ModalOrderDetails = ({
             sender: role,
             senderId: id,
             receiver: selectedOrder.orderItems.product.vendor.name,
-            receiverId: selectedOrder.orderItems.product.vendor.name,
+            receiverId: selectedOrder.orderItems.product.vendor.id,
             message: `ALL PRODUCT IN THIS ORDER IS ACCEPTED BY ${role}`,
           })
           .catch((err) => console.log(err));
@@ -147,10 +147,11 @@ const ModalOrderDetails = ({
       })
       .catch((err) => console.log(err));
     onClose();
+    window.location.reload();
   };
   const fileInputRef = useRef(null);
 
-  const handleButtonClick = () => {
+  const handleUploadClick = () => {
     fileInputRef.current.click();
   };
 
@@ -159,8 +160,30 @@ const ModalOrderDetails = ({
     // Save the selected file to array
     setSelectedFiles([...selectedFiles, selectedFile]);
 
+    setShowActionToast(true);
+    setActionToastHeader("Berhasil");
+    setActionToastBody("File siap untuk diupload.");
+    setTimeout(() => {
+      setShowActionToast(false);
+      setActionToastHeader("");
+      setActionToastBody("");
+    }, 3000);
+
     // Reset the input value to allow selecting the same file again
     event.target.value = null;
+  };
+
+  const handleUploadFile = () => {
+    axios
+      .post("http://rsudsamrat.site:8990/api/v1/notifikasi", {
+        sender: role,
+        senderId: id,
+        receiver: selectedOrder.orderItems[0].product.vendor.name,
+        receiverId: selectedOrder.orderItems[0].product.vendor.id,
+        message: `Semua produk dalam order id ${selectedOrder.id} telah diterima. Berkas Telah dikirim.`,
+      })
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
   };
 
   // STATUS BERUBAH IF ALL ORDER ITEM "ACCEPTED" without button
@@ -320,7 +343,7 @@ const ModalOrderDetails = ({
               onChange={handleFileChange}
             />
             <button
-              onClick={handleButtonClick}
+              onClick={handleUploadClick}
               className="btn btn-secondary"
               disabled={selectedFiles.length === 1}
             >
@@ -348,10 +371,7 @@ const ModalOrderDetails = ({
           {selectedFiles.map((file, index) => (
             <div style={{ display: "flex" }}>
               <p key={index}>{file.name}</p>
-              <button
-                className="btn btn-secondary"
-                onClick={() => console.log(`Upload File ${file.name} sukses`)}
-              >
+              <button className="btn btn-secondary" onClick={handleUploadFile}>
                 Upload
               </button>
             </div>
