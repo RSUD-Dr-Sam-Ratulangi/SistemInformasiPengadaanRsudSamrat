@@ -2,6 +2,7 @@ package com.example.beckendreportingpengadaan.image;
 
 import com.example.beckendreportingpengadaan.image.DTO.CreateImageDTO;
 import com.example.beckendreportingpengadaan.image.DTO.ResponseImageDTO;
+import com.example.beckendreportingpengadaan.image.Util.ImageProcessor;
 import org.bson.types.Binary;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +49,36 @@ public class ImageServiceImpl implements ImageService {
         image.setProductUuid(createImageDTO.getProductUuid());
         image.setImages(imageList);
 
-        image = imageRepository.save(image);
+        try {
+            image = imageRepository.save(image);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle the exception as per your requirements
+        }
 
-        return modelMapper.map(image, ResponseImageDTO.class);
+        // Generate image URLs based on the saved image data
+        ImageProcessor imageProcessor = new ImageProcessor();
+        List<String> imageUrls = imageProcessor.generateImageUrls(image.getImages());
+
+        // Store images in the specified directory
+        for (int i = 0; i < imageList.size(); i++) {
+            Binary imageBinary = imageList.get(i);
+            String imageName = imageUrls.get(i);
+            imageProcessor.storeImage(imageBinary, imageName);
+        }
+
+        ResponseImageDTO response = new ResponseImageDTO();
+        response.setId(image.getId());
+        response.setProductId(image.getProductId());
+        response.setProductUuid(image.getProductUuid());
+        response.setImageUrls(imageUrls);
+
+        return response;
     }
+
+
+
+
 
 
     @Override
