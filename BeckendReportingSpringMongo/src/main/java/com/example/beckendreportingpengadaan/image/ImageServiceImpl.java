@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
-
 @Service
 public class ImageServiceImpl implements ImageService {
 
@@ -64,7 +62,7 @@ public class ImageServiceImpl implements ImageService {
         List<String> storedImageNames = new ArrayList<>();
         for (int i = 0; i < imageList.size(); i++) {
             Binary imageBinary = imageList.get(i);
-            String imageName = imageUrls.get(i);
+            String imageName = imageProcessor.generateUniqueImageName(imageBinary);
             try {
                 String storedImageName = imageProcessor.storeImage(imageBinary, imageName);
                 storedImageNames.add(storedImageName);
@@ -76,7 +74,7 @@ public class ImageServiceImpl implements ImageService {
 
         List<String> responseImageUrls = new ArrayList<>();
         for (String storedImageName : storedImageNames) {
-            String imageUrl = ImageProcessor.BASE_URL + storedImageName;
+            String imageUrl = ImageProcessor.BASE_URL + storedImageName + ".jpg";
             responseImageUrls.add(imageUrl);
         }
 
@@ -88,13 +86,6 @@ public class ImageServiceImpl implements ImageService {
 
         return response;
     }
-
-
-
-
-
-
-
 
     @Override
     public List<ResponseImageDTO> getImagesByProductUuid(String productUuid) {
@@ -108,6 +99,4 @@ public class ImageServiceImpl implements ImageService {
 
         return responseDTOList;
     }
-
 }
-

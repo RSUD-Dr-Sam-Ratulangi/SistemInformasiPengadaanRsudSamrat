@@ -20,24 +20,18 @@ public class ImageProcessor {
 
         for (Binary image : images) {
             String imageName = generateUniqueImageName(image);
-            String imageUrl = generateImageUrl(image, imageName);
+            String imageUrl = generateImageUrl(imageName);
             imageUrls.add(imageUrl);
+            storeImage(image, imageName);
         }
 
         return imageUrls;
     }
 
-
-
-
-
-    public String generateImageUrl(Binary image, String imageName) throws IOException {
+    public String generateImageUrl(String imageName) {
         String imageUrl = BASE_URL + imageName + ".jpg";
-        storeImage(image, imageName);
         return imageUrl;
     }
-
-
 
     public String generateUniqueImageName(Binary image) {
         String uniqueImageName = UUID.randomUUID().toString();
@@ -50,11 +44,8 @@ public class ImageProcessor {
         if (!directory.exists()) {
             directory.mkdirs();
         }
-        File outputFile = new File(directory, imageName);
+        File outputFile = new File(directory, imageName + ".jpg");
         ImageIO.write(bufferedImage, "jpg", outputFile);
         return imageName;
     }
-
-
-
 }
