@@ -10,14 +10,13 @@ export default function ProductPagesNew() {
   function productItem() {
     return (
       <div>
-        <div className="mb-2 overflow-hidden rounded-xl">
-          <img
-            src="https://dummyimage.com/256x256/68B2A0/fff"
-            alt="product-img"
-            width={256}
-            height={256}
-          />
-        </div>
+        <img
+          src="https://dummyimage.com/256x256/68B2A0/fff"
+          alt="product-img"
+          width={256}
+          height={256}
+          className="rounded-xl mb-2"
+        />
         <div className="mb-2">
           <span className="font-bold ">Product name</span>
           <div className="flex items-center font-semibold">
@@ -32,7 +31,10 @@ export default function ProductPagesNew() {
           </div>
           <span className="font-medium">Vendor name</span>
         </div>
-        <button className="w-full text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2">
+        <button
+          onClick={() => window.quantityModal.showModal()}
+          className="w-full text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+        >
           Order
         </button>
       </div>
@@ -42,7 +44,7 @@ export default function ProductPagesNew() {
   function vendorItem(active) {
     return (
       <div
-        className={`flex flex-col ${
+        className={`flex flex-col cursor-pointer ${
           active && "text-primary-1 pl-4 border-l-2 border-primary-1"
         }`}
       >
@@ -84,6 +86,7 @@ export default function ProductPagesNew() {
 
   return (
     <>
+      {/* Cart Modal */}
       <dialog id="ordersModal" className="modal">
         <form method="dialog" className="modal-box">
           {/* Header */}
@@ -131,8 +134,41 @@ export default function ProductPagesNew() {
         </form>
       </dialog>
 
-      <div className="container flex px-[6.5rem] mx-auto">
-        <div className="bg-red w-[256px] pr-3">
+      {/* Quantity Modal */}
+      <dialog id="quantityModal" className="modal">
+        <form method="dialog" className="modal-box">
+          {/* Header */}
+          <div className="flex items-center gap-2 mb-2">
+            <MdInventory className="text-2xl text-primary-1" />
+            <h3 className="text-xl font-bold">Quantity</h3>
+          </div>
+
+          {/* Cart Item */}
+          <div>
+            <input
+              id="search-input"
+              type="number"
+              defaultValue={1}
+              min={1}
+              placeholder="1"
+              className="w-full input border-primary-1 focus:outline-primary-1 "
+            />
+          </div>
+
+          {/* Footer */}
+          <div className="modal-action">
+            <button className="text-primary-1 btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2">
+              Close
+            </button>
+            <button className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2">
+              Order
+            </button>
+          </div>
+        </form>
+      </dialog>
+
+      <div className="container flex lg:px-[14rem] xl:px-[15rem] 2xl:px-[15rem] mx-auto flex-col md:flex-row ">
+        <div className="bg-red w-[256px] pr-3 mb-3">
           <h2 className="flex items-center gap-1 mb-3 text-xl font-bold">
             Choose Vendor
           </h2>
@@ -169,8 +205,8 @@ export default function ProductPagesNew() {
           </div>
 
           {/* Categories */}
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <span className="font-semibold ">Categories</span>
+          <div className="flex items-center justify-center gap-2 mb-3 w-full">
+            <span className="font-semibold hidden xl:block">Categories</span>
             <button className="flex-1 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2">
               All
             </button>
@@ -223,7 +259,7 @@ export default function ProductPagesNew() {
           </div>
 
           {/* Product List */}
-          <div className="flex flex-wrap gap-4 mb-3">
+          <div className="grid grid-cols-3 gap-4">
             {[...Array(20)].map((_, i) => productItem())}
           </div>
 
