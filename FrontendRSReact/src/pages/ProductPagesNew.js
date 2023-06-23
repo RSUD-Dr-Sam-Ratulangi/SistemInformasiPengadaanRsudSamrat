@@ -367,7 +367,6 @@ export default function ProductPagesNew() {
           </div>
           <span className="font-medium">{product.vendor.name}</span>
         </div>
-        <span>{product.status} - {product?.categories.map(category => category.name)} - {product?.subcategories.map(subCategory => subCategory.name)}</span>
         <button
           className="w-full text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
           onClick={() => handleProductOrderOnClick(product)}
@@ -526,8 +525,8 @@ export default function ProductPagesNew() {
         </form>
       </dialog>
 
-      <div className="container flex lg:px-[14rem] xl:px-[15rem] 2xl:px-[15rem] mx-auto flex-col md:flex-row~">
-        <div className="bg-red w-[256px] pr-3 mb-3">
+      <div className="container flex px-[6.5rem] mx-auto">
+        <div className="bg-red w-[256px] pr-3">
           <h2 className="flex items-center gap-1 mb-3 text-xl font-bold">
             Choose Vendor
           </h2>
@@ -573,8 +572,8 @@ export default function ProductPagesNew() {
               </div>
 
               {/* Categories */}
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <span className="font-semibold ">Categories</span>
+              <div className="flex items-center justify-center gap-2 mb-3 w-full">
+                <span className="font-semibold hidden xl:block">Categories</span>
                 <button
                   className="flex-1 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
                   onClick={() => handleSelectedCategoriesAndSelectedSubCategoryChange("ALL")}
