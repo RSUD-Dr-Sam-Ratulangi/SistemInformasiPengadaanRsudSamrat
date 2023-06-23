@@ -1,7 +1,10 @@
 <template>
   <div class="container">
     <h1>SMART PROCUREMENT</h1>
-    <p style="font-size: 20px;">Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum<br/> DR Sam Ratulangi Tondano</p>
+    <p style="font-size: 20px">
+      Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum<br />
+      DR Sam Ratulangi Tondano
+    </p>
   </div>
 
   <!-- Dropdown
@@ -25,14 +28,10 @@
   </div> -->
 </template>
 
-<script>
-</script>
+<script></script>
 
 <style scoped>
 h1 {
   font-size: 70px;
 }
 </style>
-
-
-
