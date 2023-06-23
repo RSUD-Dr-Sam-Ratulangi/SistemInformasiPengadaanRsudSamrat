@@ -65,6 +65,7 @@ export default function ProductPagesNew() {
   }, [selectedCategory, selectedSubCategory]);
 
   useEffect(() => {
+    console.log("useEffect - carts", carts);
     if (carts) {
       localStorage.setItem("carts", JSON.stringify(carts));
     } else if (vendors.length > 0) {
@@ -318,6 +319,11 @@ export default function ProductPagesNew() {
                 productId: product.id,
                 quantity: product.orderQuantity
               });
+            });
+            
+            newCarts.push({
+              ...cart,
+              products: []
             });
           }
           else {
