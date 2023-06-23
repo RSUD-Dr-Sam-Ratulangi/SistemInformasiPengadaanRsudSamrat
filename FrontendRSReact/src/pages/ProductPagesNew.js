@@ -526,8 +526,8 @@ export default function ProductPagesNew() {
         </form>
       </dialog>
 
-      <div className="container flex px-[6.5rem] mx-auto">
-        <div className="bg-red w-[256px] pr-3">
+      <div className="container flex lg:px-[14rem] xl:px-[15rem] 2xl:px-[15rem] mx-auto flex-col md:flex-row~">
+        <div className="bg-red w-[256px] pr-3 mb-3">
           <h2 className="flex items-center gap-1 mb-3 text-xl font-bold">
             Choose Vendor
           </h2>

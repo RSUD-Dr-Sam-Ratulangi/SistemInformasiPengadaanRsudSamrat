@@ -94,7 +94,7 @@ const Navigation = () => {
   }
 
   return (
-    <div className="relative flex items-center justify-between p-2 border-b border-slate-200">
+    <div className="relative flex items-center justify-between w-full p-2 border-b border-slate-200">
       <div className="flex items-center justify-start gap-2">
         <img src={logo} alt="Logo" className="w-8" />
         <div className="flex flex-col text-dark">
