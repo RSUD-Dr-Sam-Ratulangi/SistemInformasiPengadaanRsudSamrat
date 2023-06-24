@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
@@ -39,10 +41,13 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public Page<NotificationResponseDTO> getNotificationsByReceiverId(Long receiverId, int page, int size) {
-        Page<NotificationModel> notificationPage = notificationRepository.findByReceiverId(receiverId, PageRequest.of(page, size));
-        return notificationPage.map(notification -> modelMapper.map(notification, NotificationResponseDTO.class));
+    public List<NotificationResponseDTO> getNotificationsByReceiverId(Long receiverId) {
+        List<NotificationModel> notifications = notificationRepository.findByReceiverId(receiverId);
+        return notifications.stream()
+                .map(notification -> modelMapper.map(notification, NotificationResponseDTO.class))
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public Page<NotificationResponseDTO> getNotificationsBySenderId(Long senderId, int page, int size) {
