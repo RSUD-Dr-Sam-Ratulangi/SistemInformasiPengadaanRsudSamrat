@@ -12,6 +12,7 @@ import Footer from "../components/Footer";
 // import "bootstrap/dist/css/bootstrap.min.css";
 import Vendorpages from "../pages/Vendorpages";
 import Orderpages from "../pages/Orderpages";
+import OrderpagesNew from "../pages/OrderpagesNew";
 import Notificationpages from "../pages/Notificationpages";
 import Profilpages from "../pages/Profilpages";
 import SignInpages from "../pages/SignInpages";
@@ -44,6 +45,7 @@ const Routers = () => {
               <Route path="/productsNew" element={<ProductPagesNew />} />
               <Route path="/vendor" element={<Vendorpages />} />
               <Route path="/orders" element={<Orderpages />} />
+              <Route path="/ordersNew" element={<OrderpagesNew />} />
               <Route path="/notifications" element={<Notificationpages />} />
               <Route path="/profile" element={<Profilpages />} />
               <Route path="/Vendors" element={<Vendors />} />
