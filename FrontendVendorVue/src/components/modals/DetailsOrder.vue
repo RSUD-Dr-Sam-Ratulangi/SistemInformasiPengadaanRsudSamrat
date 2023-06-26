@@ -331,6 +331,14 @@ export default {
           const ppIds = this.employee[1].id;
           console.log(response.data);
           this.showRejectModal = false;
+<<<<<<< HEAD
+          //Post history
+          axios.post(
+            "http://rsudsamrat.site:8090/api/bid-exchange/history",
+            {}
+          );
+=======
+>>>>>>> 3da99218c36d0ad9acd7f62ffaab52feede58a0f
           //Post notif
           axios
             .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
@@ -355,31 +363,47 @@ export default {
       this.selectedItem = null;
       location.reload();
     },
-    uploadFaktur() {
+    async uploadFaktur() {
       const ppRole = this.employee[1].role;
       const ppIds = this.employee[1].id;
-      console.log(`File ${this.selectedFile} berhasil di upload`);
-      axios
-        .put(
-          `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/status`,
-          {
-            status: "SHIPPING",
-          }
-        )
-        .then((res) => {
-          console.log(res.data);
-          axios
-            .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-              sender: this.username,
-              senderId: this.vendorid,
-              receiver: ppRole,
-              receiverId: ppIds,
-              message: `FAKTUR TELAH DIKIRIM BERSAMA FILE ${this.selectedFile}. `,
-            })
-            .then((res) => console.log(res))
-            .catch((err) => console.log(err));
-        })
-        .catch((err) => console.log(err));
+      console.log(`File ${this.selectedFile[0].name} berhasil di upload`);
+      const formData = new FormData();
+
+      const productId = this.generateUUID;
+      const productUuid = this.generateUUID;
+      formData.append("product_id", productId);
+      formData.append("product_uuid", productUuid);
+      formData.append("images", this.selectedFile[0]);
+      try {
+        const response = await axios.post(
+          "http://rsudsamrat.site:8990/images",
+          formData
+        );
+        console.log("Berhasil mengirim data", response);
+      } catch (err) {
+        console.log("gagal mengirim data", err);
+      }
+      // axios
+      //   .put(
+      //     `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/status`,
+      //     {
+      //       status: "SHIPPING",
+      //     }
+      //   )
+      //   .then((res) => {
+      //     console.log(res.data);
+      //     axios
+      //       .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+      //         sender: this.username,
+      //         senderId: this.vendorid,
+      //         receiver: ppRole,
+      //         receiverId: ppIds,
+      //         message: `FAKTUR TELAH DIKIRIM BERSAMA FILE ${this.selectedFile}. `,
+      //       })
+      //       .then((res) => console.log(res))
+      //       .catch((err) => console.log(err));
+      //   })
+      //   .catch((err) => console.log(err));
     },
     getItemsByVendor(vendor) {
       return this.orders.orderItems.filter(
@@ -406,6 +430,17 @@ export default {
 
       // Reset the input value to allow selecting the same file again
       event.target.value = "";
+    },
+    //random string
+    generateUUID() {
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+        /[xy]/g,
+        function (c) {
+          var r = (Math.random() * 16) | 0,
+            v = c === "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        }
+      );
     },
   },
   components: { FontAwesomeIcon },

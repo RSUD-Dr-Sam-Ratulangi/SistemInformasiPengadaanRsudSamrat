@@ -4,12 +4,14 @@ import com.example.beckendreportingpengadaan.Notifications.DTO.CreateNotificatio
 import com.example.beckendreportingpengadaan.Notifications.DTO.NotificationResponseDTO;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface NotificationService {
     NotificationResponseDTO createNotification(CreateNotificationRequestDTO request);
 
     Page<NotificationResponseDTO> getAllNotifications(int page, int size);
 
-    Page<NotificationResponseDTO> getNotificationsByReceiverId(Long receiverId, int page, int size);
+    List<NotificationResponseDTO> getNotificationsByReceiverId(Long receiverId);
 
     Page<NotificationResponseDTO> getNotificationsBySenderId(Long senderId, int page, int size);
 

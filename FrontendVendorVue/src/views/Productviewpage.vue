@@ -1,7 +1,10 @@
 <template>
   <div class="header-status">
     <h1>SMART SAMRAT PROCUREMENT</h1>
-    <p>Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum DR Sam Ratulangi Tondano</p>
+    <p>
+      Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum DR Sam
+      Ratulangi Tondano
+    </p>
   </div>
 
   <div class="box">
@@ -10,17 +13,28 @@
       <div>
         <div class="field has-addons">
           <div class="control is-expanded">
-            <input class="input is-fullwidth" type="text" placeholder="Search Products" v-model="searchInput">
+            <input
+              class="input is-fullwidth"
+              type="text"
+              placeholder="Search Products"
+              v-model="searchInput"
+            />
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <button class="button is-small" style="margin-top: 5px;" @click="addProductModal()">Add Product</button>
+  <button
+    class="button is-small"
+    style="margin-top: 5px"
+    @click="addProductModal()"
+  >
+    Add Product
+  </button>
 
   <div>
-    <table>
+    <table class="table">
       <thead>
         <tr>
           <th>Product Name</th>
@@ -38,13 +52,22 @@
           <td>{{ product.price }}</td>
           <td>{{ product.quantity }}</td>
           <td>{{ product.status }}</td>
-          <td v-if="product.categories && product.categories.length > 0">{{ product.categories[0].name }}</td>
+          <td v-if="product.categories && product.categories.length > 0">
+            {{ product.categories[0].name }}
+          </td>
           <td v-else>No category available</td>
-          <td v-if="product.subcategories && product.subcategories.length > 0">{{ product.subcategories[0].name }}</td>
+          <td v-if="product.subcategories && product.subcategories.length > 0">
+            {{ product.subcategories[0].name }}
+          </td>
           <td v-else>No Sub Category</td>
-          <td><button class="button is-danger"
-              @click="deleteProduct(product.productuuid, product.name)">Delete</button><button
-              class="button is-primary">Details</button></td>
+          <td>
+            <button
+              class="button is-danger"
+              @click="deleteProduct(product.productuuid, product.name)"
+            >
+              Delete</button
+            ><button class="button is-primary">Details</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -71,24 +94,30 @@
     </div>
   </div> -->
 
-
   <!-- Modals edit Product -->
   <Teleport to="body">
     <!-- pakai komponen modal, passing ke prop(lihat Editproduct.vue) -->
-    <modal :show="showmodaleditProduct" :product="selectedProduct" @close="showmodaleditProduct = false" />
+    <modal
+      :show="showmodaleditProduct"
+      :product="selectedProduct"
+      @close="showmodaleditProduct = false"
+    />
   </Teleport>
 
   <!-- Modals Add Product -->
   <Teleport to="body">
     <!-- pakai komponen modal, passing ke prop(lihat Editproduct.vue) -->
-    <modalAddProduct :show="showModalAddProduct" @close="showModalAddProduct = false" />
+    <modalAddProduct
+      :show="showModalAddProduct"
+      @close="showModalAddProduct = false"
+    />
   </Teleport>
 </template>
 
 <script>
 import axios from "axios";
 import modal from "../components/modals/Editproduct.vue";
-import modalAddProduct from "../components/modals/AddProduct.vue"
+import modalAddProduct from "../components/modals/AddProduct.vue";
 import LoadingBar from "../components/molecules/LoadingBar.vue";
 import { mapGetters } from "vuex";
 import { ref } from "vue";
@@ -112,14 +141,16 @@ export default {
   computed: {
     ...mapGetters(["vendoruuid", "username"]),
     filteredProducts() {
-      if (this.searchInput === '') {
-        return this.products
+      if (this.searchInput === "") {
+        return this.products;
       } else {
         // Filter products based on search input
         const searchTerm = this.searchInput.toLowerCase();
-        return this.products.filter(product => product.name.toLowerCase().includes(searchTerm))
+        return this.products.filter((product) =>
+          product.name.toLowerCase().includes(searchTerm)
+        );
       }
-    }
+    },
   },
   created() {
     this.isLoading = true;
@@ -129,7 +160,7 @@ export default {
       )
       .then((response) => {
         this.products = response.data;
-        console.log(response.data)
+        console.log(response.data);
       })
       .catch((err) => {
         console.log(`Terjadi error guyss, ${err}`);
@@ -163,8 +194,8 @@ export default {
     },
     addProductModal() {
       this.showModalAddProduct = true;
-      console.log("ok")
-    }
+      console.log("ok");
+    },
   },
 };
 </script>
@@ -180,7 +211,7 @@ export default {
   background-color: #f1f1f1;
   /* Atur warna latar belakang sesuai kebutuhan */
   margin-top: 2%;
-  background-image: url('../components/img/bckgrund.jpeg');
+  background-image: url("../components/img/bckgrund.jpeg");
 }
 
 .boxSearch {
