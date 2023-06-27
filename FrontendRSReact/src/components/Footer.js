@@ -18,14 +18,12 @@ const Footer = () => {
 
   function navLink(name, linkTo) {
     return (
-      <li className="flex items-center justify-center h-full">
-        <Link
-          to={`/${linkTo}`}
-          className="flex items-center justify-center h-full text-[#D9D9D9] no-underline"
-        >
-          <span className="items-center justify-center d-flex">{name}</span>
-        </Link>
-      </li>
+      <Link
+        to={`/${linkTo}`}
+        className="flex items-center justify-center h-full text-[#D9D9D9] no-underline"
+      >
+        <span className="items-center justify-center d-flex">{name}</span>
+      </Link>
     );
   }
 
