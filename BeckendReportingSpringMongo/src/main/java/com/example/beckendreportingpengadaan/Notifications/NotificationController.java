@@ -5,6 +5,8 @@ import com.example.beckendreportingpengadaan.Notifications.DTO.NotificationRespo
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/notifikasi")
 public class NotificationController {
@@ -26,11 +28,10 @@ public class NotificationController {
     }
 
     @GetMapping("/receiver/{receiverId}")
-    public Page<NotificationResponseDTO> getNotificationsByReceiverId(@PathVariable Long receiverId,
-                                                                      @RequestParam(defaultValue = "0") int page,
-                                                                      @RequestParam(defaultValue = "10") int size) {
-        return notificationService.getNotificationsByReceiverId(receiverId, page, size);
+    public List<NotificationResponseDTO> getNotificationsByReceiverId(@PathVariable Long receiverId) {
+        return notificationService.getNotificationsByReceiverId(receiverId);
     }
+
 
     @GetMapping("/sender/{senderId}")
     public Page<NotificationResponseDTO> getNotificationsBySenderId(@PathVariable Long senderId,

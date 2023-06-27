@@ -331,6 +331,14 @@ export default {
           const ppIds = this.employee[1].id;
           console.log(response.data);
           this.showRejectModal = false;
+<<<<<<< HEAD
+          //Post history
+          axios.post(
+            "http://rsudsamrat.site:8090/api/bid-exchange/history",
+            {}
+          );
+=======
+>>>>>>> 3da99218c36d0ad9acd7f62ffaab52feede58a0f
           //Post notif
           axios
             .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {

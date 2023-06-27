@@ -8,8 +8,6 @@ import {
 } from "react-icons/md";
 import axios from "axios";
 
-
-
 export default function ProductPagesNew() {
   const navigate = useNavigate();
 
@@ -19,6 +17,7 @@ export default function ProductPagesNew() {
 
   // products
   const [products, setProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
 
   // products filter
@@ -31,19 +30,27 @@ export default function ProductPagesNew() {
 
   // selected product modal
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showSelectedProductModal, setShowSelectedProductModal] = useState(false);
-  const [selectedProductModalOrderQuantity, setSelectedProductModalOrderQuantity] = useState(0);
-  const [isSelectedProductModalOrderQuantityValueValid, setIsSelectedProductModalOrderQuantityValueValid] = useState(false);
+  const [showSelectedProductModal, setShowSelectedProductModal] =
+    useState(false);
+  const [
+    selectedProductModalOrderQuantity,
+    setSelectedProductModalOrderQuantity,
+  ] = useState(0);
+  const [
+    isSelectedProductModalOrderQuantityValueValid,
+    setIsSelectedProductModalOrderQuantityValueValid,
+  ] = useState(false);
 
   // carts modal
   const [showCartsModal, setShowCartsModal] = useState(false);
-  const [cartsModalSelectedVendor, setCartsModalSelectedVendor] = useState(null);
-
-
+  const [cartsModalSelectedVendor, setCartsModalSelectedVendor] =
+    useState(null);
 
   useEffect(() => {
     getVendors();
+    getAllProducts();
   }, []);
+  console.log("all products", allProducts);
 
   useEffect(() => {
     getProducts();
@@ -54,14 +61,16 @@ export default function ProductPagesNew() {
   }, [products]);
 
   useEffect(() => {
-    setFilteredProducts(filterProducts({searchQuery: searchQuery}));
+    setFilteredProducts(filterProducts({ searchQuery: searchQuery }));
   }, [searchQuery]);
 
   useEffect(() => {
-    setFilteredProducts(filterProducts({
-      categoryName: selectedCategory,
-      subCategoryName: selectedSubCategory
-    }));
+    setFilteredProducts(
+      filterProducts({
+        categoryName: selectedCategory,
+        subCategoryName: selectedSubCategory,
+      })
+    );
   }, [selectedCategory, selectedSubCategory]);
 
   useEffect(() => {
@@ -74,8 +83,6 @@ export default function ProductPagesNew() {
     }
   }, [vendors, carts]);
 
-
-
   async function getVendors() {
     try {
       const res = await axios.get(
@@ -87,9 +94,21 @@ export default function ProductPagesNew() {
       console.log("Unable to get vendors", err.message);
     }
   }
-  
+
+  async function getAllProducts() {
+    try {
+      const res = await axios.get(
+        "http://rsudsamrat.site:8080/pengadaan/dev/v1/products/0/10"
+      );
+      setAllProducts(res.data.content);
+      // console.log("vendors", res.data);
+    } catch (err) {
+      console.log("Unable to get vendors", err.message);
+    }
+  }
+
   async function getProducts() {
-    if(selectedVendorUUID) {
+    if (selectedVendorUUID) {
       try {
         const res = await axios.get(
           `http://rsudsamrat.site:8080/pengadaan/dev/v1/products/vendor/${selectedVendorUUID}`
@@ -99,8 +118,7 @@ export default function ProductPagesNew() {
       } catch (err) {
         console.log("Unable to get products", err.message);
       }
-    }
-    else {
+    } else {
       setProducts([]);
     }
   }
@@ -111,7 +129,7 @@ export default function ProductPagesNew() {
       statusList = ["APPROVED"], // must be array of string
       searchQuery = "", // must be string
       categoryName = "ALL", // must be string
-      subCategoryName = null // must be string
+      subCategoryName = null, // must be string
     } = properties;
 
     let newFilteredProducts = products;
@@ -136,9 +154,7 @@ export default function ProductPagesNew() {
       if (searchQuery.length !== 0) {
         newFilteredProducts = newFilteredProducts.filter(
           (product) =>
-            product.name
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
+            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             product.price.toString().includes(searchQuery)
         );
       }
@@ -171,32 +187,31 @@ export default function ProductPagesNew() {
   }
 
   function cartsInitialValues() {
-    if(vendors.length > 0) {
+    if (vendors.length > 0) {
       const newCarts = vendors.map((vendor) => {
         return {
           vendorUUID: vendor.vendoruuid,
           vendorName: vendor.name,
-          products: []
+          products: [],
         };
       });
 
       return newCarts;
-    }
-    else return [];
+    } else return [];
   }
 
-
-
-  function handleSelectedCategoriesAndSelectedSubCategoryChange(newCategory, newSubCategory=null) {
+  function handleSelectedCategoriesAndSelectedSubCategoryChange(
+    newCategory,
+    newSubCategory = null
+  ) {
     setSelectedCategory(newCategory);
     setSelectedSubCategory(newSubCategory);
   }
 
-  function handleProductOrderOnClick(newSelectedProduct=null) {
-    if(showSelectedProductModal) {
+  function handleProductOrderOnClick(newSelectedProduct = null) {
+    if (showSelectedProductModal) {
       setSelectedProduct(null);
-    }
-    else {
+    } else {
       setSelectedProduct(newSelectedProduct);
       window.quantityModal.showModal();
     }
@@ -224,13 +239,12 @@ export default function ProductPagesNew() {
         selectedProduct.quantity - existingProductOrderQuantity
     ) {
       setIsSelectedProductModalOrderQuantityValueValid(true);
-    }
-    else setIsSelectedProductModalOrderQuantityValueValid(false);
+    } else setIsSelectedProductModalOrderQuantityValueValid(false);
 
     setSelectedProductModalOrderQuantity(newOrderQuantity);
   }
 
-    function handleSelectedProductModalAddToCart() {
+  function handleSelectedProductModalAddToCart() {
     // check if product already exist in carts
     let isProductExistInCart = false;
     carts.forEach((cart) => {
@@ -254,7 +268,7 @@ export default function ProductPagesNew() {
                     ...product,
                     orderQuantity:
                       product.orderQuantity +
-                      parseInt(selectedProductModalOrderQuantity)
+                      parseInt(selectedProductModalOrderQuantity),
                   };
                 else return product;
               })
@@ -262,8 +276,8 @@ export default function ProductPagesNew() {
                 ...cart.products,
                 {
                   ...selectedProduct,
-                  orderQuantity: parseInt(selectedProductModalOrderQuantity)
-                }
+                  orderQuantity: parseInt(selectedProductModalOrderQuantity),
+                },
               ],
         };
       } else return cart;
@@ -277,10 +291,9 @@ export default function ProductPagesNew() {
   }
 
   function handleCartsOnClick() {
-    if(showCartsModal) {
+    if (showCartsModal) {
       setCartsModalSelectedVendor(null);
-    }
-    else {
+    } else {
       window.ordersModal.showModal();
     }
 
@@ -313,20 +326,19 @@ export default function ProductPagesNew() {
         const newCarts = [];
 
         carts.forEach((cart) => {
-          if(cartsModalSelectedVendor.vendorUUID === cart.vendorUUID) {
-            cart.products.forEach(product => {
+          if (cartsModalSelectedVendor.vendorUUID === cart.vendorUUID) {
+            cart.products.forEach((product) => {
               orders.push({
                 productId: product.id,
-                quantity: product.orderQuantity
+                quantity: product.orderQuantity,
               });
             });
-            
+
             newCarts.push({
               ...cart,
-              products: []
+              products: [],
             });
-          }
-          else {
+          } else {
             newCarts.push(cart);
           }
         });
@@ -347,23 +359,28 @@ export default function ProductPagesNew() {
       .catch((err) => console.log("unable to order products", err.message));
   }
 
-
-
   function productItem(product) {
+    console.log("product inside component", product);
     return (
       <div key={product.id}>
         <img
-          src={(product.imageUrl) ? product.imageUrl : "https://dummyimage.com/256x256/68B2A0/fff"}
+          src={
+            product.imageUrl
+              ? product.imageUrl
+              : "https://dummyimage.com/256x256/68B2A0/fff"
+          }
           alt="product-img"
           width={256}
           height={256}
-          className="rounded-xl mb-2"
+          className="rounded-xl mb-2 bg-primary-1 min-h-[256px] min-w-[256px] object-cover"
         />
         <div className="mb-2">
           <span className="font-bold ">{product.name}</span>
           <div className="flex items-center font-semibold">
             <span className="w-6">Rp</span>
-            <span className="font-medium text-primary-1">{product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</span>
+            <span className="font-medium text-primary-1">
+              {product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+            </span>
           </div>
           <div className="flex items-center">
             <span className="w-6">
@@ -371,7 +388,7 @@ export default function ProductPagesNew() {
             </span>
             <span className="text-primary-1">{product.quantity}</span>
           </div>
-          <span className="font-medium">{product.vendor.name}</span>
+          {/* <span className="font-medium">{product.vendor.name}</span> */}
         </div>
         <button
           className="w-full text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
@@ -388,7 +405,8 @@ export default function ProductPagesNew() {
       <div
         key={vendor.id}
         className={`flex flex-col cursor-pointer ${
-          (selectedVendorUUID === vendor.vendoruuid) && "text-primary-1 pl-4 border-l-2 border-primary-1"
+          selectedVendorUUID === vendor.vendoruuid &&
+          "text-primary-1 pl-4 border-l-2 border-primary-1"
         }`}
         onClick={() => setSelectedVendorUUID(vendor.vendoruuid)}
       >
@@ -424,14 +442,16 @@ export default function ProductPagesNew() {
           </div>
           <div className="flex items-end justify-end w-full h-full gap-1">
             <span className="font-semibold ">Rp </span>
-            <span className="text-primary-1">{(parseInt(product.orderQuantity) * parseInt(product.price)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}</span>
+            <span className="text-primary-1">
+              {(parseInt(product.orderQuantity) * parseInt(product.price))
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+            </span>
           </div>
         </div>
       </div>
     );
   }
-
-
 
   return (
     <>
@@ -456,21 +476,33 @@ export default function ProductPagesNew() {
                 tabIndex={0}
                 className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
               >
-                {showCartsModal && carts.map(cart => (cart.products.length > 0) && (
-                  <li key={cart.vendorUUID} onClick={() => handleCartsModalVendorSelection(cart)}>
-                    <a>{cart.vendorName}</a>
-                  </li>
-                ))}
+                {showCartsModal &&
+                  carts.map(
+                    (cart) =>
+                      cart.products.length > 0 && (
+                        <li
+                          key={cart.vendorUUID}
+                          onClick={() => handleCartsModalVendorSelection(cart)}
+                        >
+                          <a>{cart.vendorName}</a>
+                        </li>
+                      )
+                  )}
               </ul>
             </div>
           </div>
 
           {/* Cart Item */}
           <div className="flex flex-col gap-2">
-            {!cartsModalSelectedVendor
-              ? <div>Select a vendor first</div>
-              : carts.map(cart => (cartsModalSelectedVendor.vendorUUID === cart.vendorUUID) && cart.products.map(product => cartItem(product)))
-            }
+            {!cartsModalSelectedVendor ? (
+              <div>Select a vendor first</div>
+            ) : (
+              carts.map(
+                (cart) =>
+                  cartsModalSelectedVendor.vendorUUID === cart.vendorUUID &&
+                  cart.products.map((product) => cartItem(product))
+              )
+            )}
           </div>
 
           {/* Footer */}
@@ -506,10 +538,14 @@ export default function ProductPagesNew() {
               id="search-input"
               type="number"
               value={selectedProductModalOrderQuantity}
-              onChange={e => handleSelectedProductModalOrderQuantityChange(e.target.value)}
+              onChange={(e) =>
+                handleSelectedProductModalOrderQuantityChange(e.target.value)
+              }
               className="w-full input border-primary-1 focus:outline-primary-1 "
             />
-            {!isSelectedProductModalOrderQuantityValueValid && <div>Quantity is not valid</div>}
+            {!isSelectedProductModalOrderQuantityValueValid && (
+              <div>Quantity is not valid</div>
+            )}
           </div>
 
           {/* Footer */}
@@ -538,122 +574,160 @@ export default function ProductPagesNew() {
           </h2>
 
           <div className="flex flex-col gap-2">
-            {vendors.length === 0
-              ? <div>Loading vendors</div>
-              : vendors.map(vendor => vendorItem(vendor))
-            }
+            {vendors.length === 0 ? (
+              <div>Loading vendors</div>
+            ) : (
+              vendors.map((vendor) => vendorItem(vendor))
+            )}
           </div>
         </div>
-
-        {!selectedVendorUUID
-          ? <div>Select a vendor first</div>
-          : (
-            <div className="flex flex-col flex-1">
-              {/* Search */}
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="relative flex items-center justify-center w-full">
-                  <label
-                    htmlFor="search-input"
-                    className="absolute text-2xl -translate-y-1/2 top-1/2 left-4"
-                  >
-                    <MdSearch />
-                  </label>
-                  <input
-                    id="search-input"
-                    type="text"
-                    placeholder="Search by item name or vendor name"
-                    className="w-full input border-primary-1 focus:outline-primary-1 ps-12"
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <button
-                  className="text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2 btn-wide"
-                  onClick={() => handleCartsOnClick()}
-                  disabled={carts.every(cart => cart.products.length === 0)}
-                >
-                  <MdShoppingCart className="text-2xl" />
-                  Cart
-                </button>
-              </div>
-
-              {/* Categories */}
-              <div className="flex items-center justify-center gap-2 mb-3 w-full">
-                <span className="font-semibold hidden xl:block">Categories</span>
-                <button
-                  className="flex-1 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                  onClick={() => handleSelectedCategoriesAndSelectedSubCategoryChange("ALL")}
-                >
-                  All
-                </button>
-                <button
-                  className="flex-1 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                  onClick={() => handleSelectedCategoriesAndSelectedSubCategoryChange("JASA")}
-                >
-                  Jasa
-                </button>
-                <div className="flex-1 dropdown dropdown-end">
-                  <label
-                    tabIndex={0}
-                    className="relative w-full text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                    onClick={() => handleSelectedCategoriesAndSelectedSubCategoryChange("BM")}
-                  >
-                    BM
-                    <MdArrowDropDown className="absolute text-2xl right-4" />
-                  </label>
-                  <ul
-                    tabIndex={0}
-                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                  >
-                    <li onClick={() => handleSelectedCategoriesAndSelectedSubCategoryChange("BM", "ALKES")}>
-                      <a>Alkes</a>
-                    </li>
-                    <li onClick={() => handleSelectedCategoriesAndSelectedSubCategoryChange("BM", "ALKEN")}>
-                      <a>Alken</a>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex-1 dropdown dropdown-end">
-                  <label
-                    tabIndex={0}
-                    className="relative w-full text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                    onClick={() => handleSelectedCategoriesAndSelectedSubCategoryChange("BPH")}
-                  >
-                    BPH
-                    <MdArrowDropDown className="absolute text-2xl right-4" />
-                  </label>
-                  <ul
-                    tabIndex={0}
-                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                  >
-                    <li onClick={() => handleSelectedCategoriesAndSelectedSubCategoryChange("BPH", "BHPNONMEDIS")}>
-                      <a>BHP Non medis</a>
-                    </li>
-                    <li onClick={() => handleSelectedCategoriesAndSelectedSubCategoryChange("BPH", "BHPMEDIS")}>
-                      <a>BHP Medis</a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Product List */}
-              <div>Result: {filteredProducts.length}</div>
-              <div className="flex flex-wrap gap-4 mb-3">
-                {filteredProducts.map(product => productItem(product))}
-              </div>
-
-              {/* Pagination */}
-              {(filteredProducts.length > 0) && (
-                <div className="flex items-center justify-center join">
-                  <button className="join-item btn">1</button>
-                  <button className="join-item btn btn-active">2</button>
-                  <button className="join-item btn">3</button>
-                  <button className="join-item btn">4</button>
-                </div>
-              )}
+        <div className="flex flex-col flex-1">
+          {/* Search */}
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="relative flex items-center justify-center w-full">
+              <label
+                htmlFor="search-input"
+                className="absolute text-2xl -translate-y-1/2 top-1/2 left-4"
+              >
+                <MdSearch />
+              </label>
+              <input
+                id="search-input"
+                type="text"
+                placeholder="Search by item name or vendor name"
+                className="w-full input border-primary-1 focus:outline-primary-1 ps-12"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-          )
-        }
+            <button
+              className="text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2 btn-wide"
+              onClick={() => handleCartsOnClick()}
+              disabled={carts.every((cart) => cart.products.length === 0)}
+            >
+              <MdShoppingCart className="text-2xl" />
+              Cart
+            </button>
+          </div>
+
+          {/* Categories */}
+          <div className="flex items-center justify-center gap-2 mb-3 w-full">
+            <span className="font-semibold hidden xl:block">Categories</span>
+            <button
+              className="flex-1 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={() =>
+                handleSelectedCategoriesAndSelectedSubCategoryChange("ALL")
+              }
+            >
+              All
+            </button>
+            <button
+              className="flex-1 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={() =>
+                handleSelectedCategoriesAndSelectedSubCategoryChange("JASA")
+              }
+            >
+              Jasa
+            </button>
+            <div className="flex-1 dropdown dropdown-end">
+              <label
+                tabIndex={0}
+                className="relative w-full text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={() =>
+                  handleSelectedCategoriesAndSelectedSubCategoryChange("BM")
+                }
+              >
+                BM
+                <MdArrowDropDown className="absolute text-2xl right-4" />
+              </label>
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                <li
+                  onClick={() =>
+                    handleSelectedCategoriesAndSelectedSubCategoryChange(
+                      "BM",
+                      "ALKES"
+                    )
+                  }
+                >
+                  <a>Alkes</a>
+                </li>
+                <li
+                  onClick={() =>
+                    handleSelectedCategoriesAndSelectedSubCategoryChange(
+                      "BM",
+                      "ALKEN"
+                    )
+                  }
+                >
+                  <a>Alken</a>
+                </li>
+              </ul>
+            </div>
+            <div className="flex-1 dropdown dropdown-end">
+              <label
+                tabIndex={0}
+                className="relative w-full text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={() =>
+                  handleSelectedCategoriesAndSelectedSubCategoryChange("BPH")
+                }
+              >
+                BPH
+                <MdArrowDropDown className="absolute text-2xl right-4" />
+              </label>
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                <li
+                  onClick={() =>
+                    handleSelectedCategoriesAndSelectedSubCategoryChange(
+                      "BPH",
+                      "BHPNONMEDIS"
+                    )
+                  }
+                >
+                  <a>BHP Non medis</a>
+                </li>
+                <li
+                  onClick={() =>
+                    handleSelectedCategoriesAndSelectedSubCategoryChange(
+                      "BPH",
+                      "BHPMEDIS"
+                    )
+                  }
+                >
+                  <a>BHP Medis</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Product List */}
+          <div>Result: {filteredProducts.length}</div>
+          <div className="flex flex-wrap gap-4 mb-3">
+            {/* {allProducts.length === 0 ? (
+              <div>Loading products</div>
+            ) : (
+              allProducts.map((product) => productItem(product))
+            )} */}
+            {filteredProducts.length === 0
+              ? allProducts.map((product) => productItem(product))
+              : filteredProducts.map((product) => productItem(product))}
+          </div>
+
+          {/* Pagination */}
+          {filteredProducts.length > 0 && (
+            <div className="flex items-center justify-center join">
+              <button className="join-item btn">1</button>
+              <button className="join-item btn btn-active">2</button>
+              <button className="join-item btn">3</button>
+              <button className="join-item btn">4</button>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
