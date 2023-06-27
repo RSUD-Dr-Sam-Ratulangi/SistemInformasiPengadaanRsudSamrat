@@ -9,6 +9,7 @@ import {
   MdInfo,
   MdHandshake,
   MdDelete,
+  MdMoney,
 } from "react-icons/md";
 import axios from "axios";
 
@@ -74,7 +75,7 @@ const OrderpagesNew = () => {
               </li>
               <hr />
               <li>
-                <a>
+                <a onClick={() => window.negotiationModal.showModal()}>
                   <MdHandshake className="text-xl text-success" />
                   Negotiation
                 </a>
@@ -138,10 +139,12 @@ const OrderpagesNew = () => {
 
           {/* Item list/vendor Item */}
           {productPerVendorItem()}
-
           {/* Footer */}
           <div className="modal-action mt-12">
-            <button className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2">
+            <button
+              onClick={() => window.payoutModal.showModal()}
+              className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+            >
               Payout Details
             </button>
             <button className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2">
@@ -209,6 +212,138 @@ const OrderpagesNew = () => {
                 <span className="text-black font-medium">Tareran</span>
               </div>
             </div>
+          </div>
+        </form>
+      </dialog>
+
+      {/* Negotiation Modal */}
+      <dialog id="negotiationModal" className="modal">
+        <form method="dialog" className="modal-box max-w-3xl">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <MdHandshake className="text-2xl text-primary-1" />
+              <h3 className="text-xl font-bold">Negotation</h3>
+            </div>
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              ✕
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-2 ">
+            <h2 className="text-3xl font-semibold text-slate-600">
+              Best Product
+            </h2>
+            <div className="flex gap-3">
+              <div className="flex flex-col text-primary-1 w-28">
+                Price
+                <span className="text-black font-medium">Rp 100.000</span>
+              </div>
+            </div>
+            <div>
+              <div className="mb-3">
+                <label
+                  htmlFor="negotiation-input"
+                  className="font-semibold text-xl mb-2"
+                >
+                  Your Offer
+                </label>
+                <input
+                  id="negotation-input"
+                  type="number"
+                  placeholder="Rp 100.000"
+                  className="w-full input border-primary-1 focus:outline-primary-1 "
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="negotiation-input"
+                  className="font-semibold text-xl mb-2"
+                >
+                  Message
+                </label>
+                <textarea
+                  id="negotation-input"
+                  type="number"
+                  placeholder="Rp 100.000"
+                  className="w-full textarea border-primary-1 focus:outline-primary-1 "
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="modal-action">
+            <button className="btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2">
+              Accept
+            </button>
+            <button className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2">
+              Submit Offer
+            </button>
+          </div>
+        </form>
+      </dialog>
+
+      {/* Payout Modal */}
+      <dialog id="payoutModal" className="modal">
+        <form method="dialog" className="modal-box max-w-3xl">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <MdMoney className="text-2xl text-primary-1" />
+              <h3 className="text-xl font-bold">Payout #123</h3>
+            </div>
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              ✕
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-2 ">
+            <div className="flex gap-3">
+              <div className="flex flex-col text-primary-1 w-28">
+                Date
+                <span className="text-black font-medium">23 Jun 2023</span>
+              </div>
+              <div className="flex flex-col text-primary-1">
+                Time
+                <span className="text-black font-medium">08:36 PM</span>
+              </div>
+            </div>
+            <div>
+              <table className="table table-pin-rows">
+                {/* head */}
+                <thead>
+                  <tr>
+                    <th>Product name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Amount Per Item</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="font-medium text-primary-1">Masker</td>
+                    <td>2</td>
+                    <td>Rp 200.000</td>
+                    <td>Rp 100.000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-primary-1 font-semibold">Total</span>
+              <span className="text-primary-1">
+                Rp
+                <span className="text-black ms-2">200.000</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="modal-action">
+            <button className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2">
+              Print
+            </button>
           </div>
         </form>
       </dialog>
