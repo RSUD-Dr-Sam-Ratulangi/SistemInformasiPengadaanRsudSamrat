@@ -17,7 +17,6 @@ export default function ProductPagesNew() {
 
   // products
   const [products, setProducts] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
 
   // products filter
@@ -48,19 +47,17 @@ export default function ProductPagesNew() {
 
   useEffect(() => {
     getVendors();
-    getAllProducts();
-  }, []);
-  console.log("all products", allProducts);
-
-  useEffect(() => {
     getProducts();
-  }, [selectedVendorUUID]);
+  }, []);
 
   useEffect(() => {
-    setFilteredProducts(filterProducts({}));
-  }, [products]);
+    setFilteredProducts(
+      filterProducts({})
+    );
+  }, [products, selectedVendorUUID]);
 
   useEffect(() => {
+    setSelectedVendorUUID(null);
     setFilteredProducts(filterProducts({ searchQuery: searchQuery }));
   }, [searchQuery]);
 
@@ -95,31 +92,15 @@ export default function ProductPagesNew() {
     }
   }
 
-  async function getAllProducts() {
+  async function getProducts() {
     try {
       const res = await axios.get(
-        "http://rsudsamrat.site:8080/pengadaan/dev/v1/products/0/10"
+        "http://rsudsamrat.site:8080/pengadaan/dev/v1/products/2/50"
       );
-      setAllProducts(res.data.content);
-      // console.log("vendors", res.data);
+      setProducts(res.data.content);
+      // console.log("products", res.data.content);
     } catch (err) {
       console.log("Unable to get vendors", err.message);
-    }
-  }
-
-  async function getProducts() {
-    if (selectedVendorUUID) {
-      try {
-        const res = await axios.get(
-          `http://rsudsamrat.site:8080/pengadaan/dev/v1/products/vendor/${selectedVendorUUID}`
-        );
-        setProducts(res.data);
-        // console.log("products", res.data);
-      } catch (err) {
-        console.log("Unable to get products", err.message);
-      }
-    } else {
-      setProducts([]);
     }
   }
 
@@ -134,6 +115,13 @@ export default function ProductPagesNew() {
 
     let newFilteredProducts = products;
     if (products.length > 0) {
+      // filter using vendor
+      if (selectedVendorUUID) {
+        newFilteredProducts = newFilteredProducts.filter(
+          (product) => selectedVendorUUID === product.vendor.vendoruuid
+        );
+      }
+
       // filter using quantity
       if (minimumQuantity !== null) {
         newFilteredProducts = newFilteredProducts.filter(
@@ -182,7 +170,7 @@ export default function ProductPagesNew() {
       }
     }
 
-    // console.log(`minimumQuantity (${minimumQuantity}) | statusList (${statusList.map(status => status)}) | searchQuery (${searchQuery}) | categoryName (${categoryName}) | subCategoryName (${subCategoryName})`);
+    // console.log(`thisSelectedVendorUUID (${thisSelectedVendorUUID}) | minimumQuantity (${minimumQuantity}) | statusList (${statusList.map(status => status)}) | searchQuery (${searchQuery}) | categoryName (${categoryName}) | subCategoryName (${subCategoryName})`);
     return newFilteredProducts;
   }
 
@@ -248,7 +236,7 @@ export default function ProductPagesNew() {
     // check if product already exist in carts
     let isProductExistInCart = false;
     carts.forEach((cart) => {
-      if (selectedVendorUUID === cart.vendorUUID) {
+      if (selectedProduct.vendor.vendoruuid === cart.vendorUUID) {
         cart.products.forEach((product) => {
           if (selectedProduct.id === product.id) isProductExistInCart = true;
         });
@@ -257,7 +245,7 @@ export default function ProductPagesNew() {
 
     let newCarts = [];
     newCarts = carts.map((cart) => {
-      if (selectedVendorUUID === cart.vendorUUID) {
+      if (selectedProduct.vendor.vendoruuid === cart.vendorUUID) {
         return {
           vendorUUID: cart.vendorUUID,
           vendorName: cart.vendorName,
@@ -360,7 +348,6 @@ export default function ProductPagesNew() {
   }
 
   function productItem(product) {
-    console.log("product inside component", product);
     return (
       <div key={product.id}>
         <img
@@ -388,7 +375,8 @@ export default function ProductPagesNew() {
             </span>
             <span className="text-primary-1">{product.quantity}</span>
           </div>
-          {/* <span className="font-medium">{product.vendor.name}</span> */}
+          <span className="font-medium">{product.vendor.name}</span>
+          {/* <span className="font-medium">{product.vendor.name} - {product.vendor.vendoruuid.match(/.{1,4}/g).join(' ')}</span> */}
         </div>
         <button
           className="w-full text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
@@ -411,6 +399,7 @@ export default function ProductPagesNew() {
         onClick={() => setSelectedVendorUUID(vendor.vendoruuid)}
       >
         <h3 className="font-semibold ">{vendor.name}</h3>
+        {/* <h3 className="font-semibold ">{vendor.name} - {vendor.vendoruuid.match(/.{1,4}/g).join(' ')}</h3> */}
         <span className="text-sm">{vendor.address}</span>
       </div>
     );
@@ -603,7 +592,7 @@ export default function ProductPagesNew() {
             <button
               className="text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2 btn-wide"
               onClick={() => handleCartsOnClick()}
-              disabled={carts.every((cart) => cart.products.length === 0)}
+              disabled={(carts) ? carts.every((cart) => cart.products.length === 0) : true}
             >
               <MdShoppingCart className="text-2xl" />
               Cart
@@ -708,14 +697,7 @@ export default function ProductPagesNew() {
           {/* Product List */}
           <div>Result: {filteredProducts.length}</div>
           <div className="flex flex-wrap gap-4 mb-3">
-            {/* {allProducts.length === 0 ? (
-              <div>Loading products</div>
-            ) : (
-              allProducts.map((product) => productItem(product))
-            )} */}
-            {filteredProducts.length === 0
-              ? allProducts.map((product) => productItem(product))
-              : filteredProducts.map((product) => productItem(product))}
+            {filteredProducts.map((product) => productItem(product))}
           </div>
 
           {/* Pagination */}
