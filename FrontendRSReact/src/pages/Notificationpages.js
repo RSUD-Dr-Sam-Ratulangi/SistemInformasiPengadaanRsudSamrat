@@ -17,14 +17,17 @@ const NotificationPages = () => {
 
   function handleCardOnClick(notification) {
     const orderId = notification.message.split(",")[0].trim();
-    navigate("/orders", {state: (isNaN(orderId)) ? null : orderId});
+    navigate("/orders", { state: isNaN(orderId) ? null : orderId });
   }
 
   function getNotifications() {
     try {
       axios
         .get(`http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/${id}`)
-        .then((res) => {setNotifications(res.data); console.log('res.data', res.data)});
+        .then((res) => {
+          setNotifications(res.data);
+          console.log("res.data", res.data);
+        });
     } catch (e) {
       console.log("failed to get notifications. ", e);
     }
