@@ -1,114 +1,77 @@
 <template>
-  <div class="footer">
+  <footer
+    class="footer relative footer-center items-center mt-auto text-base-content bottom-0 left-0 w-full"
+  >
+    <div class="flex gap-4 pt-3 justify-center">
+      <div>
+        <RouterLink to="/">
+          <div class="nav-item">
+            <p class="font-semibold text-black">Home</p>
+          </div>
+        </RouterLink>
+      </div>
+      <div>
+        <RouterLink to="/productView">
+          <div class="nav-item">
+            <p class="font-semibold text-black">Products</p>
+          </div>
+        </RouterLink>
+      </div>
+      <div>
+        <RouterLink to="/orderDetails">
+          <div class="nav-item">
+            <p class="font-semibold text-black">Orders</p>
+          </div>
+        </RouterLink>
+      </div>
+    </div>
     <div>
-      <div className="footer-buttons">
-        <RouterLink to="/" className="btn btn-light">
-          Dashboard
-        </RouterLink>
-        <RouterLink to="/productview" className="btn btn-light">
-        Products
-        </RouterLink>
-        <RouterLink to="/orderDetails" className="btn btn-light">
-        Orders
-        </RouterLink>
-      </div>
-      <div className="footer-text1">
-        <span className="footer-text-bold">Smart Samrat Procurement</span>
-        <br />
-        <span className="footer-text-small">
-          Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum DR Sam
-          Ratulangi Tondano
-        </span>
-      </div>
-      <div className="footer-social-icons">
-        <a href="https://instagram.com/rsud_samrat_tondano?igshid=OGQ5ZDc2ODk2ZA==">
-          <FontAwesomeIcon icon="fa-brands fa-facebook" />
-        </a>
-        <a href="https://www.facebook.com/PageOfficialRSUDSamRatulangi?mibextid=LQQJ4d">
-          <FontAwesomeIcon icon="fa-brands fa-instagram" />
-        </a>
-        <a href="https://rsudsamrat.site/epasien/">
-          <FontAwesomeIcon icon="fa-solid fa-globe" />
-        </a>
-      </div>
-      <div className="footer-text">
-        © 2023 UPTI RSUD DR SAM RATULANGI TONDANO. Hak Cipta Dilindungi
-      </div>
-    </div>
-
-  </div>
-  <!-- <footer class="footer">
-    <div class="header">
-      <div class="content has-text-left ">
-      <p> SMART SAMRAT PROCUREMENT </p>
-      <p>Layanan Informasi Pengadaan Barang & Jasa <br />Rumah Sakit Umum DR Sam Ratulangi<br /> Tondano</p>
-      <div class="icon-brand">
-      <FontAwesomeIcon icon="fa-brands fa-facebook" /> |
-      <FontAwesomeIcon icon="fa-brands fa-instagram" /> |
-      <FontAwesomeIcon icon="fa-solid fa-globe" />
-      </div>
-
-    </div>
-    </div>
-
-    <div class="content has-text-right">
-      <div class="contact-info">
-        <div>
-          <FontAwesomeIcon icon="fa-solid fa-phone" />
-          000-000-000
-        </div>
-        <div>
-          <FontAwesomeIcon icon="fa-solid fa-location-dot" /> 
-          Tondano
-        </div>
-        <div>
-          <FontAwesomeIcon icon="fa-solid fa-envelope" />
-          RSUD@gmail.com
+      <div class="grid grid-flow-col gap-4">
+        <div class="grid">
+          <h2 class="font-bold text-black">SMART SAMRAT PROCUREMENT</h2>
+          <strong class="text-2x1 text-gray-700"
+            >Layanan Informasi pengadaan Barang & Jasa Rumah Sakit Umum DR Sam
+            Ratulangi Tondano</strong
+          >
+          <div class="flex flex-col items-center gap-4">
+            <div class="flex gap-4">
+              <div>
+                <FontAwesomeIcon
+                  class="text-2xl text-black"
+                  icon="fa-brands fa-facebook"
+                />
+              </div>
+              <div>
+                <FontAwesomeIcon
+                  class="text-2xl text-black"
+                  icon="fa-brands fa-instagram"
+                />
+              </div>
+              <div>
+                <FontAwesomeIcon
+                  class="text-2xl text-black"
+                  icon="fa-solid fa-globe"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      <div>
+        <p class="font-bold text-2x1 text-black">
+          Copyright © 2023 - All right reserved
+        </p>
+      </div>
     </div>
-  </footer> -->
+  </footer>
 </template>
 
 <script setup>
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 </script>
-
 
 <style scoped>
 .footer {
-  background-color: #f8f9fa;
-  padding: 5px;
-  text-align: center;
-  box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.footer-text-bold {
-  font-weight: bold;
-  font-size: 15px;
-  color: #000000;
-  /* margin-right: 200px; */
-}
-
-.footer-text-small {
-  font-size: 10px;
-  color: #000000;
-  /* margin-right: 300px; */
-}
-
-.footer-social-icons a {
-  color: #000;
-  font-size: 20px;
-  margin-right: 10px;
-}
-
-.footer-text {
-  color: #000000;
-  font-size: 10px;
-}
-
-.footer-buttons .btn {
-  margin-right: 1px;
-  font-size: smaller;
+  background-color: #cde0c9;
 }
 </style>

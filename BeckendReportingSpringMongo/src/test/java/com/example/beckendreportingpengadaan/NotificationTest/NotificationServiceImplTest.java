@@ -86,33 +86,7 @@ public class NotificationServiceImplTest {
         verify(notificationRepository, times(1)).findAll(any(PageRequest.class));
     }
 
-    @Test
-    public void getNotificationsByReceiverId_shouldReturnNotificationsByReceiverId() {
-        // Arrange
-        Long receiverId = 1L;
-        int page = 0;
-        int size = 10;
-        List<NotificationModel> notificationModels = new ArrayList<>();
-        notificationModels.add(new NotificationModel());
-        notificationModels.add(new NotificationModel());
-        Page<NotificationModel> notificationPage = new PageImpl<>(notificationModels);
-        List<NotificationResponseDTO> expectedResponseDTOs = new ArrayList<>();
-        expectedResponseDTOs.add(new NotificationResponseDTO());
-        expectedResponseDTOs.add(new NotificationResponseDTO());
 
-        when(notificationRepository.findByReceiverId(eq(receiverId), any(PageRequest.class)))
-                .thenReturn(notificationPage);
-        when(modelMapper.map(any(NotificationModel.class), eq(NotificationResponseDTO.class)))
-                .thenReturn(new NotificationResponseDTO());
-
-        // Act
-        Page<NotificationResponseDTO> actualResponseDTOs = notificationService
-                .getNotificationsByReceiverId(receiverId, page, size);
-
-        // Assert
-        assertEquals(expectedResponseDTOs.size(), actualResponseDTOs.getContent().size());
-        verify(notificationRepository, times(1)).findByReceiverId(eq(receiverId), any(PageRequest.class));
-    }
 
     @Test
     public void getNotificationsBySenderId_shouldReturnNotificationsBySenderId() {

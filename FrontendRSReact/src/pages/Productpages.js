@@ -1,511 +1,716 @@
-import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Toast,
-  Dropdown,
-  Modal,
-  Button
-} from "react-bootstrap";
+  MdSearch,
+  MdShoppingCart,
+  MdInventory,
+  MdArrowDropDown,
+} from "react-icons/md";
+import axios from "axios";
 
-import '../assets/css/pages/products.css';
-
-const Productpages = () => {
+export default function ProductPages() {
   const navigate = useNavigate();
 
+  // vendor
   const [vendors, setVendors] = useState([]);
+  const [selectedVendorUUID, setSelectedVendorUUID] = useState(null);
+
+  // products
   const [products, setProducts] = useState([]);
-  const [selectedVendor, setSelectedVendor] = useState(null);
-  const [filteredData, setFilteredData] = useState([]);
-  const [filteredPendingProducts, setFilteredPendingProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  // products filter
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
 
-  //order
-  const [orderedItems, setOrderedItems] = useState([]);
-  const [showModalOrderedProduct, setShowModalOrderedProduct] = useState(false);
+  // carts
+  const [carts, setCarts] = useState(JSON.parse(localStorage.getItem("carts")));
 
-  //notif
-  const [showToast, setShowToast] = useState(false);
+  // selected product modal
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showSelectedProductModal, setShowSelectedProductModal] =
+    useState(false);
+  const [
+    selectedProductModalOrderQuantity,
+    setSelectedProductModalOrderQuantity,
+  ] = useState(0);
+  const [
+    isSelectedProductModalOrderQuantityValueValid,
+    setIsSelectedProductModalOrderQuantityValueValid,
+  ] = useState(false);
 
-  // modal
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [quantity, setQuantity] = useState(0);
-  const [modalErrorMessage, setModalErrorMessage] = useState('');
+  // carts modal
+  const [showCartsModal, setShowCartsModal] = useState(false);
+  const [cartsModalSelectedVendor, setCartsModalSelectedVendor] =
+    useState(null);
 
-  // Mengambil data Vendor
   useEffect(() => {
-    loadVendors();
+    getVendors();
+    getProducts();
   }, []);
 
-  // Mengambil data Product berdasarkan VendorUUID
   useEffect(() => {
-    if (selectedVendor) {
-      loadProducts();
-    }
-  }, [selectedVendor]);
+    setFilteredProducts(filterProducts({}));
+  }, [products, selectedVendorUUID]);
 
   useEffect(() => {
-    if (products.length > 0) {
-      const filteredPending = products.filter(
-        (item) => item.status === "PENDING"
-      );
-      setFilteredPendingProducts(filteredPending);
-    }
-  }, [products]);
+    setSelectedVendorUUID(null);
+    setFilteredProducts(filterProducts({ searchQuery: searchQuery }));
+  }, [searchQuery]);
 
   useEffect(() => {
-    console.log(orderedItems);
-  }, [orderedItems]);
-
-  // Filter data produk berdasarkan status "APPROVED"
-  useEffect(() => {
-    if (products.length > 0) {
-      console.log('products', products);
-      const filteredProducts = products.filter(item => (item.status === "APPROVED" && item.quantity > 0));
-      setFilteredData(filteredProducts);
-    }
-  }, [products]);
-
-
-
-  function showModalOrder() {
-    setShowModalOrderedProduct(true);
-  };
-
-  //order
-  function addToCart() {
-    let isItemExist = false;
-    orderedItems.forEach(item => {
-      if(selectedItem.id === item.id) isItemExist = true;
-    });
-
-    let updatedItem;
-    if(isItemExist) {
-      updatedItem = orderedItems.map(item => {
-        if(selectedItem.id === item.id) return {...item, orderQuantity: item.orderQuantity + parseInt(quantity)};
-        else return item;
-      });
-    }
-    else {
-      updatedItem = [...orderedItems, {...selectedItem, orderQuantity: parseInt(quantity)}];
-    }
-    
-    setOrderedItems(updatedItem);
-    setSelectedItem(null);
-    setQuantity(0);
-    setModalErrorMessage('');
-    setShowModal(false);
-    setShowToast(true);
-
-    console.log(orderedItems);
-  };
-
-  function placeOrder() {
-    axios
-      .post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
-      .then((res) => {
-        console.log(res.data.id);
-        const orderItem = orderedItems.map((items) => {
-          return {productId: items.id, quantity: items.orderQuantity};
-        });
-        axios
-          .post(
-            `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
-            orderItem
-          )
-          .then(() => {
-            navigate('/orders');
-            setSelectedItem(null);
-            setShowModal(false);
-            setQuantity(0);
-            setModalErrorMessage('');
-          })
-          .catch((err) => console.log(err));
+    setFilteredProducts(
+      filterProducts({
+        categoryName: selectedCategory,
+        subCategoryName: selectedSubCategory,
       })
-      .catch((err) => console.log(err));
-  };
+    );
+  }, [selectedCategory, selectedSubCategory]);
 
-  // Load Vendors
-  async function loadVendors() {
+  useEffect(() => {
+    console.log("useEffect - carts", carts);
+    if (carts) {
+      localStorage.setItem("carts", JSON.stringify(carts));
+    } else if (vendors.length > 0) {
+      setCarts(cartsInitialValues());
+      localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
+    }
+  }, [vendors, carts]);
+
+  async function getVendors() {
     try {
-      const response = await axios.get(
+      const res = await axios.get(
         "http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=2&size=25"
       );
-      setVendors(response.data);
+      setVendors(res.data);
+      // console.log("vendors", res.data);
     } catch (err) {
-      console.log(err);
+      console.log("Unable to get vendors", err.message);
     }
-  };
+  }
 
-  // Load Vendor Products berdasarkan yang dipilih
-  async function loadProducts() {
+  async function getProducts() {
     try {
-      const response = await axios.get(
-        `http://rsudsamrat.site:8080/pengadaan/dev/v1/products/vendor/${selectedVendor}`
+      const res = await axios.get(
+        "http://rsudsamrat.site:8080/pengadaan/dev/v1/products/2/50"
       );
-      setProducts(response.data);
+      setProducts(res.data.content);
+      // console.log("products", res.data.content);
     } catch (err) {
-      console.log(err);
+      console.log("Unable to get vendors", err.message);
     }
-  };
-
-  function handlePendingProducts() {
-    setFilteredData(filteredPendingProducts);
-  };
-
-  function handleVendorSelection(vendorUUID) {
-    setOrderedItems([]);
-    setSelectedVendor(vendorUUID);
-  };
-
-  function handleSearch(e) {
-    setSearchQuery(e.target.value);
-  };
-
-  function handleCategorySelection(category) {
-    filterProductOnCategory(category);
-    setSelectedCategory(category);
-  };
-
-  function handleSubCategorySelection(subCategory) {
-    filterProductOnSubCategory(subCategory);
   }
 
-  function openModal(item) {
-    setSelectedItem(item);
-    setShowModal(true);
-  };
+  function filterProducts(properties) {
+    const {
+      minimumQuantity = 0, // must be number
+      statusList = ["APPROVED"], // must be array of string
+      searchQuery = "", // must be string
+      categoryName = "ALL", // must be string
+      subCategoryName = null, // must be string
+    } = properties;
 
-  function closeModal() {
-    setShowModal(false);
-    setQuantity(0);
-    setModalErrorMessage('');
-  };
+    let newFilteredProducts = products;
+    if (products.length > 0) {
+      // filter using vendor
+      if (selectedVendorUUID) {
+        newFilteredProducts = newFilteredProducts.filter(
+          (product) => selectedVendorUUID === product.vendor.vendoruuid
+        );
+      }
 
-  function handleQuantity(value) {
-    let orderedItemOrderQuantity = 0;
-    orderedItems.forEach(item => {
-      if(selectedItem.id === item.id) orderedItemOrderQuantity = item.orderQuantity;
-    });
+      // filter using quantity
+      if (minimumQuantity !== null) {
+        newFilteredProducts = newFilteredProducts.filter(
+          (product) => product.quantity > minimumQuantity
+        );
+      }
 
-    if(parseInt(value) > 0 && parseInt(value) <= selectedItem.quantity - orderedItemOrderQuantity) setModalErrorMessage('');
-    else setModalErrorMessage('Quantity is not valid.');
+      // filter using status
+      if (statusList) {
+        statusList.forEach((status) => {
+          newFilteredProducts = newFilteredProducts.filter(
+            (product) => status === product.status
+          );
+        });
+      }
 
-    setQuantity(value);
+      // filter using both name or price
+      if (searchQuery.length !== 0) {
+        newFilteredProducts = newFilteredProducts.filter(
+          (product) =>
+            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.price.toString().includes(searchQuery)
+        );
+      }
+
+      // filter using category
+      if (categoryName !== "ALL") {
+        newFilteredProducts = newFilteredProducts.filter(
+          (product) =>
+            product.categories.length > 0 &&
+            product.categories.some(
+              (category) => category.name === categoryName
+            )
+        );
+      }
+
+      // filter using sub category
+      if (subCategoryName) {
+        newFilteredProducts = newFilteredProducts.filter(
+          (product) =>
+            product.subcategories.length > 0 &&
+            product.subcategories.some(
+              (subCategory) => subCategory.name === subCategoryName
+            )
+        );
+      }
+    }
+
+    // console.log(`thisSelectedVendorUUID (${thisSelectedVendorUUID}) | minimumQuantity (${minimumQuantity}) | statusList (${statusList.map(status => status)}) | searchQuery (${searchQuery}) | categoryName (${categoryName}) | subCategoryName (${subCategoryName})`);
+    return newFilteredProducts;
   }
 
-  const removeItem = (itemId) => {
-    const updatedItems = orderedItems.filter((item) => item.id !== itemId);
-    setOrderedItems(updatedItems);
-  };
-
-  const handleCancelClick = () => {
-    // Menghapus semua produk yang telah dipilih (misalnya dalam sebuah array bernama 'selectedProducts')
-    setOrderedItems([]);
-
-    // Mengosongkan halaman modal dengan mengatur state 'showModalOrderedProduct' menjadi false
-    setShowModalOrderedProduct(false);
-  };
-
-  const filteredProducts = filteredData.filter((item) => {
-    const { name, description, quantity, price, id, productuuid, vendor } =
-      item;
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    return (
-      name.toLowerCase().includes(lowerCaseQuery) ||
-      description.toLowerCase().includes(lowerCaseQuery) ||
-      quantity.toString().includes(lowerCaseQuery) ||
-      price.toString().includes(lowerCaseQuery) ||
-      id.toString().includes(lowerCaseQuery) ||
-      productuuid.toLowerCase().includes(lowerCaseQuery) ||
-      vendor.name.toLowerCase().includes(lowerCaseQuery) // Menggunakan vendor.name
-    );
-  });
-
-  function filterProductOnCategory(category) {
-    let filteredProducts = [];
-    console.log('category', category);
-    
-    if(category === 'All') {
-      filteredProducts = products.filter(item => (item.status === "APPROVED" && item.quantity > 0));
-    }
-    else {
-      products.forEach(product => {
-        if(product.categories.length > 0 && product.quantity > 0) {
-          product.categories.forEach(productCategory => {
-            if(category.toLowerCase() === productCategory.name.toLowerCase()) {
-              filteredProducts.push(product);
-            }
-          });
-        }
+  function cartsInitialValues() {
+    if (vendors.length > 0) {
+      const newCarts = vendors.map((vendor) => {
+        return {
+          vendorUUID: vendor.vendoruuid,
+          vendorName: vendor.name,
+          products: [],
+        };
       });
-    }
 
-    console.log('filteredProducts category', filteredProducts);
-    setFilteredData(filteredProducts);
+      return newCarts;
+    } else return [];
   }
 
-  function filterProductOnSubCategory(subCategory) {
-    let filteredProducts = [];
-    console.log('subCategory', subCategory);
-    
-    products.forEach(product => {
-      if(product.subcategories.length > 0 && product.quantity > 0) {
-        product.subcategories.forEach(productSubCategory => {
-          if(subCategory.toLowerCase() === productSubCategory.name.toLowerCase()) {
-            filteredProducts.push(product);
-          }
+  function handleSelectedCategoriesAndSelectedSubCategoryChange(
+    newCategory,
+    newSubCategory = null
+  ) {
+    setSelectedCategory(newCategory);
+    setSelectedSubCategory(newSubCategory);
+  }
+
+  function handleProductOrderOnClick(newSelectedProduct = null) {
+    if (showSelectedProductModal) {
+      setSelectedProduct(null);
+    } else {
+      setSelectedProduct(newSelectedProduct);
+      window.quantityModal.showModal();
+    }
+
+    setShowSelectedProductModal(!showSelectedProductModal);
+    setSelectedProductModalOrderQuantity(0);
+    setIsSelectedProductModalOrderQuantityValueValid(false);
+  }
+
+  function handleSelectedProductModalOrderQuantityChange(newOrderQuantity) {
+    // if product already exist in carts, save the productQuantity in existingProductOrderQuantity
+    let existingProductOrderQuantity = 0;
+    carts.forEach((cart) => {
+      if (selectedVendorUUID === cart.vendorUUID) {
+        cart.products.forEach((product) => {
+          if (selectedProduct.id === product.id)
+            existingProductOrderQuantity = product.orderQuantity;
         });
       }
     });
 
-    console.log('filteredProducts subCategory', filteredProducts);
-    setFilteredData(filteredProducts);
+    if (
+      parseInt(newOrderQuantity) > 0 &&
+      parseInt(newOrderQuantity) <=
+        selectedProduct.quantity - existingProductOrderQuantity
+    ) {
+      setIsSelectedProductModalOrderQuantityValueValid(true);
+    } else setIsSelectedProductModalOrderQuantityValueValid(false);
+
+    setSelectedProductModalOrderQuantity(newOrderQuantity);
   }
 
+  function handleSelectedProductModalAddToCart() {
+    // check if product already exist in carts
+    let isProductExistInCart = false;
+    carts.forEach((cart) => {
+      if (selectedProduct.vendor.vendoruuid === cart.vendorUUID) {
+        cart.products.forEach((product) => {
+          if (selectedProduct.id === product.id) isProductExistInCart = true;
+        });
+      }
+    });
 
+    let newCarts = [];
+    newCarts = carts.map((cart) => {
+      if (selectedProduct.vendor.vendoruuid === cart.vendorUUID) {
+        return {
+          vendorUUID: cart.vendorUUID,
+          vendorName: cart.vendorName,
+          products: isProductExistInCart
+            ? cart.products.map((product) => {
+                if (selectedProduct.id === product.id)
+                  return {
+                    ...product,
+                    orderQuantity:
+                      product.orderQuantity +
+                      parseInt(selectedProductModalOrderQuantity),
+                  };
+                else return product;
+              })
+            : [
+                ...cart.products,
+                {
+                  ...selectedProduct,
+                  orderQuantity: parseInt(selectedProductModalOrderQuantity),
+                },
+              ],
+        };
+      } else return cart;
+    });
+
+    setSelectedProduct(null);
+    setShowSelectedProductModal(false);
+    setSelectedProductModalOrderQuantity(0);
+    setIsSelectedProductModalOrderQuantityValueValid(false);
+    setCarts(newCarts);
+  }
+
+  function handleCartsOnClick() {
+    if (showCartsModal) {
+      setCartsModalSelectedVendor(null);
+    } else {
+      window.ordersModal.showModal();
+    }
+
+    setShowCartsModal(!showCartsModal);
+  }
+
+  function handleCartsModalVendorSelection(newCartsModalSelectedVendor) {
+    setCartsModalSelectedVendor(newCartsModalSelectedVendor);
+  }
+
+  function handleCartsModalProductDelete(productId) {
+    const newCarts = carts.map((cart) => {
+      if (cartsModalSelectedVendor.vendorUUID === cart.vendorUUID) {
+        return {
+          vendorUUID: cart.vendorUUID,
+          vendorName: cart.vendorName,
+          products: cart.products.filter((product) => productId !== product.id),
+        };
+      } else return cart;
+    });
+
+    setCarts(newCarts);
+  }
+
+  function handleCartsModalCreate() {
+    axios
+      .post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
+      .then((res) => {
+        const orders = [];
+        const newCarts = [];
+
+        carts.forEach((cart) => {
+          if (cartsModalSelectedVendor.vendorUUID === cart.vendorUUID) {
+            cart.products.forEach((product) => {
+              orders.push({
+                productId: product.id,
+                quantity: product.orderQuantity,
+              });
+            });
+
+            newCarts.push({
+              ...cart,
+              products: [],
+            });
+          } else {
+            newCarts.push(cart);
+          }
+        });
+
+        axios
+          .post(
+            `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${res.data.id}/items`,
+            orders
+          )
+          .then(() => {
+            setCarts(newCarts);
+            setTimeout(() => {
+              navigate("/orders");
+            }, 150);
+          })
+          .catch((err) => console.log("unable to order products", err.message));
+      })
+      .catch((err) => console.log("unable to order products", err.message));
+  }
+
+  function productItem(product) {
+    return (
+      <div key={product.id}>
+        <img
+          src={
+            product.imageUrl
+              ? product.imageUrl
+              : "https://dummyimage.com/256x256/68B2A0/fff"
+          }
+          alt="product-img"
+          width={256}
+          height={256}
+          className="rounded-xl mb-2 bg-primary-1 min-h-[256px] min-w-[256px] object-cover"
+        />
+        <div className="mb-2">
+          <span className="font-bold ">{product.name}</span>
+          <div className="flex items-center font-semibold">
+            <span className="w-6">Rp</span>
+            <span className="font-medium text-primary-1">
+              {product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+            </span>
+          </div>
+          <div className="flex items-center">
+            <span className="w-6">
+              <MdInventory />
+            </span>
+            <span className="text-primary-1">{product.quantity}</span>
+          </div>
+          <span className="font-medium">{product.vendor.name}</span>
+          {/* <span className="font-medium">{product.vendor.name} - {product.vendor.vendoruuid.match(/.{1,4}/g).join(' ')}</span> */}
+        </div>
+        <button
+          className="w-full text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+          onClick={() => handleProductOrderOnClick(product)}
+        >
+          Order
+        </button>
+      </div>
+    );
+  }
+
+  function vendorItem(vendor) {
+    return (
+      <div
+        key={vendor.id}
+        className={`flex flex-col cursor-pointer ${
+          selectedVendorUUID === vendor.vendoruuid &&
+          "text-primary-1 pl-4 border-l-2 border-primary-1"
+        }`}
+        onClick={() => setSelectedVendorUUID(vendor.vendoruuid)}
+      >
+        <h3 className="font-semibold ">{vendor.name}</h3>
+        {/* <h3 className="font-semibold ">{vendor.name} - {vendor.vendoruuid.match(/.{1,4}/g).join(' ')}</h3> */}
+        <span className="text-sm">{vendor.address}</span>
+      </div>
+    );
+  }
+
+  function cartItem(product) {
+    return (
+      <div key={product.id} className="relative flex gap-2">
+        <button
+          className="absolute top-0 right-0 text-red-500 btn btn-sm btn-ghost"
+          onClick={() => handleCartsModalProductDelete(product.id)}
+        >
+          ✕
+        </button>
+
+        <img
+          src="https://dummyimage.com/128x128/68B2A0/fff"
+          alt=""
+          width={128}
+          className="rounded-xl"
+        />
+
+        <div className="flex flex-col w-full">
+          <h3 className="font-semibold">{product.name}</h3>
+          <span className="text-primary-1">{product.vendor.name}</span>
+          <div className="flex items-center gap-2">
+            <MdInventory className="text-2xl text-primary-1" />
+            <span className="font-medium">{product.orderQuantity}</span>
+          </div>
+          <div className="flex items-end justify-end w-full h-full gap-1">
+            <span className="font-semibold ">Rp </span>
+            <span className="text-primary-1">
+              {(parseInt(product.orderQuantity) * parseInt(product.price))
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div id='products-page' style={{ display: "flex" }}>
-      <div style={{ paddingRight: "5px" }}>
-        <h3>Choose Vendor</h3>
-        
-        <ol className="list-group">
-          {vendors.map((item) => (
-            <li
-              className={`list-group-item d-flex justify-content-between align-items-start ${
-                selectedVendor === item.vendoruuid
-                  ? "selected-vendor"
-                  : "vendor-item"
-              }`}
-              key={item.id}
-              onClick={() => handleVendorSelection(item.vendoruuid)}
+    <>
+      {/* Cart Modal */}
+      <dialog id="ordersModal" className="modal">
+        <form method="dialog" className="modal-box">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MdShoppingCart className="text-2xl text-primary-1" />
+              <h3 className="text-xl font-bold">Cart</h3>
+            </div>
+            <div className="dropdown dropdown-end">
+              <label
+                tabIndex={0}
+                className="relative w-full pr-12 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              >
+                Select Vendor
+                <MdArrowDropDown className="absolute text-2xl right-4" />
+              </label>
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                {showCartsModal &&
+                  carts.map(
+                    (cart) =>
+                      cart.products.length > 0 && (
+                        <li
+                          key={cart.vendorUUID}
+                          onClick={() => handleCartsModalVendorSelection(cart)}
+                        >
+                          <a>{cart.vendorName}</a>
+                        </li>
+                      )
+                  )}
+              </ul>
+            </div>
+          </div>
+
+          {/* Cart Item */}
+          <div className="flex flex-col gap-2">
+            {!cartsModalSelectedVendor ? (
+              <div>Select a vendor first</div>
+            ) : (
+              carts.map(
+                (cart) =>
+                  cartsModalSelectedVendor.vendorUUID === cart.vendorUUID &&
+                  cart.products.map((product) => cartItem(product))
+              )
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="modal-action">
+            <button
+              className="text-primary-1 btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={() => handleCartsOnClick()}
             >
-              <div className="ms-2 me-auto">
-                <div className="fw-bold">{item.name}</div>
-                {item.address}
-              </div>
-              {/* <span className="badge bg-primary rounded-pill">10</span> */}
-            </li>
-          ))}
-        </ol>
-        {selectedVendor && (
-          <button
-            className="btn btn-light shadow"
-            style={{ marginLeft: "10px", marginTop: "15px" }}
-            onClick={handlePendingProducts}
-          >
-            See Pending Product
-          </button>
-        )}
+              Close
+            </button>
+            <button
+              className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={() => handleCartsModalCreate()}
+            >
+              Create
+            </button>
+          </div>
+        </form>
+      </dialog>
+
+      {/* Quantity Modal */}
+      <dialog id="quantityModal" className="modal">
+        <form method="dialog" className="modal-box">
+          {/* Header */}
+          <div className="flex items-center gap-2 mb-2">
+            <MdInventory className="text-2xl text-primary-1" />
+            <h3 className="text-xl font-bold">Quantity</h3>
+          </div>
+
+          {/* Cart Item */}
+          <div>
+            <input
+              id="search-input"
+              type="number"
+              value={selectedProductModalOrderQuantity}
+              onChange={(e) =>
+                handleSelectedProductModalOrderQuantityChange(e.target.value)
+              }
+              className="w-full input border-primary-1 focus:outline-primary-1 "
+            />
+            {!isSelectedProductModalOrderQuantityValueValid && (
+              <div>Quantity is not valid</div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="modal-action">
+            <button
+              className="text-primary-1 btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={handleProductOrderOnClick}
+            >
+              Close
+            </button>
+            <button
+              className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={handleSelectedProductModalAddToCart}
+              disabled={!isSelectedProductModalOrderQuantityValueValid}
+            >
+              Order
+            </button>
+          </div>
+        </form>
+      </dialog>
+
+      <div className="container flex px-[6.5rem] mx-auto flex-col md:flex-row">
+        <div className="bg-red w-[256px] pr-3">
+          <h2 className="flex items-center gap-1 mb-3 text-xl font-bold">
+            Choose Vendor
+          </h2>
+
+          <div className="flex flex-col gap-2">
+            {vendors.length === 0 ? (
+              <div>Loading vendors</div>
+            ) : (
+              vendors.map((vendor) => vendorItem(vendor))
+            )}
+          </div>
+        </div>
+        <div className="flex flex-col flex-1">
+          {/* Search */}
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="relative flex items-center justify-center w-full">
+              <label
+                htmlFor="search-input"
+                className="absolute text-2xl -translate-y-1/2 top-1/2 left-4"
+              >
+                <MdSearch />
+              </label>
+              <input
+                id="search-input"
+                type="text"
+                placeholder="Search by item name or vendor name"
+                className="w-full input border-primary-1 focus:outline-primary-1 ps-12"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <button
+              className="text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2 btn-wide"
+              onClick={() => handleCartsOnClick()}
+              disabled={
+                carts ? carts.every((cart) => cart.products.length === 0) : true
+              }
+            >
+              <MdShoppingCart className="text-2xl" />
+              Cart
+            </button>
+          </div>
+
+          {/* Categories */}
+          <div className="flex items-center justify-center gap-2 mb-3 w-full">
+            <span className="font-semibold hidden xl:block">Categories</span>
+            <button
+              className="flex-1 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={() =>
+                handleSelectedCategoriesAndSelectedSubCategoryChange("ALL")
+              }
+            >
+              All
+            </button>
+            <button
+              className="flex-1 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={() =>
+                handleSelectedCategoriesAndSelectedSubCategoryChange("JASA")
+              }
+            >
+              Jasa
+            </button>
+            <div className="flex-1 dropdown dropdown-end">
+              <label
+                tabIndex={0}
+                className="relative w-full text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={() =>
+                  handleSelectedCategoriesAndSelectedSubCategoryChange("BM")
+                }
+              >
+                BM
+                <MdArrowDropDown className="absolute text-2xl right-4" />
+              </label>
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                <li
+                  onClick={() =>
+                    handleSelectedCategoriesAndSelectedSubCategoryChange(
+                      "BM",
+                      "ALKES"
+                    )
+                  }
+                >
+                  <a>Alkes</a>
+                </li>
+                <li
+                  onClick={() =>
+                    handleSelectedCategoriesAndSelectedSubCategoryChange(
+                      "BM",
+                      "ALKEN"
+                    )
+                  }
+                >
+                  <a>Alken</a>
+                </li>
+              </ul>
+            </div>
+            <div className="flex-1 dropdown dropdown-end">
+              <label
+                tabIndex={0}
+                className="relative w-full text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={() =>
+                  handleSelectedCategoriesAndSelectedSubCategoryChange("BPH")
+                }
+              >
+                BPH
+                <MdArrowDropDown className="absolute text-2xl right-4" />
+              </label>
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+              >
+                <li
+                  onClick={() =>
+                    handleSelectedCategoriesAndSelectedSubCategoryChange(
+                      "BPH",
+                      "BHPNONMEDIS"
+                    )
+                  }
+                >
+                  <a>BHP Non medis</a>
+                </li>
+                <li
+                  onClick={() =>
+                    handleSelectedCategoriesAndSelectedSubCategoryChange(
+                      "BPH",
+                      "BHPMEDIS"
+                    )
+                  }
+                >
+                  <a>BHP Medis</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Product List */}
+          <div>Result: {filteredProducts.length}</div>
+          <div className="flex flex-wrap gap-4 mb-3">
+            {filteredProducts.map((product) => productItem(product))}
+          </div>
+
+          {/* Pagination */}
+          {filteredProducts.length > 0 && (
+            <div className="flex items-center justify-center join">
+              <button className="join-item btn">1</button>
+              <button className="join-item btn btn-active">2</button>
+              <button className="join-item btn">3</button>
+              <button className="join-item btn">4</button>
+            </div>
+          )}
+        </div>
       </div>
-
-      {selectedVendor && (
-        <div style={{ flex: 1 }}>
-          <div className="row justify-content-start">
-            <div className="col-md-12 mb-4">
-              <div className="input-group mb-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search..."
-                  aria-label="Search"
-                  value={searchQuery}
-                  onChange={handleSearch}
-                  style={{ marginTop: "40px" }}
-                />
-              </div>
-            </div>
-            <div className="col-md-12 mb-4">
-              <div className='list-group list-group-horizontal' style={{width: '100%'}}>
-                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === "All") ? "active" : "light"} category-button`} onClick={() => handleCategorySelection("All")}>
-                  <div className="ms-2 me-auto category-button-text">
-                    <div className="fw-bold category-button-text">All</div>
-                    All category
-                  </div>
-                </button>
-                <button className={`list-group-item d-flex justify-content-between align-items-start ${(selectedCategory === "Jasa") ? "active" : "light"} category-button`} onClick={() => handleCategorySelection("Jasa")}>
-                  <div className="ms-2 me-auto category-button-text">
-                    <div className="fw-bold category-button-text">Jasa</div>
-                    Jasa category
-                  </div>
-                </button>
-                <Dropdown className='category-button'>
-                  <Dropdown.Toggle variant={(selectedCategory === 'BM' ? 'primary' : 'light')} style={{width: '100%'}}>
-                    <div className="ms-2 me-auto" onClick={() => handleCategorySelection('BM')}>
-                      <div className="fw-bold">BM</div>
-                      Select BM category
-                    </div>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => handleSubCategorySelection('Alkes')}>Alkes</Dropdown.Item>
-                    <Dropdown.Item onClick={() => handleSubCategorySelection('Alkon')}>Alkon</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-                <Dropdown className='category-button'>
-                  <Dropdown.Toggle variant={(selectedCategory === 'BHP' ? 'primary' : 'light')} style={{width: '100%'}}>
-                    <div className="ms-2 me-auto" onClick={() => handleCategorySelection('BHP')}>
-                      <div className="fw-bold">BHP</div>
-                      Select BHP category
-                    </div>
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => handleSubCategorySelection('BHP Non Medis')}>BHP Non Medis</Dropdown.Item>
-                    <Dropdown.Item onClick={() => handleSubCategorySelection('BHP Medis')}>BHP Medis</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </div>
-            </div>
-
-            {filteredProducts.map((item) => (
-              <div className="col-md-3 mb-4" key={item.id}>
-                <div className="card h-100 w-full md:w-3/4 lg:w-1/2 xl:w-1/3">
-                  <img
-                    src={item.imageUrl}
-                    className="card-img-top"
-                    alt="Product"
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title" style={{ fontSize: "12px" }}>
-                      {item.name}
-                    </h5>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      ID: {item.id}
-                    </p>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      Description: {item.description}
-                    </p>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      Quantity: {item.quantity}
-                    </p>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      Price: {item.price}
-                    </p>
-                    <p className="card-text" style={{ fontSize: "10px" }}>
-                      Status: {item.status}
-                    </p>
-                  </div>
-                  <button
-                    className="btn btn-dark"
-                    onClick={() => openModal(item)}
-                  >
-                    Order
-                  </button>
-
-                  <Modal show={showModal} onHide={closeModal}>
-                    <Modal.Header closeButton>
-                      <Modal.Title>Add Quantity</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                      <div>
-                        <label>Quantity:</label>
-                        <input
-                          type="number"
-                          value={quantity}
-                          onChange={e => handleQuantity(e.target.value)}
-                          min={1}
-                        />
-                      </div>
-                      <label>{modalErrorMessage}</label>
-                    </Modal.Body>
-                    <Modal.Footer>
-                      <Button variant="secondary" onClick={closeModal}>
-                        Close
-                      </Button>
-                      <Button variant="primary" onClick={addToCart} disabled={(modalErrorMessage.length !== 0)}>
-                        Add
-                      </Button>
-                    </Modal.Footer>
-                  </Modal>
-                </div>
-              </div>
-            ))}
-          </div>
-          <button
-            className="btn btn-light shadow"
-            style={{ marginLeft: "10px", marginTop: "15px" }}
-            onClick={placeOrder}
-          >
-            Show all orders
-          </button>
-          <button
-            className="btn btn-light shadow"
-            style={{ marginLeft: "10px", marginTop: "15px" }}
-            onClick={showModalOrder}
-          >
-            See modal
-          </button>
-        </div>
-      )}
-
-      {showModalOrderedProduct && (
-        <div className="modal modal-background" style={{ display: "block" }}>
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h3 className="modal-title">Product Details</h3>
-                <button
-                  type="button"
-                  className="close"
-                  onClick={() => setShowModalOrderedProduct(false)}
-                >
-                  <span>&times;</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                {orderedItems.map((item) => (
-                  <div key={item.id}>
-                    <p>Name: {item.name}</p>
-                    <p>Description: {item.description}</p>
-                    <p>Quantity: {item.orderQuantity}</p>
-                    <p>Price: Rp. {item.price * item.orderQuantity}</p>
-                    <button
-                      className="btn btn-danger"
-                      style={{ marginRight: "10px" }}
-                      onClick={() => removeItem(item.id)}
-                    >
-                      Delete
-                    </button>
-                    <hr />
-                  </div>
-                ))}
-                <button
-                  className="btn btn-dark"
-                  style={{ marginLeft: "10px", marginTop: "15px" }}
-                  onClick={placeOrder}
-                >
-                  Place Order
-                </button>
-                <button
-                  className="btn btn-dark"
-                  style={{ marginLeft: "10px", marginTop: "15px" }}
-                  onClick={handleCancelClick} // Menambahkan event handler pada button Cancel
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <Toast
-        show={showToast}
-        className="toast-container fixed-top"
-        bg="primary"
-        autohide
-        delay={2000}
-        onClose={() => setShowToast(false)}
-      >
-        <Toast.Header>
-          <strong className="me-auto">Notification</strong>
-        </Toast.Header>
-        <Toast.Body>Berhasil ditambahkan ke See Modal</Toast.Body>
-      </Toast>
-    </div>
+    </>
   );
-};
-
-export default Productpages;
+}

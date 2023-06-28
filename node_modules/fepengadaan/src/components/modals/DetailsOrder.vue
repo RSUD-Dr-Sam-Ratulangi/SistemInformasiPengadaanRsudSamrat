@@ -1,6 +1,6 @@
 <template>
   <Transition name="modal">
-    <div v-if="show" class="modal-mask" style="overflow: auto;">
+    <div v-if="show" class="modal-mask" style="overflow: auto">
       <div class="modal-container">
         <div class="modal-header">
           <h1 style="font-weight: bold">
@@ -8,7 +8,7 @@
           </h1>
           <h1>Status : {{ orders.status }}</h1>
         </div>
-        <div class="modal-body" style="overflow: auto;">
+        <div class="modal-body" style="overflow: auto">
           <table class="table is-bordered is-striped is-narrow is-hoverable">
             <thead>
               <tr>
@@ -22,8 +22,12 @@
             </thead>
             <tbody>
               <tr v-for="orderItem in orders.orderItems">
-                <th @click="selectItem(orderItem)" style="cursor: default;">{{ orderItem.id }}</th>
-                <td @click="selectItem(orderItem)" style="cursor: default;">{{ orderItem.product.name }}</td>
+                <th @click="selectItem(orderItem)" style="cursor: default">
+                  {{ orderItem.id }}
+                </th>
+                <td @click="selectItem(orderItem)" style="cursor: default">
+                  {{ orderItem.product.name }}
+                </td>
                 <td>{{ orderItem.quantity }}</td>
                 <td>{{ orderItem.product.price }}</td>
                 <td>{{ orderItem.totalAmount }}</td>
@@ -32,50 +36,126 @@
             </tbody>
           </table>
           <h1>Total Harga :{{ orders.payment.amount }}</h1>
-          <h1 style="font-weight: bolder;" v-if="selectedItem">Harga yang ditawar : {{ selectedItem.bidPrice }}</h1>
-          <h1>Total yang akan dibayar : {{ orders.orderItems[0].totalAmount }}</h1>
+          <h1 style="font-weight: bolder" v-if="selectedItem">
+            Harga yang ditawar : {{ selectedItem.bidPrice }}
+          </h1>
+          <h1>
+            Total yang akan dibayar : {{ orders.orderItems[0].totalAmount }}
+          </h1>
         </div>
 
         <div class="buttons" v-if="selectedItem !== null">
           <div v-if="selectedItem.status === 'OFFER'">
-            <button class="button is-primary" @click.prevent="acceptBid">Accept</button>
-            <button class="button is-danger" @click="showModalRejected">Reject</button>
+            <button class="button is-primary" @click.prevent="acceptBid">
+              Accept
+            </button>
+            <button class="button is-danger" @click="showModalRejected">
+              Reject
+            </button>
             <button class="button is-info">See Details</button>
-            <button @click="showModalHistory" class="button is-light"> See History </button>
+            <button @click="showModalHistory" class="button is-light">
+              See History
+            </button>
           </div>
 
           <!-- <div v-if="selectedItem.status === 'PENDING' || selectedItem.status === 'REJECTED' || selectedItem.status === 'ACCEPTED'" style="padding-right: 5px">
             <button class="button is-info">See Details<span style="font-size: 12px;">(Comming Soon)</span></button>
           </div> -->
 
-          <div v-if="selectedItem.status === 'ACCEPTED'" style="padding-right: 5px;">
-            <button class="button is-primary">Kirim <span style="font-size: 12px;">(Comming Soon)</span></button>
-            <button @click="showModalHistory" class="button is-light"> See History </button>
+          <div
+            v-if="selectedItem.status === 'ACCEPTED'"
+            style="padding-right: 5px"
+          >
+            <button class="button is-primary">
+              Kirim <span style="font-size: 12px">(Comming Soon)</span>
+            </button>
+            <button @click="showModalHistory" class="button is-light">
+              See History
+            </button>
           </div>
-
         </div>
-        <button style="display: flex; justify-content: flex-end; margin-top: 10px" class="button is-warning"
-          @click="closeModal">
-          Tutup
-        </button>
+        <div style="display: flex">
+          <div class="footer-modals">
+            <button class="button is-warning" @click="closeModal">Tutup</button>
+          </div>
+          <div
+            v-if="
+              orders.status !== 'SHIPPING' &&
+              orders.status !== 'NEGOTIATION' &&
+              allItemsAccepted
+            "
+            class="file"
+            style="padding-left: 10px"
+          >
+            <label class="file-label">
+              <input
+                class="file-input"
+                type="file"
+                name="resume"
+                @change="handleFileChange"
+                :disabled="selectedFile.length === 1"
+              />
+              <span class="file-cta">
+                <span class="file-icon">
+                  <FontAwesomeIcon icon="fas fa-upload" />
+                </span>
+                <span class="file-label"> Upload Faktur </span>
+              </span>
+            </label>
+          </div>
+          <div v-if="selectedFile" style="display: flex">
+            <p v-if="selectedFile.length > 0">{{ selectedFile[0].name }}</p>
+            <button
+              v-if="selectedFile.length > 0"
+              @click.prevent="uploadFaktur"
+            >
+              Upload
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </Transition>
 
-
   <!-- Modal reject -->
   <Transition name="modal">
-    <div v-if="showRejectModal" class="modal-mask" style="overflow: auto;">
+    <div v-if="showRejectModal" class="modal-mask" style="overflow: auto">
       <div class="modal-container">
         <!-- Konten modal penolakan -->
-        <h1 style="font-weight: bold;">History</h1>
-        <p>Apakah Anda yakin ingin menolak penawaran BARANG {{ selectedItem.product.name }}</p>
+        <h1 style="font-weight: bold">History</h1>
+        <p>
+          Apakah Anda yakin ingin menolak penawaran BARANG
+          {{ selectedItem.product.name }}
+        </p>
         <div class="control">
-          <input class="input is-hovered" type="number" placeholder="Harga" v-model="rejectBidInputBid" required>
+          <input
+            class="input is-hovered"
+            type="number"
+            placeholder="Harga"
+            v-model="rejectBidInputBid"
+            required
+          />
+        </div>
+        <div class="control">
+          <input
+            class="input is-hovered"
+            type="text"
+            placeholder="Message"
+            v-model="rejectBidInputMessage"
+            required
+          />
         </div>
         <div class="buttons">
-          <button class="button is-danger" :disabled="!rejectBidInputBid" @click="rejectBid">Tolak</button>
-          <button class="button is-primary" @click="closeRejectModal">Batal</button>
+          <button
+            class="button is-danger"
+            :disabled="!rejectBidInputBid"
+            @click="rejectBid"
+          >
+            Tolak
+          </button>
+          <button class="button is-primary" @click="closeRejectModal">
+            Batal
+          </button>
         </div>
       </div>
     </div>
@@ -83,10 +163,10 @@
 
   <!-- Modal History -->
   <Transition name="modal">
-    <div v-if="showHistoryModal" class="modal-mask" style="overflow: auto;">
+    <div v-if="showHistoryModal" class="modal-mask" style="overflow: auto">
       <div class="modal-container">
         <!-- Konten modal penolakan -->
-        <h1 style="font-weight: bold;">History</h1>
+        <h1 style="font-weight: bold">History</h1>
         <p>{{ orders.id }}</p>
         <div class="control">
           <div v-if="history">
@@ -99,6 +179,7 @@
                     <th>bidPrice</th>
                     <th>bidPriceChange</th>
                     <th>Status</th>
+                    <th>Message</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -108,6 +189,7 @@
                     <th>{{ histori.bidPrice }}</th>
                     <th>{{ histori.bidPriceChange }}</th>
                     <th>{{ histori.status }}</th>
+                    <th>{{ histori.message }}</th>
                   </tr>
                 </tbody>
               </table>
@@ -118,7 +200,9 @@
           </div>
         </div>
         <div class="buttons">
-          <button class="button is-primary" @click="closeHistoryModal">Close</button>
+          <button class="button is-primary" @click="closeHistoryModal">
+            Close
+          </button>
         </div>
       </div>
     </div>
@@ -126,7 +210,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import axios from "axios";
 import { mapGetters } from "vuex";
 
 export default {
@@ -134,11 +219,11 @@ export default {
     show: Boolean,
     orders: Object,
   },
-  emits: ['close'],
-
+  emits: ["close"],
   data() {
     return {
       history: [],
+      employee: [],
       selectedItem: null,
       accepted: "ACCEPTED",
       rejected: "REJECTED",
@@ -146,9 +231,13 @@ export default {
       showHistoryModal: false,
       fileName: "",
       rejectBidInputBid: "",
+      rejectBidInputMessage: "",
+      selectedFile: [],
     };
   },
-
+  created() {
+    this.getEmployee();
+  },
   computed: {
     getUniqueVendors() {
       const vendors = [];
@@ -160,41 +249,62 @@ export default {
       }
       return vendors;
     },
+    allItemsAccepted() {
+      return this.orders.orderItems.every(
+        (item) => item.status === this.accepted
+      );
+    },
     ...mapGetters(["message", "username", "vendoruuid", "vendorid"]),
   },
-
   methods: {
     selectItem(orderItem) {
       this.selectedItem = orderItem;
-      axios.get(`http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${this.orders.id}/${this.selectedItem.id}`)
+      axios
+        .get(
+          `http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${this.orders.id}/${this.selectedItem.id}`
+        )
         .then((res) => {
           this.history = res.data;
           console.log(this.history);
-        }).catch((err) => {
-          console.log(err)
         })
+        .catch((err) => {
+          console.log(err);
+        });
     },
     acceptBid() {
-      axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
-        orderItemId: this.selectedItem.id,
-        status: this.accepted
-      })
+      axios
+        .put(
+          `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`,
+          {
+            orderItemId: this.selectedItem.id,
+            status: this.accepted,
+          }
+        )
         .then((response) => {
+          const ppRole = this.employee[1].role;
+          const ppIds = this.employee[1].id;
           console.log(response.data);
-          axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-            sender: this.username,
-            senderId: this.vendorid,
-            receiver: this.selectedItem.product.vendor.name,
-            receiverId: this.selectedItem.product.vendor.vendorid,
-            message: `Your Product Is Accepted `
-          }).then((res) => console.log(res.data)).catch(err => console.log(err))
-          this.$emit('close')
+          axios
+            .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+              sender: this.username,
+              senderId: this.vendorid,
+              receiver: ppRole,
+              receiverId: ppIds,
+              message: `Your Product ${this.selectedItem.product.name} Is Accepted `,
+            })
+            .then((res) =>
+              alert(
+                `Your Product ${this.selectedItem.product.name} Is Accepted `
+              )
+            )
+            .catch((err) => console.log(err));
+          this.$emit("close");
           location.reload();
         })
-        .catch(err => console.log(err));
+        .catch((err) => console.log(err));
     },
     showModalRejected() {
-      this.showRejectModal = true
+      this.showRejectModal = true;
     },
     showModalHistory() {
       this.showHistoryModal = true;
@@ -206,46 +316,117 @@ export default {
       this.showHistoryModal = false;
     },
     rejectBid() {
-      axios.put(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`, {
-        orderItemId: this.selectedItem.id,
-        bidPrice: this.rejectBidInputBid,
-        status: this.rejected
-      }).then((response) => {
-        console.log(response.data);
-        this.showRejectModal = false;
-        axios.post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-          sender: this.username,
-          senderId: this.vendorid,
-          receiver: this.selectedItem.product.vendor.name,
-          receiverId: this.selectedItem.product.vendor.vendorid,
-          message: `Rejected from Vendor : ${this.username}`
-        }).then((res) => {
-          this.$emit('close')
-        }).catch(err => console.log(err))
-        // this.$emit('close')
-      }).catch(err => console.log(err));
+      axios
+        .put(
+          `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/items/${this.selectedItem.id}`,
+          {
+            orderItemId: this.selectedItem.id,
+            bidPrice: this.rejectBidInputBid,
+            status: this.rejected,
+            message: this.rejectBidInputMessage,
+          }
+        )
+        .then((response) => {
+          const ppRole = this.employee[1].role;
+          const ppIds = this.employee[1].id;
+          console.log(response.data);
+          this.showRejectModal = false;
+<<<<<<< HEAD
+          //Post history
+          axios.post(
+            "http://rsudsamrat.site:8090/api/bid-exchange/history",
+            {}
+          );
+=======
+>>>>>>> 3da99218c36d0ad9acd7f62ffaab52feede58a0f
+          //Post notif
+          axios
+            .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+              sender: this.username,
+              senderId: this.vendorid,
+              receiver: ppRole,
+              receiverId: ppIds,
+              message: `Your Product ${this.selectedItem.product.name} Rejected `,
+            })
+            .then((res) =>
+              confirm(
+                `This Product ${this.selectedItem.product.name} will be Rejected, Are you suer? `
+              )
+            )
+            .catch((err) => console.log(err));
+          // this.$emit('close')
+        })
+        .catch((err) => console.log(err));
     },
     closeModal() {
-      this.$emit('close'); // Mengemisikan event 'close' ke komponen induk
+      this.$emit("close"); // Mengemisikan event 'close' ke komponen induk
       this.selectedItem = null;
       location.reload();
     },
-    uploadFaktur(event) {
-      const file = event.target.files[0]
-      this.fileName = file.name
-      console.log('Uploading file', file.name)
+    uploadFaktur() {
+      const ppRole = this.employee[1].role;
+      const ppIds = this.employee[1].id;
+      console.log(`File ${this.selectedFile} berhasil di upload`);
+      axios
+        .put(
+          `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.orders.id}/status`,
+          {
+            status: "SHIPPING",
+          }
+        )
+        .then((res) => {
+          console.log(res.data);
+          axios
+            .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+              sender: this.username,
+              senderId: this.vendorid,
+              receiver: ppRole,
+              receiverId: ppIds,
+              message: `FAKTUR TELAH DIKIRIM BERSAMA FILE ${this.selectedFile}. `,
+            })
+            .then((res) => console.log(res))
+            .catch((err) => console.log(err));
+        })
+        .catch((err) => console.log(err));
     },
     getItemsByVendor(vendor) {
-      return this.orders.orderItems.filter(orderItem => orderItem.product.vendor.name === vendor);
+      return this.orders.orderItems.filter(
+        (orderItem) => orderItem.product.vendor.name === vendor
+      );
+    },
+    async getEmployee() {
+      try {
+        const response = await axios.get(
+          "http://rsudsamrat.site:8080/employee"
+        );
+        this.employee = response.data;
+        console.log(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    handleFileChange(event) {
+      const selectedFile = event.target.files[0];
+
+      // Save the selected file to the array
+      this.selectedFile.push(selectedFile);
+      console.log(this.selectedFile);
+
+      // Reset the input value to allow selecting the same file again
+      event.target.value = "";
     },
   },
-
+  components: { FontAwesomeIcon },
 };
 </script>
 
 <style scoped>
 .buttons {
   margin-right: 0.5em;
+}
+
+.footer-modals {
+  justify-content: flex-end;
 }
 
 /* Modals */

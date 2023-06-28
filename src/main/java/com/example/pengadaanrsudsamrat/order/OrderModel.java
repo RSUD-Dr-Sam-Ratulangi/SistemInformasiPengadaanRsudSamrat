@@ -31,7 +31,9 @@ public class OrderModel {
         VALIDATING,
         CHECKING,
         PAYMENT,
-        CANCEL
+        CANCEL,
+        SHIPPING,
+        COMPLETED,
     }
 
     @Id

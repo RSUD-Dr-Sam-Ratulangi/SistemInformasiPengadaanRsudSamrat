@@ -8,6 +8,7 @@ import com.example.pengadaanrsudsamrat.order.ReportServiceDTO.BidExchangeHistory
 import com.example.pengadaanrsudsamrat.order.ReportServiceDTO.BidExchangeHistoryResponseDTO;
 import com.example.pengadaanrsudsamrat.order.ReportServiceDTO.BidItemDTO;
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemRequestDTO;
+import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemResponseDTO;
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemUpdateRequestDTO;
 import com.example.pengadaanrsudsamrat.orderitem.OrderItemModel;
 import com.example.pengadaanrsudsamrat.orderitem.OrderItemRepository;
@@ -20,11 +21,11 @@ import com.example.pengadaanrsudsamrat.products.ProductRepository;
 import com.example.pengadaanrsudsamrat.vendor.DTO.VendorResponseDTO;
 import com.example.pengadaanrsudsamrat.vendor.VendorModel;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Cacheable;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -300,6 +301,7 @@ public class OrderServiceImpl implements OrderService {
                     bidItemDTO.setBidPrice(orderItem.getBidPrice());
                     bidItemDTO.setBidPriceChange(orderItem.getBidPrice() - orderItem.getProduct().getPrice());
                     bidItemDTO.setStatus(orderItem.getStatus().toString());
+                    bidItemDTO.setMessage(updateRequestDTO.getMessage()); // Set the message
                     return bidItemDTO;
                 })
                 .collect(Collectors.toList());
@@ -307,8 +309,7 @@ public class OrderServiceImpl implements OrderService {
         requestDTO.setBidItems(bidItems);
         requestDTO.setStatus(savedOrderModel.getStatus().toString());
 
-        // Save the updated order to the other Spring Boot backend endpoint
-        String otherEndpointUrl = "http://rsudsamrat.site:8090/api/bid-exchange/history"; // Replace with the actual URL of the other endpoint
+        String otherEndpointUrl = "http://rsudsamrat.site:8090/api/bid-exchange/history";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
@@ -323,9 +324,7 @@ public class OrderServiceImpl implements OrderService {
                 BidExchangeHistoryResponseDTO.class
         );
 
-
         BidExchangeHistoryResponseDTO responseDTO = responseEntity.getBody();
-
 
         return modelMapper.map(savedOrderModel, OrderResponseDTO.class);
     }
@@ -337,24 +336,32 @@ public class OrderServiceImpl implements OrderService {
         OrderModel orderModel = orderRepository.findById(orderId)
                 .orElseThrow(EntityNotFoundException::new);
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (OrderItemModel orderItemModel : orderModel.getOrderItems()) {
-            BigDecimal bidPrice = BigDecimal.valueOf(orderItemModel.getBidPrice());
-            BigDecimal quantity = BigDecimal.valueOf(orderItemModel.getQuantity());
-            BigDecimal itemTotalAmount = bidPrice.multiply(quantity);
-            totalAmount = totalAmount.add(itemTotalAmount);
-        }
-
         PaymentModel paymentModel = orderModel.getPayment();
         if (paymentModel == null) {
             throw new EntityNotFoundException("Payment not found for this order.");
         }
 
-        PaymentDTO paymentDTO = modelMapper.map(paymentModel, PaymentDTO.class);
-        paymentDTO.setAmount(totalAmount);
-
         OrderResponseDTO orderResponseDTO = modelMapper.map(orderModel, OrderResponseDTO.class);
-        orderResponseDTO.setPayment(paymentDTO);
+        orderResponseDTO.setPayment(modelMapper.map(paymentModel, PaymentDTO.class));
+
+        List<OrderItemResponseDTO> orderItemResponseDTOs = orderModel.getOrderItems().stream()
+                .map(orderItemModel -> {
+                    ProductModel productModel = orderItemModel.getProduct();
+                    VendorModel vendorModel = productModel.getVendor();
+
+                    ProductResponseDTO productResponseDTO = modelMapper.map(productModel, ProductResponseDTO.class);
+                    VendorResponseDTO vendorResponseDTO = modelMapper.map(vendorModel, VendorResponseDTO.class);
+
+                    productResponseDTO.setVendor(vendorResponseDTO);
+
+                    OrderItemResponseDTO orderItemResponseDTO = modelMapper.map(orderItemModel, OrderItemResponseDTO.class);
+                    orderItemResponseDTO.setProduct(productResponseDTO);
+
+                    return orderItemResponseDTO;
+                })
+                .collect(Collectors.toList());
+
+        orderResponseDTO.setOrderItems(orderItemResponseDTOs);
 
         return orderResponseDTO;
     }
@@ -544,39 +551,39 @@ public class OrderServiceImpl implements OrderService {
 
 
 //pertukaran stock dan pembelian
-    @Override
-    public Page<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(int page, int size, String sortBy) {
-        if (sortBy == null) {
-            sortBy = "orderDate"; // Set default sort order to orderDate
-        }
+@Override
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
-        Page<OrderModel> orders = orderRepository.findAll(pageable);
-
-        List<OrderItemQuantityExchangeResponseDTO> orderItemDTOList = new ArrayList<>();
-        for (OrderModel orderModel : orders) {
-            List<OrderItemModel> orderItems = orderModel.getOrderItems();
-            for (OrderItemModel orderItem : orderItems) {
-                OrderItemQuantityExchangeResponseDTO orderItemDTO = new OrderItemQuantityExchangeResponseDTO();
-                orderItemDTO.setOrderId(orderModel.getId());
-                orderItemDTO.setOrderItemId(orderItem.getId());
-                if (orderItem.getProduct() != null) {
-                    if (orderItem.getProduct().getVendor() != null) {
-                        orderItemDTO.setVendor(modelMapper.map(orderItem.getProduct().getVendor(), VendorResponseDTO.class));
-                    }
-                    orderItemDTO.setProduct(modelMapper.map(orderItem.getProduct(), ProductResponseDTO.class));
-                    orderItemDTO.setProductQuantity(orderItem.getProduct().getQuantity());
-                    orderItemDTO.setProductTotalStock(orderItem.getProduct().getQuantity() - orderItem.getQuantity());
-                }
-                orderItemDTO.setOrderItemQuantity(orderItem.getQuantity());
-                orderItemDTO.setOrderDate(orderModel.getOrderDate());
-                orderItemDTO.setStatus(orderModel.getStatus());
-                orderItemDTOList.add(orderItemDTO);
-            }
-        }
-
-        return new PageImpl<>(orderItemDTOList, pageable, orderItemDTOList.size());
+public List<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(String sortBy) {
+    if (sortBy == null) {
+        sortBy = "orderDate"; // Set default sort order to orderDate
     }
+
+    List<OrderModel> orders = orderRepository.findAll(Sort.by(sortBy).descending());
+
+    List<OrderItemQuantityExchangeResponseDTO> orderItemDTOList = new ArrayList<>();
+    for (OrderModel orderModel : orders) {
+        List<OrderItemModel> orderItems = orderModel.getOrderItems();
+        for (OrderItemModel orderItem : orderItems) {
+            OrderItemQuantityExchangeResponseDTO orderItemDTO = new OrderItemQuantityExchangeResponseDTO();
+            orderItemDTO.setOrderId(orderModel.getId());
+            orderItemDTO.setOrderItemId(orderItem.getId());
+            if (orderItem.getProduct() != null) {
+                if (orderItem.getProduct().getVendor() != null) {
+                    orderItemDTO.setVendor(modelMapper.map(orderItem.getProduct().getVendor(), VendorResponseDTO.class));
+                }
+                orderItemDTO.setProduct(modelMapper.map(orderItem.getProduct(), ProductResponseDTO.class));
+                orderItemDTO.setProductQuantity(orderItem.getProduct().getQuantity());
+                orderItemDTO.setProductTotalStock(orderItem.getProduct().getQuantity() - orderItem.getQuantity());
+            }
+            orderItemDTO.setOrderItemQuantity(orderItem.getQuantity());
+            orderItemDTO.setOrderDate(orderModel.getOrderDate());
+            orderItemDTO.setStatus(orderModel.getStatus());
+            orderItemDTOList.add(orderItemDTO);
+        }
+    }
+
+    return orderItemDTOList;
+}
 
 
 

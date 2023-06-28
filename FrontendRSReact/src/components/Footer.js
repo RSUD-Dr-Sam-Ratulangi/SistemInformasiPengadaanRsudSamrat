@@ -6,95 +6,74 @@ import {
   FaEnvelope,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import "./Footer.css";
+import { Link, useLocation } from "react-router-dom";
 
 const Footer = () => {
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  // const activeTab = window.location.pathname;
+  const location = useLocation();
 
-  const handleTabClick = (tab) => {
-    // Handle tab click logic here
-  };
+  const isSignInPage = location.pathname === "/signIn";
+  if (isSignInPage) {
+    return null;
+  }
+
+  function navLink(name, linkTo) {
+    return (
+      <Link
+        to={`/${linkTo}`}
+        className="flex items-center justify-center h-full text-[#D9D9D9] no-underline"
+      >
+        <span className="items-center justify-center d-flex">{name}</span>
+      </Link>
+    );
+  }
 
   return (
-    <div className="footer">
-      {isLoggedIn && (
-        <div>
-          <div className="footer-buttons">
-            <Link
-              to="/"
-              className="btn btn-light"
-              onClick={() => handleTabClick("/")}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/vendor"
-              className="btn btn-light"
-              onClick={() => handleTabClick("/vendor")}
-            >
-              Request
-            </Link>
-            <Link
-              to="/products"
-              className="btn btn-light"
-              onClick={() => handleTabClick("/products")}
-            >
-              Products
-            </Link>
-            <Link
-              to="/orders"
-              className="btn btn-light"
-              onClick={() => handleTabClick("/orders")}
-            >
-              Orders
-            </Link>
-            <Link
-              to="/Vendors"
-              className="btn btn-light"
-              onClick={() => handleTabClick("/Vendors")}
-            >
-              Vendors
-            </Link>
-            <Link
-              to="/Payments"
-              className="btn btn-light"
-              onClick={() => handleTabClick("/Payments")}
-            >
-              Payments
-            </Link>
-          </div>
-        </div>
-      )}
-      <div className="footer-text1">
-        <span className="footer-text-bold">Smart Samrat Procurement</span>
-        <br />
-        <span className="footer-text-small">
-          Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum DR Sam
+    <div className="bg-[#000E0A] flex justify-center items-center flex-col py-4 mt-5 w-full">
+      <div>
+        <ul className="flex gap-2">
+          <li>{navLink("Dashboard", "")}</li>
+          <li>{navLink("Request", "vendor")}</li>
+          <li>{navLink("Products", "products")}</li>
+          <li>{navLink("Orders", "orders")}</li>
+          <li>{navLink("Vendor", "vendors")}</li>
+          <li>{navLink("Payments", "payments")}</li>
+        </ul>
+      </div>
+      <div className="flex flex-col items-center justify-center mb-3 text-white">
+        <span className="font-semibold">Smart Samrat Procurement</span>
+        <span>
+          Layanan Infrmasi Pengadaan Barang & Jasa Rumah Sakit Umum DR Sam
           Ratulangi Tondano
         </span>
       </div>
-      <div className="footer-social-icons">
-        <a href="https://instagram.com/rsud_samrat_tondano?igshid=OGQ5ZDc2ODk2ZA==">
-          <FaInstagram />
+      <div className="flex gap-5 mb-3">
+        <a
+          href="https://instagram.com/rsud_samrat_tondano?igshid=OGQ5ZDc2ODk2ZA=="
+          className="text-white"
+        >
+          <FaInstagram className="scale-125" />
         </a>
-        <a href="https://www.facebook.com/PageOfficialRSUDSamRatulangi?mibextid=LQQJ4d">
-          <FaFacebook />
+        <a
+          href="https://www.facebook.com/PageOfficialRSUDSamRatulangi?mibextid=LQQJ4d"
+          className="text-white"
+        >
+          <FaFacebook className="scale-125" />
         </a>
-        <a href="https://rsudsamrat.site/epasien/">
-          <FaGlobe />
+        <a href="https://rsudsamrat.site/epasien/" className="text-white">
+          <FaGlobe className="scale-125" />
         </a>
-        <a href="mailto:samratulangirsud@gmail.com">
-          <FaEnvelope />
+        <a href="mailto:samratulangirsud@gmail.com" className="text-white">
+          <FaEnvelope className="scale-125" />
         </a>
-        <a href="https://goo.gl/maps/dcuTHTNYtmFDfkxA7">
-          <FaMapMarkerAlt />
+        <a href="https://goo.gl/maps/dcuTHTNYtmFDfkxA7" className="text-white">
+          <FaMapMarkerAlt className="scale-125" />
         </a>
       </div>
-      <div className="footer-text">
-        © 2023 UPTI RSUD DR SAM RATULANGI TONDANO. Hak Cipta Dilindungi
+      <hr />
+      <div className="flex items-center justify-center w-full pt-3 border-t opacity-40">
+        <p className="text-white">
+          © 2023 UPTI RSUD DR SAM RATULANGI TONDANO. Hak Cipta Dilindungi
+        </p>
       </div>
     </div>
   );

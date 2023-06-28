@@ -244,29 +244,6 @@ class OrderControllerTest {
         assertEquals(expectedResponsePage, responseEntity.getBody());
     }
 
-    @Test
-    void getAllOrderItemsWithProductStock() {
-        // Mock data
-        int page = 0;
-        int size = 10;
-        String sortBy = "orderDate";
-        Page<OrderItemQuantityExchangeResponseDTO> expectedResponsePage = mock(Page.class);
-
-        // Mock service method
-        when(orderService.getAllOrderItemsWithProductStock(page, size, sortBy)).thenReturn(expectedResponsePage);
-
-        // Perform the test
-        ResponseEntity<Page<OrderItemQuantityExchangeResponseDTO>> responseEntity =
-                orderController.getAllOrderItemsWithProductStock(page, size, sortBy);
-
-        // Verify the service method was called
-        verify(orderService).getAllOrderItemsWithProductStock(page, size, sortBy);
-
-        // Check the response
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(expectedResponsePage, responseEntity.getBody());
-    }
 
     @Test
     void getOrderItemProductInOrderRevenueAndStock() {

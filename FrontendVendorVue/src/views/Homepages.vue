@@ -1,7 +1,10 @@
 <template>
   <div class="header-status">
     <h1>SMART SAMRAT PROCUREMENT</h1>
-    <p>Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum DR Sam Ratulangi Tondano</p>
+    <p>
+      Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum DR Sam
+      Ratulangi Tondano
+    </p>
   </div>
   <div class="box">
     <div class="content is-fullwidth is-clearfix">
@@ -9,8 +12,13 @@
       <div class="container">
         <div class="field has-addons">
           <div class="control is-expanded">
-            <input class="input is-small" type="text" placeholder="Find a repository" v-model="searchInput"
-              @keyup.enter="searchOrders">
+            <input
+              class="input is-small"
+              type="text"
+              placeholder="Find a repository"
+              v-model="searchInput"
+              @keyup.enter="searchOrders"
+            />
           </div>
           <div class="control">
             <button @click="searchOrders" class="button is-info is-small">
@@ -21,7 +29,10 @@
       </div>
       <!-- Table -->
       <div>
-        <table class="table is-bordered is-striped is-narrow is-hoverable" v-if="filteredOrders">
+        <table
+          class="table is-bordered is-striped is-narrow is-hoverable"
+          v-if="filteredOrders"
+        >
           <thead>
             <tr>
               <th>OrderId</th>
@@ -35,7 +46,14 @@
               <td>{{ order.id }}</td>
               <td>{{ order.orderDate }}</td>
               <td>{{ order.status }}</td>
-              <td><button @click="selectedOrderItems(order)" class="button is-primary">Details</button></td>
+              <td>
+                <button
+                  @click="selectedOrderItems(order)"
+                  class="button is-primary"
+                >
+                  Details
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -45,7 +63,11 @@
 
   <!-- Modals edit Product -->
   <Teleport to="body">
-    <modal :show="showmodalSeeDetails" :orders="selectedOrders" @close="showmodalSeeDetails = false" />
+    <modal
+      :show="showmodalSeeDetails"
+      :orders="selectedOrders"
+      @close="showmodalSeeDetails = false"
+    />
   </Teleport>
 </template>
 
@@ -71,18 +93,21 @@ export default {
     ...mapGetters(["message", "username", "vendoruuid", "vendorid"]),
   },
   created() {
-    axios.get(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.vendorid}/vendor`)
+    axios
+      .get(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.vendorid}/vendor`
+      )
       .then((res) => {
         this.orders = res.data;
         console.log(res.data);
-      }).catch(err => console.log(err));
-    
+      })
+      .catch((err) => console.log(err));
   },
   methods: {
     searchOrders() {
       // Perform search logic and update the filteredOrders array
       if (this.searchInput === "") {
-        return null
+        return null;
       } else {
         const searchTerm = this.searchInput.toLowerCase();
         this.filteredOrders = this.orders.filter(
@@ -95,11 +120,10 @@ export default {
     selectedOrderItems(orderss) {
       this.selectedOrders = orderss;
       this.showmodalSeeDetails = true;
-    }
+    },
   },
 };
 </script>
-
 
 <style scoped>
 .header-status {
@@ -112,7 +136,7 @@ export default {
   background-color: #f1f1f1;
   /* Atur warna latar belakang sesuai kebutuhan */
   margin-top: 2%;
-  background-image: url('../components/img/bckgrund.jpeg');
+  background-image: url("../components/img/bckgrund.jpeg");
 }
 
 .container {
