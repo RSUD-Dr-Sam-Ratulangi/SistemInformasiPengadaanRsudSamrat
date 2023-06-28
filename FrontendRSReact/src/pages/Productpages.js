@@ -69,7 +69,6 @@ export default function ProductPages() {
   }, [selectedCategory, selectedSubCategory]);
 
   useEffect(() => {
-    console.log("useEffect - carts", carts);
     if (carts) {
       localStorage.setItem("carts", JSON.stringify(carts));
     } else if (vendors.length > 0) {
@@ -168,7 +167,7 @@ export default function ProductPages() {
       }
     }
 
-    // console.log(`thisSelectedVendorUUID (${thisSelectedVendorUUID}) | minimumQuantity (${minimumQuantity}) | statusList (${statusList.map(status => status)}) | searchQuery (${searchQuery}) | categoryName (${categoryName}) | subCategoryName (${subCategoryName})`);
+    // console.log(`selectedVendorUUID (${selectedVendorUUID}) | minimumQuantity (${minimumQuantity}) | statusList (${statusList.map(status => status)}) | searchQuery (${searchQuery}) | categoryName (${categoryName}) | subCategoryName (${subCategoryName})`);
     return newFilteredProducts;
   }
 
@@ -184,6 +183,15 @@ export default function ProductPages() {
 
       return newCarts;
     } else return [];
+  }
+
+  function handleSeePendingProductsOnClick() {
+    console.log("handleSeePendingProductsOnClick");
+    setFilteredProducts(
+      filterProducts({
+        statusList: ["PENDING"]
+      })
+    )
   }
 
   function handleSelectedCategoriesAndSelectedSubCategoryChange(
@@ -374,7 +382,6 @@ export default function ProductPages() {
             <span className="text-primary-1">{product.quantity}</span>
           </div>
           <span className="font-medium">{product.vendor.name}</span>
-          {/* <span className="font-medium">{product.vendor.name} - {product.vendor.vendoruuid.match(/.{1,4}/g).join(' ')}</span> */}
         </div>
         <button
           className="w-full text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
@@ -567,6 +574,14 @@ export default function ProductPages() {
               vendors.map((vendor) => vendorItem(vendor))
             )}
           </div>
+
+          <button
+            className="flex-1 text-md text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+            onClick={handleSeePendingProductsOnClick}
+            style={{marginTop: "28px"}}
+          >
+            See Pending Products
+          </button>
         </div>
         <div className="flex flex-col flex-1">
           {/* Search */}
