@@ -49,6 +49,9 @@ public class OrderItemModel {
         REJECTED,
         ACCEPTED,
         OFFER,
+        REFUND,
+        RESEND,
+        CHECKED,
     }
 
 
