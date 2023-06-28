@@ -1,6 +1,6 @@
 <template>
   <div>
-    <table>
+    <table class="table">
       <thead>
         <tr>
           <th>Order ID</th>
@@ -15,7 +15,9 @@
           <td>{{ datas.orderDate }}</td>
           <td>{{ datas.status }}</td>
           <td>
-            <button @click="selectOrdersItem(datas)" class="button is-primary">Detail</button>
+            <button @click="selectOrdersItem(datas)" class="button is-primary">
+              Detail
+            </button>
           </td>
         </tr>
       </tbody>

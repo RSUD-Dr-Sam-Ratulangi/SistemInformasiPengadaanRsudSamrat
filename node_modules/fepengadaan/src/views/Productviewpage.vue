@@ -1,98 +1,83 @@
 <template>
-  <div class="header-status">
-    <h1>SMART SAMRAT PROCUREMENT</h1>
-    <p>
-      Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum DR Sam
-      Ratulangi Tondano
-    </p>
-  </div>
+  <div class="pl-5 pr-5">
+    <div class="header-status">
+      <h1>SMART SAMRAT PROCUREMENT</h1>
+      <p>
+        Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum DR Sam
+        Ratulangi Tondano
+      </p>
+    </div>
 
-  <div class="box">
-    <h1>Search Your Products</h1>
-    <div class="container">
-      <div>
-        <div class="field has-addons">
-          <div class="control is-expanded">
-            <input
-              class="input is-fullwidth"
-              type="text"
-              placeholder="Search Products"
-              v-model="searchInput"
-            />
+    <div class="box">
+      <h1>Search Your Products</h1>
+      <div class="container">
+        <div>
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input
+                class="input is-fullwidth"
+                type="text"
+                placeholder="Search Products"
+                v-model="searchInput"
+              />
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <button
-    class="button is-small"
-    style="margin-top: 5px"
-    @click="addProductModal()"
-  >
-    Add Product
-  </button>
+    <button
+      class="button is-small"
+      style="margin-top: 5px"
+      @click="addProductModal()"
+    >
+      Add Product
+    </button>
 
-  <div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Product Name</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Status</th>
-          <th>Categories</th>
-          <th>Sub Categories</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="product in products" :key="product.id">
-          <td>{{ product.name }}</td>
-          <td>{{ product.price }}</td>
-          <td>{{ product.quantity }}</td>
-          <td>{{ product.status }}</td>
-          <td v-if="product.categories && product.categories.length > 0">
-            {{ product.categories[0].name }}
-          </td>
-          <td v-else>No category available</td>
-          <td v-if="product.subcategories && product.subcategories.length > 0">
-            {{ product.subcategories[0].name }}
-          </td>
-          <td v-else>No Sub Category</td>
-          <td>
-            <button
-              class="button is-danger"
-              @click="deleteProduct(product.productuuid, product.name)"
-            >
-              Delete</button
-            ><button class="button is-primary">Details</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- <div class="contentProduct">
-    <div class="card" v-for="product in filteredProducts" :key="product.id">
-      <div class="card-content">
-        <div class="media">
-          <div class="media-content">
-            <img :src="product.imageUrl" />
-            <p class="title is-4">Product Name: {{ product.name }}</p>
-          </div>
-        </div>
-        <div class="content">
-          <p>Price: {{ product.price }}</p>
-          <p>Quantity: {{ product.quantity }}</p>
-          <p>Description: {{ product.description }}</p>
-          <p>Category: {{ product.categoryIds }}</p>
-          <button class="button is-danger" @click="deleteProduct(product.productuuid, product.name)">Delete</button>
-          <button class="button is-primary" style="margin-left: 10px;" @click="selectProduct(product)">Edit</button>
-        </div>
+    <div class="pr-2 pl-2">
+      <div class="max-w-full overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Status</th>
+              <th>Categories</th>
+              <th>Sub Categories</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="product in products" :key="product.id">
+              <td>{{ product.name }}</td>
+              <td>{{ product.price }}</td>
+              <td>{{ product.quantity }}</td>
+              <td>{{ product.status }}</td>
+              <td v-if="product.categories && product.categories.length > 0">
+                {{ product.categories[0].name }}
+              </td>
+              <td v-else>No category available</td>
+              <td
+                v-if="product.subcategories && product.subcategories.length > 0"
+              >
+                {{ product.subcategories[0].name }}
+              </td>
+              <td v-else>No Sub Category</td>
+              <td>
+                <button
+                  class="button is-danger"
+                  @click="deleteProduct(product.productuuid, product.name)"
+                >
+                  Delete</button
+                ><button class="button is-primary">Details</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-  </div> -->
+  </div>
 
   <!-- Modals edit Product -->
   <Teleport to="body">
@@ -222,44 +207,5 @@ export default {
   height: auto;
   background-color: rgb(255, 255, 255);
   border: #555;
-}
-
-.container {
-  text-align: center;
-  justify-content: center;
-  align-items: center;
-  height: auto;
-}
-
-.card {
-  width: 300px;
-  margin: 10px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.media-content img {
-  height: 150px;
-  width: 150px;
-}
-
-.card-content {
-  margin-top: 10px;
-}
-
-.title {
-  margin-bottom: 5px;
-}
-
-.content {
-  font-size: 14px;
-  color: #555;
-}
-
-.contentProduct {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
 }
 </style>
