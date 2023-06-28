@@ -290,11 +290,11 @@ export default {
               senderId: this.vendorid,
               receiver: ppRole,
               receiverId: ppIds,
-              message: `Your Product ${this.selectedItem.product.name} Is Accepted `,
+              message: `${this.orders.id},Your Product ${this.selectedItem.product.name} Is Accepted `,
             })
             .then((res) =>
               alert(
-                `Your Product ${this.selectedItem.product.name} Is Accepted `
+                `${this.orders.id},Your Product ${this.selectedItem.product.name} Is Accepted `
               )
             )
             .catch((err) => console.log(err));
@@ -331,14 +331,6 @@ export default {
           const ppIds = this.employee[1].id;
           console.log(response.data);
           this.showRejectModal = false;
-<<<<<<< HEAD
-          //Post history
-          axios.post(
-            "http://rsudsamrat.site:8090/api/bid-exchange/history",
-            {}
-          );
-=======
->>>>>>> 3da99218c36d0ad9acd7f62ffaab52feede58a0f
           //Post notif
           axios
             .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
@@ -346,7 +338,7 @@ export default {
               senderId: this.vendorid,
               receiver: ppRole,
               receiverId: ppIds,
-              message: `Your Product ${this.selectedItem.product.name} Rejected `,
+              message: `${this.orders.id},Your Product ${this.selectedItem.product.name} Rejected `,
             })
             .then((res) =>
               confirm(
@@ -366,6 +358,9 @@ export default {
     uploadFaktur() {
       const ppRole = this.employee[1].role;
       const ppIds = this.employee[1].id;
+      const panpenRole = this.employee[3].role;
+      const panpenIds = this.employee[3].id;
+
       console.log(`File ${this.selectedFile} berhasil di upload`);
       axios
         .put(
@@ -375,6 +370,7 @@ export default {
           }
         )
         .then((res) => {
+          //Send notif to PP
           console.log(res.data);
           axios
             .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
@@ -384,7 +380,19 @@ export default {
               receiverId: ppIds,
               message: `FAKTUR TELAH DIKIRIM BERSAMA FILE ${this.selectedFile}. `,
             })
-            .then((res) => console.log(res))
+            .then((res) => {
+              //Send Notif to panpen
+              axios
+                .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+                  sender: this.username,
+                  senderId: this.vendorid,
+                  receiver: panpenRole,
+                  receiverId: panpenIds,
+                  message: `${panpenRole} mendapatkan notifikasi pemeriksaan barang, order id ${this.orders.id}. `,
+                })
+                .then((res) => console.log(res))
+                .catch((err) => console.log(err));
+            })
             .catch((err) => console.log(err));
         })
         .catch((err) => console.log(err));
@@ -400,7 +408,7 @@ export default {
           "http://rsudsamrat.site:8080/employee"
         );
         this.employee = response.data;
-        console.log(response.data);
+        console.log("employee", response.data);
       } catch (err) {
         console.log(err);
       }

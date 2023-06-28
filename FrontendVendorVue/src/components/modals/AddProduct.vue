@@ -17,69 +17,113 @@
                 <div class="field">
                   <label class="label">Product Name</label>
                   <div class="control">
-                    <input class="input" type="text" placeholder="Product Name" v-model="product.name" required>
+                    <input
+                      class="input"
+                      type="text"
+                      placeholder="Product Name"
+                      v-model="product.name"
+                      required
+                    />
                   </div>
                 </div>
                 <div class="field">
                   <label class="label">Price</label>
                   <div class="control">
-                    <input class="input" type="number" placeholder="Price" v-model="product.price" required>
+                    <input
+                      class="input"
+                      type="number"
+                      placeholder="Price"
+                      v-model="product.price"
+                      required
+                    />
                   </div>
                 </div>
                 <div class="field">
                   <label class="label">Quantity</label>
                   <div class="control">
-                    <input class="input" type="number" placeholder="Quantity" v-model="product.quantity" required>
+                    <input
+                      class="input"
+                      type="number"
+                      placeholder="Quantity"
+                      v-model="product.quantity"
+                      required
+                    />
                   </div>
                 </div>
                 <div class="field">
                   <label class="label">Description</label>
                   <div class="control">
-                    <input class="input is-large" type="text" placeholder="Description" v-model="product.description"
-                      required>
+                    <input
+                      class="input is-large"
+                      type="text"
+                      placeholder="Description"
+                      v-model="product.description"
+                      required
+                    />
                   </div>
                   <div class="field">
                     <p>Categories</p>
                     <label class="checkbox">
-                      <input type="checkbox" v-model="product.categoryIds" :value="3"
-                        @change="handleCheckboxChangeCategory(3)" required>
+                      <input
+                        type="checkbox"
+                        v-model="product.categoryIds"
+                        :value="3"
+                      />
                       BHP
                     </label>
                     <label class="checkbox">
-                      <input type="checkbox" v-model="product.categoryIds" :value="4"
-                        @change="handleCheckboxChangeCategory(4)" required>
+                      <input
+                        type="checkbox"
+                        v-model="product.categoryIds"
+                        :value="4"
+                      />
                       BM
                     </label>
                     <label class="checkbox">
-                      <input type="checkbox" v-model="product.categoryIds" :value="5"
-                        @change="handleCheckboxChangeCategory(5)" required>
+                      <input
+                        type="checkbox"
+                        v-model="product.categoryIds"
+                        :value="5"
+                      />
                       JASA
                     </label>
                   </div>
                   <div class="field">
-                    <div v-show="product.categoryIds.includes(3)">
+                    <div>
                       <p>Sub Categories</p>
                       <label class="checkbox">
-                        <input type="checkbox" v-model="product.subCategoryId" :value="1"
-                          @change="handleCheckboxChangeSubCategory(1)" required>
+                        <input
+                          type="checkbox"
+                          v-model="product.subCategoryId"
+                          :value="1"
+                        />
                         NON MEDIS
                       </label>
                       <label class="checkbox">
-                        <input type="checkbox" v-model="product.subCategoryId" :value="2"
-                          @change="handleCheckboxChangeSubCategory(2)" required>
+                        <input
+                          type="checkbox"
+                          v-model="product.subCategoryId"
+                          :value="2"
+                        />
                         MEDIS
                       </label>
                     </div>
-                    <div v-show="product.categoryIds.includes(4)">
+                    <div>
                       <p>Sub Categories</p>
                       <label class="checkbox">
-                        <input type="checkbox" v-model="product.subCategoryId" :value="5"
-                          @change="handleCheckboxChangeSubCategory(5)" required>
+                        <input
+                          type="checkbox"
+                          v-model="product.subCategoryId"
+                          :value="5"
+                        />
                         ALKSES
                       </label>
                       <label class="checkbox">
-                        <input type="checkbox" v-model="product.subCategoryId" :value="6"
-                          @change="handleCheckboxChangeSubCategory(6)" required>
+                        <input
+                          type="checkbox"
+                          v-model="product.subCategoryId"
+                          :value="6"
+                        />
                         ALKON
                       </label>
                     </div>
@@ -90,23 +134,26 @@
               <div class="form-right">
                 <label class="label">Url image</label>
                 <div class="control">
-                  <input class="input" type="text" placeholder="Url" v-model="product.imageUrl">
+                  <input
+                    class="input"
+                    type="text"
+                    placeholder="Url"
+                    v-model="product.imageUrl"
+                  />
                 </div>
               </div>
             </form>
           </div>
         </div>
       </div>
-
     </div>
-
   </Transition>
 </template>
 
 <script>
-import axios from 'axios';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { mapGetters } from 'vuex';
+import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { mapGetters } from "vuex";
 export default {
   props: {
     show: Boolean,
@@ -123,7 +170,7 @@ export default {
         description: "",
         imageUrl: "",
         categoryIds: [],
-        subCategoryId: []
+        subCategoryId: [],
       },
       message: "",
     };
@@ -134,8 +181,8 @@ export default {
   components: { FontAwesomeIcon },
   methods: {
     toggleDropdown() {
-      this.isActive = !this.isActive
-      console.log("okbro")
+      this.isActive = !this.isActive;
+      console.log("okbro");
     },
     Submitform() {
       axios
@@ -144,16 +191,18 @@ export default {
           this.product
         )
         .then((response) => {
-          this.$emit('close')
+          this.$emit("close");
           location.reload();
-          alert(`Product dengan nama : ${this.product.name} berhasil ditambahkan`)
+          alert(
+            `Product dengan nama : ${this.product.name} berhasil ditambahkan`
+          );
           console.log(
             `Berhasil ditambahkan, Deskripsi: ${this.product.description}`
           );
         })
         .catch((err) => {
           console.log(err);
-        })
+        });
     },
     handleCheckboxChangeCategory(checkedCategoryId) {
       this.product.categoryIds = [checkedCategoryId];
@@ -163,13 +212,12 @@ export default {
       this.product.subCategoryId = [checkedSubCategoryId];
     },
     handleCloseClick() {
-      this.product.categoryIds = [],
-        this.product.subCategoryId = null,
-
-        this.$emit('close');
-    }
-  }
-}
+      (this.product.categoryIds = []),
+        (this.product.subCategoryId = null),
+        this.$emit("close");
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -202,4 +250,5 @@ export default {
 
 .dropdown {
   padding-top: 10px;
-}</style>
+}
+</style>

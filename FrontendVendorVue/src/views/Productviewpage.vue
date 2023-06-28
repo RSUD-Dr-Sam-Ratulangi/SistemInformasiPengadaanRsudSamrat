@@ -66,11 +66,11 @@
               <td v-else>No Sub Category</td>
               <td>
                 <button
-                  class="button is-danger"
+                  class="btn btn-warning"
                   @click="deleteProduct(product.productuuid, product.name)"
                 >
-                  Delete</button
-                ><button class="button is-primary">Details</button>
+                  Delete
+                </button>
               </td>
             </tr>
           </tbody>
