@@ -1,5 +1,5 @@
-import React from 'react';
-import Modal from '../Modal';
+import React from "react";
+import Modal from "../Modal";
 
 const ModalPayoutDetails = ({ onClose, payoutDetails }) => {
   const calculatePayoutAmount = (orderItems) => {
@@ -12,12 +12,12 @@ const ModalPayoutDetails = ({ onClose, payoutDetails }) => {
   };
 
   return (
-    <Modal title='Submit Offer' onClose={onClose}>
-      <div className='modal-body'>
+    <Modal title="Submit Offer" onClose={onClose}>
+      <div className="modal-body">
         <h4>Order ID: {payoutDetails.id}</h4>
         <h4>Order Date: {payoutDetails.orderDate}</h4>
         <h4>Order Items:</h4>
-        <table className='table'>
+        <table className="table">
           <thead>
             <tr>
               <th>Product Name</th>
@@ -41,11 +41,11 @@ const ModalPayoutDetails = ({ onClose, payoutDetails }) => {
           Payout Amount: {calculatePayoutAmount(payoutDetails.orderItems)}
         </h4>
       </div>
-      <div className='modal-footer'>
-        <button type='button' className='btn btn-danger' onClick={onClose}>
+      <div className="modal-footer">
+        <button type="button" className="btn btn-danger" onClick={onClose}>
           Close
         </button>
-        <button type='button' className='btn btn-info'>
+        <button type="button" className="btn btn-info">
           Print
         </button>
       </div>

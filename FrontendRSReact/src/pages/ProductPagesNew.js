@@ -8,7 +8,7 @@ import {
 } from "react-icons/md";
 import axios from "axios";
 
-export default function ProductPages() {
+export default function ProductPagesNew() {
   const navigate = useNavigate();
 
   // vendor
@@ -51,7 +51,9 @@ export default function ProductPages() {
   }, []);
 
   useEffect(() => {
-    setFilteredProducts(filterProducts({}));
+    setFilteredProducts(
+      filterProducts({})
+    );
   }, [products, selectedVendorUUID]);
 
   useEffect(() => {
@@ -554,7 +556,7 @@ export default function ProductPages() {
         </form>
       </dialog>
 
-      <div className="container flex px-[6.5rem] mx-auto flex-col md:flex-row">
+      <div className="container flex px-[6.5rem] mx-auto">
         <div className="bg-red w-[256px] pr-3">
           <h2 className="flex items-center gap-1 mb-3 text-xl font-bold">
             Choose Vendor
@@ -590,9 +592,7 @@ export default function ProductPages() {
             <button
               className="text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2 btn-wide"
               onClick={() => handleCartsOnClick()}
-              disabled={
-                carts ? carts.every((cart) => cart.products.length === 0) : true
-              }
+              disabled={(carts) ? carts.every((cart) => cart.products.length === 0) : true}
             >
               <MdShoppingCart className="text-2xl" />
               Cart

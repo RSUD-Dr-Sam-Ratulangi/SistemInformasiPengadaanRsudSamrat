@@ -11,7 +11,7 @@ import ModalPayoutDetails from "../components/orderPagesNew/ModalPayoutDetails";
 import ModalProductDetails from "../components/orderPagesNew/ModalProductDetails";
 import ModalOrderDetails from "../components/orderPagesNew/ModalOrderDetails";
 
-const Orderpages = () => {
+const OrderpagesNew = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   // const [page, setPage] = useState(0);
@@ -482,4 +482,4 @@ const Orderpages = () => {
   );
 };
 
-export default Orderpages;
+export default OrderpagesNew;

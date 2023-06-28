@@ -1,25 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faUser,
-  faSignIn,
-  faBell,
-  faSignOutAlt,
-} from "@fortawesome/free-solid-svg-icons";
-import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../config/auth/authSlice";
-import { useNavigate } from "react-router-dom";
-import "../assets/css/navigation.css";
-import TabsNav from "./TabsNav";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { MdNotifications, MdPerson, MdLogout } from "react-icons/md";
+import "../assets/css/tabsnav.css";
 import logo from "../assets/images/logo.jpg";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { logout } from "../config/auth/authSlice";
 
 const Navigation = () => {
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.pathname);
+  const [isOpen, setIsOpen] = useState(false);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [notificationCount, setNotificationCount] = useState(1);
   const [isSticky, setIsSticky] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -69,62 +63,93 @@ const Navigation = () => {
     }
   }
 
+  const handleTabClick = (path) => {
+    setActiveTab(path);
+  };
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
   if (isSignInPage) {
     return null;
   }
 
-  return (
-    <div>
-      <nav className={isSticky ? "sticky" : ""}>
-        <div className="logo-container">
-          <img src={logo} alt="Logo" className="logo" />
-          <div className="logo-text">
-            <span>Smart Samrat Procurement</span>
-            <span>RSUD DR SAM RATULANGI TONDANO</span>
-          </div>
-        </div>
+  function navLink(name, linkTo) {
+    return (
+      <li className="flex items-center justify-center h-full">
+        <Link
+          to={`/${linkTo}`}
+          className={`no-underline h-full flex items-center justify-center ${
+            activeTab === `/${linkTo}`
+              ? "font-bold text-primary-1 border-b-2 border-primary-1"
+              : "text-dark"
+          }`}
+          onClick={() => handleTabClick(`/${linkTo}`)}
+        >
+          <span className="items-center justify-center d-flex">{name}</span>
+        </Link>
+      </li>
+    );
+  }
 
-        {!isSignInPage && (
-          <div className="navigation-icons">
-            {isLoggedIn ? (
-              <>
-                <Link
-                  to="/notifications"
-                  className="notification-icon"
-                  onClick={handleNotificationClick}
-                >
-                  <FontAwesomeIcon icon={faBell} />
-                  {notificationCount > 0 && (
-                    <span className="notification-count">
-                      {notificationCount}
-                    </span>
-                  )}
-                </Link>
-                <Link
-                  to="/profile"
-                  className="profile-icon"
-                  onClick={handleProfileClick}
-                >
-                  <FontAwesomeIcon icon={faUser} />
-                </Link>
-                <Link
-                  to="/signIn"
-                  className="logout-icon"
-                  onClick={handleLogoutClick}
-                >
-                  <FontAwesomeIcon icon={faSignOutAlt} />
-                </Link>
-              </>
-            ) : (
-              <Link to="/signIn" className="logout-icon">
-                <FontAwesomeIcon icon={faSignIn} />
-                Login
-              </Link>
-            )}
-            <TabsNav />
-          </div>
-        )}
-      </nav>
+  return (
+    <div className="relative flex items-center justify-between w-full p-2 border-b border-slate-200">
+      <div className="flex items-center justify-start gap-2">
+        <img src={logo} alt="Logo" className="w-8" />
+        <div className="flex flex-col text-dark">
+          <span className=" fw-bold">Smart Samrat Procurement</span>
+          <span className="text-[#525252] text-xs">
+            RSUD DR SAM RATULANGI TONDANO
+          </span>
+        </div>
+      </div>
+
+      <div className="absolute h-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+        <ul className="flex items-center justify-center h-full gap-3 m-0 text-lg">
+          {navLink("Home", "")}
+          {navLink("Request", "vendor")}
+          {navLink("Products", "products")}
+          {navLink("Orders", "orders")}
+          {navLink("Vendor", "vendors")}
+          {navLink("Payments", "payments")}
+        </ul>
+      </div>
+
+      <div className="flex items-center justify-center">
+        <ul className="flex items-center justify-center gap-2 m-0">
+          <li>
+            <Link
+              to="/notifications"
+              className="flex flex-row p-0 no-underline text-primary-1"
+              onClick={handleNotificationClick}
+            >
+              <MdNotifications className="text-2xl" />
+              {notificationCount > 0 && (
+                <span className="no-underline ">{notificationCount}</span>
+              )}
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/profile"
+              className="p-0 text-primary-1"
+              onClick={handleProfileClick}
+            >
+              <MdPerson className="text-2xl" />
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/signIn"
+              className="p-0 text-primary-1"
+              onClick={handleLogoutClick}
+            >
+              <MdLogout className="text-2xl" />
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 };
