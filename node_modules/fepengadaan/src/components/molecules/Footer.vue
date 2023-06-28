@@ -1,6 +1,8 @@
 <template>
-  <footer class="footer footer-center mt-auto mt-auto text-base-content">
-    <div class="grid grid-flow-col gap-3 pt-3">
+  <footer
+    class="footer relative footer-center items-center mt-auto text-base-content bottom-0 left-0 w-full"
+  >
+    <div class="flex gap-4 pt-3 justify-center">
       <div>
         <RouterLink to="/">
           <div class="nav-item">

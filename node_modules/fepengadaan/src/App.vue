@@ -16,47 +16,31 @@ export default {
 </script>
 
 <template>
-  <div class="inti">
+  <main class="flex flex-col min-h-screen">
     <div>
-      <Navigationbar />
-      <div class="contentNoLoggedin" v-if="!isLoggedIn">
-        <Nologgedin />
-      </div>
-      <div v-if="isLoggedIn">
-        <div>
-          <div class="content">
-            <RouterView />
+      <div>
+        <Navigationbar />
+        <div class="contentNoLoggedin" v-if="!isLoggedIn">
+          <Nologgedin />
+        </div>
+        <div v-if="isLoggedIn">
+          <div>
+            <div class="content">
+              <RouterView />
+            </div>
           </div>
         </div>
       </div>
-      <div>
-      </div>
-    </div> 
-  </div>
-  <footer>
-    <Footer />
-  </footer>
+    </div>
+    <footer class="mt-auto">
+      <Footer />
+    </footer>
+  </main>
 </template>
 
 <style scoped>
-.content {
-  text-align: center;
-  margin-bottom: 150px;
-  margin-left: 60px;
-  margin-right: 60px;
-}
-
 .contentNoLoggedin {
   text-align: center;
   padding-top: 15%;
-}
-
-footer {
-  position:fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #f5f5f5; /* Sesuaikan dengan warna latar belakang yang Anda inginkan */
-  text-align: center;
 }
 </style>
