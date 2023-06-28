@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 import ModalHistory from "../components/orderPagesNew/ModalHistory";
 import ModalOrderItem from "../components/orderPagesNew/ModalOrderItem";
@@ -42,6 +43,10 @@ const Orderpages = () => {
   const [actionToastBody, setActionToastBody] = useState("");
 
   const [filteredStatusData, setFilteredStatusData] = useState([]);
+
+  // productId (taken when user click card in notifications page)
+  const location = useLocation();
+  let receivedProductId = location.state;
 
   useEffect(() => {
     fetchData();
@@ -102,6 +107,12 @@ const Orderpages = () => {
       console.log("order filter: ", uniqueData);
       console.log("order: ", response.data);
       setLoading(false);
+
+      // open modal if receivedProductId exist
+      if(receivedProductId) {
+        openModal(receivedProductId);
+        receivedProductId = null;
+      }
     } catch (error) {
       console.error(error);
     }

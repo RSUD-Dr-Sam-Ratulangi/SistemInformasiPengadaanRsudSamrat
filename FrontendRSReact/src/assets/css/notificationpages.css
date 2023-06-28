@@ -1,23 +1,29 @@
-.notification-container {
-    margin-top: 20px;
-  }
-  
-  .notification-card {
-    height: 100%;
-  }
-  
-  .notification-card-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-  }
-  
-  .notification-card-text {
-    font-size: 1rem;
-  }
-  
-  @media (max-width: 576px) {
-    .notification-card {
-      margin-bottom: 20px;
-    }
-  }
-  
+#notifications-page {
+  padding: 20px;
+}
+
+#notifications-page .cards-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 24px;
+}
+
+#notifications-page .notification-card {
+  padding: 8px;
+  border: 1px solid #68B2A0;
+  border-radius: 6px;
+}
+
+#notifications-page .notification-card:hover {
+  cursor: pointer;
+  background-color: #68B2A0;
+}
+
+#notifications-page .title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+#notifications-page .text {
+  font-size: 1rem;
+}
