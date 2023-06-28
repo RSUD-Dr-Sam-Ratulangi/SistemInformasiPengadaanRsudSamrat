@@ -5,6 +5,8 @@ import {
   MdInfo,
   MdHandshake,
   MdDelete,
+  MdSettingsBackupRestore,
+  MdCheck,
 } from "react-icons/md";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -17,6 +19,8 @@ const ModalOrderDetails = ({
   handleHistory,
   handleDetailProduct,
   handleOffer,
+  handleRefund,
+  handleConfirm,
   handleOpenSubmitModal,
   handlePayoutDetail,
   setShowActionToast,
@@ -155,6 +159,7 @@ const ModalOrderDetails = ({
     onClose();
     window.location.reload();
   };
+
   const fileInputRef = useRef(null);
 
   const handleUploadClick = () => {
@@ -230,6 +235,24 @@ const ModalOrderDetails = ({
               tabIndex={0}
               className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
             >
+              {selectedOrder.status === "SHIPPING" && (
+                <>
+                  <li>
+                    <a onClick={() => handleConfirm(orderItem.id)}>
+                      <MdCheck className="text-xl text-success" />
+                      Confirm
+                    </a>
+                  </li>
+                  <hr />
+                  <li>
+                    <a onClick={() => handleRefund(orderItem.id)}>
+                      <MdSettingsBackupRestore className="text-xl text-slate-500" />
+                      Refund
+                    </a>
+                  </li>
+                </>
+              )}
+              <hr />
               <li>
                 <a
                   onClick={() =>
@@ -307,7 +330,7 @@ const ModalOrderDetails = ({
               className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
               onClick={() => handleSetStatusValidating("VALIDATING")}
             >
-              Change Satus
+              Change Status
             </button>
           )}
           {role === "PP" && (

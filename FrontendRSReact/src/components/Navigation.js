@@ -1,6 +1,12 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { MdNotifications, MdPerson, MdLogout } from "react-icons/md";
+import {
+  MdNotifications,
+  MdPerson,
+  MdLogout,
+  MdClose,
+  MdMenu,
+} from "react-icons/md";
 import "../assets/css/tabsnav.css";
 import logo from "../assets/images/logo.jpg";
 import { useDispatch, useSelector } from "react-redux";
@@ -71,9 +77,9 @@ const Navigation = () => {
     setIsOpen(!isOpen);
   };
 
-  if (isSignInPage) {
-    return null;
-  }
+  const handleMenuToggle = () => {
+    setIsOpen(!isOpen);
+  };
 
   function navLink(name, linkTo) {
     return (
@@ -94,19 +100,19 @@ const Navigation = () => {
   }
 
   return (
-    <div className="relative flex items-center justify-between w-full p-2 border-b border-slate-200">
-      <div className="flex items-center justify-start gap-2">
-        <img src={logo} alt="Logo" className="w-8" />
-        <div className="flex flex-col text-dark">
-          <span className=" fw-bold">Smart Samrat Procurement</span>
-          <span className="text-[#525252] text-xs">
-            RSUD DR SAM RATULANGI TONDANO
-          </span>
+    <div>
+      <div className="hidden lg:flex items-center justify-between w-full p-2 border-b border-slate-200">
+        <div className="flex items-center justify-start gap-2">
+          <img src={logo} alt="Logo" className="w-8" />
+          <div className="flex flex-col text-dark">
+            <span className="fw-bold">Smart Samrat Procurement</span>
+            <span className="text-[#525252] text-xs">
+              RSUD DR SAM RATULANGI TONDANO
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div className="absolute h-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-        <ul className="flex items-center justify-center h-full gap-3 m-0 text-lg">
+        <ul className="flex items-center justify-center gap-3 m-0 text-lg">
           {navLink("Home", "")}
           {navLink("Request", "vendor")}
           {navLink("Products", "products")}
@@ -114,41 +120,84 @@ const Navigation = () => {
           {navLink("Vendor", "vendors")}
           {navLink("Payments", "payments")}
         </ul>
+
+        <div className="flex items-center justify-center space-x-2">
+          <ul className="flex items-center justify-center gap-2 m-0">
+            <li>
+              <Link
+                to="/notifications"
+                className="flex flex-row p-0 no-underline text-primary-1"
+                onClick={handleNotificationClick}
+              >
+                <MdNotifications className="text-2xl" />
+                {notificationCount > 0 && (
+                  <span className="no-underline ">{notificationCount}</span>
+                )}
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/profile"
+                className="p-0 text-primary-1"
+                onClick={handleProfileClick}
+              >
+                <MdPerson className="text-2xl" />
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/signIn"
+                className="p-0 text-primary-1"
+                onClick={handleLogoutClick}
+              >
+                <MdLogout className="text-2xl" />
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
 
-      <div className="flex items-center justify-center">
-        <ul className="flex items-center justify-center gap-2 m-0">
-          <li>
-            <Link
-              to="/notifications"
-              className="flex flex-row p-0 no-underline text-primary-1"
-              onClick={handleNotificationClick}
+      <div className="lg:hidden ">
+        <div className="flex items-center justify-between w-full p-2 border-b border-slate-200">
+          <div className="flex items-center justify-start gap-2">
+            <img src={logo} alt="Logo" className="w-8" />
+            <div className="flex flex-col text-dark">
+              <span className="fw-bold">Smart Samrat Procurement</span>
+              <span className="text-[#525252] text-xs">
+                RSUD DR SAM RATULANGI TONDANO
+              </span>
+            </div>
+          </div>
+
+          <button
+            className="btn btn-ghost text-primary-1 focus:outline-none lg:hidden"
+            onClick={handleMenuToggle}
+          >
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <MdNotifications className="text-2xl" />
-              {notificationCount > 0 && (
-                <span className="no-underline ">{notificationCount}</span>
+              {isOpen ? (
+                <MdClose className="text-2xl" />
+              ) : (
+                <MdMenu className="text-2xl" />
               )}
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/profile"
-              className="p-0 text-primary-1"
-              onClick={handleProfileClick}
-            >
-              <MdPerson className="text-2xl" />
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/signIn"
-              className="p-0 text-primary-1"
-              onClick={handleLogoutClick}
-            >
-              <MdLogout className="text-2xl" />
-            </Link>
-          </li>
-        </ul>
+            </svg>
+          </button>
+        </div>
+
+        {isOpen && (
+          <ul className="flex flex-col gap-3 px-4 py-2 bg-slate-200 border border-b border-sla">
+            {navLink("Home", "")}
+            {navLink("Request", "vendor")}
+            {navLink("Products", "products")}
+            {navLink("Orders", "orders")}
+            {navLink("Vendor", "vendors")}
+            {navLink("Payments", "payments")}
+          </ul>
+        )}
       </div>
     </div>
   );
