@@ -71,6 +71,7 @@ const Orderpages = () => {
             item.status === "ORDER" ||
             item.status === "NEGOTIATION" ||
             item.status === "VALIDATING" ||
+            item.status === "SHIPPING" ||
             item.status === "CANCEL"
         );
       }
@@ -80,6 +81,7 @@ const Orderpages = () => {
             item.status === "ORDER" ||
             item.status === "NEGOTIATION" ||
             item.status === "CANCEL" ||
+            item.status === "SHIPPING" ||
             item.status === "VALIDATING"
         );
       }
