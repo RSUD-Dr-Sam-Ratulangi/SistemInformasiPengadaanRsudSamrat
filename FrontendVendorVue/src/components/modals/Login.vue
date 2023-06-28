@@ -1,46 +1,65 @@
 <template>
-  <Transition name="modal">
-    <div v-if="show" class="modal-mask">
-      <div class="modal-container">
-        <div class="modal-header">
-          <button class="delete is-small" @click="$emit('close')">close</button>
-          <h1 style="font-weight: bold">Login</h1>
-        </div>
-        <div class="modal-body">
-          <form @submit.prevent="submitLogin">
-            <label for="Username">UserName:</label>
-            <input type="text" class="input is-small" v-model="username" />
-            <div>
-              <label for="password">Password</label>
-              <input
-                type="password"
-                class="input is-small"
-                v-model="password"
-              />
-            </div>
-            <div class="modal-footer">
-              <button
-                class="button is-primary"
-                style="margin-top: 10px"
-                type="submit"
-                @click="$emit('close')"
-              >
-                LogIn
-              </button>
-            </div>
-          </form>
-        </div>
+  <dialog
+    :open="show"
+    class="modal modal-bottom sm:modal-middle bg-gray-600 bg-opacity-90"
+    ref="signInToggle"
+  >
+    <form method="dialog" class="modal-box" @submit.prevent="submitLogin">
+      <button class="btn btn-square btn-sm" @click="closeModal">
+        <FontAwesomeIcon icon="fa-solid fa-x" />
+      </button>
+      <div class="mb-4">
+        <label
+          class="block text-gray-700 text-sm font-bold mb-2"
+          for="username"
+        >
+          Username
+        </label>
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          id="username"
+          type="text"
+          v-model="username"
+          placeholder="Username"
+        />
       </div>
-    </div>
-  </Transition>
+      <div class="mb-6">
+        <label
+          class="block text-gray-700 text-sm font-bold mb-2"
+          for="password"
+        >
+          Password
+        </label>
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+          id="password"
+          type="password"
+          v-model="password"
+          placeholder="********"
+        />
+      </div>
+      <div class="flex items-center justify-between">
+        <button
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          type="submit"
+          @click="closeModal"
+        >
+          Sign In
+        </button>
+      </div>
+    </form>
+  </dialog>
 </template>
 
 <script>
+import { onMounted } from "vue";
 import store from "../../config/stateAuth/state.js";
-import axios from "axios";
+import { onClickOutside } from "@vueuse/core";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "Login",
+  components: { FontAwesomeIcon },
   props: {
     show: Boolean,
   },
@@ -51,6 +70,10 @@ export default {
       password: "",
     };
   },
+  mounted() {
+    onClickOutside(this.$refs.signInToggle, this.closeModal());
+  },
+
   computed: {
     isLoggedIn() {
       return store.getters.isLoggedIn;
@@ -64,68 +87,9 @@ export default {
       };
       store.dispatch("login", vendor);
     },
+    closeModal() {
+      this.$emit("close");
+    },
   },
 };
 </script>
-
-<style scoped>
-/* Modals */
-
-.modal-mask {
-  position: fixed;
-  z-index: 9999;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  transition: opacity 0.3s ease;
-}
-
-.modal-container {
-  width: 500px;
-  margin: auto;
-  padding: 20px 20px;
-  background-color: #fff;
-  border-radius: 5px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
-  transition: all 0.3s ease;
-}
-
-.modal-header h3 {
-  margin-top: 0;
-  color: #42b983;
-}
-
-.modal-body {
-  margin: 20px 0;
-}
-
-.modal-default-button {
-  float: right;
-}
-
-/*
-     * The following styles are auto-applied to elements with
-     * transition="modal" when their visibility is toggled
-     * by Vue.js.
-     *
-     * You can easily play with the modal transition by editing
-     * these styles.
-     */
-
-.modal-enter-from {
-  opacity: 50;
-}
-
-.modal-leave-to {
-  opacity: 100;
-}
-
-.modal-enter-from .modal-container,
-.modal-leave-to .modal-container {
-  -webkit-transform: scale(1.1);
-  transform: scale(1.1);
-}
-</style>
