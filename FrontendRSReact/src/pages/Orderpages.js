@@ -11,6 +11,7 @@ import ModalOffer from "../components/orderPagesNew/ModalOffer";
 import ModalPayoutDetails from "../components/orderPagesNew/ModalPayoutDetails";
 import ModalProductDetails from "../components/orderPagesNew/ModalProductDetails";
 import ModalOrderDetails from "../components/orderPagesNew/ModalOrderDetails";
+import ModalRefund from "../components/orderPagesNew/ModalRefund";
 
 const Orderpages = () => {
   const [data, setData] = useState([]);
@@ -30,6 +31,8 @@ const Orderpages = () => {
   // const [isOfferAccepted, setIsOfferAccepted] = useState(false);
   // const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
   const [history, setHistory] = useState([]);
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refund, setRefund] = useState(null);
 
   const role = useSelector((state) => state.auth.role);
   const idUser = useSelector((state) => state.auth.id);
@@ -91,7 +94,12 @@ const Orderpages = () => {
         );
       }
       if (role === "PANPEN") {
-        uniqueData = uniqueData.filter((item) => item.status === "VALIDATING");
+        uniqueData = uniqueData.filter(
+          (item) =>
+            item.status === "VALIDATING" ||
+            item.status === "CHECKING" ||
+            item.status === "SHIPPING"
+        );
       }
 
       setData(uniqueData);
@@ -163,6 +171,73 @@ const Orderpages = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleRefund = (orderItemId) => {
+    const selectedOrderItem = selectedOrder.orderItems.find(
+      (orderItem) => orderItem.id === orderItemId
+    );
+    setRefund(selectedOrderItem);
+    setShowRefundModal(true);
+  };
+
+  const handleSetOrderItemStatus = (status, itemId) => {
+    console.log("order item id", itemId, "status", status);
+    axios
+      .put(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orderitems/${itemId}/status`,
+        {
+          orderItemId: itemId,
+          status: status,
+        }
+      )
+      .then((response) => {
+        // Handle the response
+        console.log("ITEM STATUS UPDATED", response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  const handleSubmitRefund = () => {
+    axios
+      .put(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
+        {
+          status: "CHECKING",
+        }
+      )
+      .then((response) => {
+        handleSetOrderItemStatus("REFUND", refund.id);
+        // Handle the response
+        console.log("Refund updated:", response.data);
+        // Close the refund modal
+        setShowRefundModal(false);
+        // Update the state
+        setSelectedOrder(response.data);
+        // Show the toast
+        setActionToastHeader("Refund Berhasil");
+        setActionToastBody(
+          `Refund untuk produk ${refund.productName} berhasil.`
+        );
+        setShowActionToast(true);
+      })
+      .catch((error) => {
+        console.error(error);
+        // Show the toast
+        setActionToastHeader("Refund Gagal");
+        setActionToastBody(`Refund untuk produk ${refund.productName} gagal.`);
+        setShowActionToast(true);
+      });
+  };
+
+  const handleConfirm = (orderItemId) => {
+    console.log("selectedOrder", selectedOrder.id);
+    handleSetOrderItemStatus("CHECKED", orderItemId);
+    setActionToastHeader("Konfirmasi Berhasil");
+    setActionToastBody(`Order berhasil dikonfirmasi.`);
+    setShowActionToast(true);
   };
 
   const handleOffer = (orderItemId) => {
@@ -354,6 +429,8 @@ const Orderpages = () => {
           handleHistory={handleHistory}
           handleDetailProduct={handleDetailProduct}
           handleOffer={handleOffer}
+          handleRefund={handleRefund}
+          handleConfirm={handleConfirm}
           handleOpenSubmitModal={handleOpenSubmitModal}
           handlePayoutDetail={handlePayoutDetail}
           setShowActionToast={setShowActionToast}
@@ -409,6 +486,15 @@ const Orderpages = () => {
         />
       )}
 
+      {/* Refund Modal */}
+      {showRefundModal && (
+        <ModalRefund
+          refund={refund}
+          onClose={() => setShowRefundModal(null)}
+          onSubmit={() => handleSubmitRefund()}
+        />
+      )}
+
       <div className="container flex flex-col px-[6.5rem] mx-auto">
         <h1 className="font-bold text-xl mb-2">
           <span className="text-primary-1">Order</span> Status
@@ -443,6 +529,12 @@ const Orderpages = () => {
             onClick={() => handleFilterStatus("SHIPPING")}
           >
             Shipping
+          </button>
+          <button
+            className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+            onClick={() => handleFilterStatus("CHECKING")}
+          >
+            Checking
           </button>
         </div>
 
