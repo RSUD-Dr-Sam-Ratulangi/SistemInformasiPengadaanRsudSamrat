@@ -171,6 +171,7 @@ export default {
         imageUrl: "",
         categoryIds: [],
         subCategoryId: [],
+        status: "APPROVED",
       },
       message: "",
     };
