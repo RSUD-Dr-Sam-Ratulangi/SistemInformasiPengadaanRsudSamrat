@@ -2,9 +2,14 @@ package com.example.pengadaanrsudsamrat.order;
 
 import com.example.pengadaanrsudsamrat.order.OrderModel;
 import com.example.pengadaanrsudsamrat.orderitem.OrderItemModel;
+import com.example.pengadaanrsudsamrat.vendor.VendorModel;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.awt.print.Pageable;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -27,5 +32,17 @@ public interface OrderRepository extends JpaRepository<OrderModel,Long> {
 
     List<OrderModel> findByOrderItemsProductVendorNameContainingIgnoreCase(String vendorName);
 
-    List<OrderModel> findByStatus(OrderModel.OrderStatus status);
+
+    @Query("SELECT v, SUM(oi.quantity * p.price) AS totalPurchase, COUNT(o.id) AS totalOrders " +
+            "FROM OrderModel o " +
+            "JOIN o.orderItems oi " +
+            "JOIN oi.product p " +
+            "JOIN p.vendor v " +
+            "GROUP BY v " +
+            "ORDER BY totalOrders DESC, totalPurchase DESC " +
+            "LIMIT :limit")
+    List<Object[]> findTopVendorsByPurchaseAndTotalOrder(@Param("limit") int limit);
+
+
+
 }

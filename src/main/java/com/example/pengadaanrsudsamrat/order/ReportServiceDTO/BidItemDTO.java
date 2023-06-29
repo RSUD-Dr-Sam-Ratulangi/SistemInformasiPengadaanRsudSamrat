@@ -16,5 +16,4 @@ public class BidItemDTO {
     private Double bidPriceChange;
     private Double totalBidPrice;
     private String status;
-    private String message;
 }

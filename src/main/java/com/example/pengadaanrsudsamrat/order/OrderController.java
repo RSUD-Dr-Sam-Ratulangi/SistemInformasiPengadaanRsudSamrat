@@ -5,6 +5,7 @@ import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemRequestDTO;
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemUpdateRequestDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -143,11 +144,15 @@ public class OrderController {
     }
 
     @GetMapping("/orders/items/product-stock")
-    public ResponseEntity<List<OrderItemQuantityExchangeResponseDTO>> getAllOrderItemsWithProductStock() {
-        List<OrderItemQuantityExchangeResponseDTO> orderItemDTOList = orderService.getAllOrderItemsWithProductStock(null);
-        return ResponseEntity.ok().body(orderItemDTOList);
+    public ResponseEntity<Page<OrderItemQuantityExchangeResponseDTO>> getAllOrderItemsWithProductStock(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sortBy) {
+
+        Page<OrderItemQuantityExchangeResponseDTO> orderItemDTOPage = orderService.getAllOrderItemsWithProductStock(page, size, sortBy);
+
+        return ResponseEntity.ok().body(orderItemDTOPage);
     }
-    
 
 
     @GetMapping("/revenue-and-stock")
@@ -205,10 +210,11 @@ public class OrderController {
         return ResponseEntity.ok(updatedOrder);
     }
 
-    @GetMapping("/order/status")
-    public ResponseEntity<List<OrderResponseDTO>> getOrdersByStatus(@RequestParam("status") OrderModel.OrderStatus status) {
-        List<OrderResponseDTO> responseDTOs = orderService.getOrdersByStatus(status);
-        return ResponseEntity.ok(responseDTOs);
+    @GetMapping("/top")
+    public ResponseEntity<List<TopVendorResponseDTO>> getTopVendorsByOrdersAndPurchase(@RequestParam("limit") int limit) {
+        List<TopVendorResponseDTO> topVendors = orderService.getTopVendorsByOrdersAndPurchase(limit);
+        return ResponseEntity.ok(topVendors);
     }
+
 
 }

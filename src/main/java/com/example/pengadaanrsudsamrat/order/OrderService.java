@@ -4,10 +4,12 @@ package com.example.pengadaanrsudsamrat.order;
 import com.example.pengadaanrsudsamrat.order.DTO.*;
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemRequestDTO;
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemUpdateRequestDTO;
+import com.example.pengadaanrsudsamrat.vendor.VendorModel;
 import org.springframework.data.domain.Page;
 
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -78,7 +80,7 @@ public interface OrderService {
     Page<OrderItemInOrderResponseDTO> getAllOrderItemsInOrders(int page, int size, String sortBy);
     Page<OrderItemInOrderDetailResponseDTO> getAllOrderItemsInOrderDetails(int page, int size, String sortBy);
 
-    List<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(String sortBy);
+    Page<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(int page, int size, String sortBy);
     List<OrderItemProductInOrderRavanueAndStockResponseDTO> getOrderItemProductInOrderRevenueAndStock(Long productId);
     List<OrderItemProductInOrderRavanueAndStockResponseDTO> getVendorProductRevenue(String vendorUUID);
     List<OrderModel> searchOrderItems(String keyword);
@@ -90,6 +92,10 @@ public interface OrderService {
     OrderResponseDTO updateOrderStatus(Long orderId, OrderModel.OrderStatus status);
     OrderResponseDTO updatePaymentForOrder(Long orderId, Long orderItemId);
     //OrderItemResponseDTO createOrderItem(OrderItemRequestDTO orderItemRequestDTO);
-    List<OrderResponseDTO> getOrdersByStatus(OrderModel.OrderStatus status);
+    List<TopVendorResponseDTO> getTopVendorsByOrdersAndPurchase(int limit);
+
+
+
+
 }
 

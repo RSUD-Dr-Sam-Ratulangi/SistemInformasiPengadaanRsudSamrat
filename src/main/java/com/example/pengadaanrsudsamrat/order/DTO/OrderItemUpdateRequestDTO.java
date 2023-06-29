@@ -15,6 +15,4 @@ public class OrderItemUpdateRequestDTO {
     private Long orderItemId;
     private BigDecimal bidPrice;
     private OrderItemModel.OrderItemStatus status;
-    private String message;
-
 }
