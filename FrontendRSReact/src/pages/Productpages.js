@@ -710,10 +710,17 @@ export default function ProductPages() {
           </div>
 
           {/* Product List */}
-          <div>Result: {filteredProducts.length}</div>
-          <div className="flex flex-wrap gap-4 mb-3">
-            {filteredProducts.map((product) => productItem(product))}
-          </div>
+          {products.length > 0
+            ? (
+              <>
+                <div>Result: {filteredProducts.length}</div>
+                <div className="flex flex-wrap gap-4 mb-3">
+                  {filteredProducts.map((product) => productItem(product))}
+                </div>
+              </>
+            )
+            : <div>Loading products ...</div>
+          }
 
           {/* Pagination */}
           {filteredProducts.length > 0 && (
