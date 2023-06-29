@@ -12,6 +12,7 @@ import ModalPayoutDetails from "../components/orderPagesNew/ModalPayoutDetails";
 import ModalProductDetails from "../components/orderPagesNew/ModalProductDetails";
 import ModalOrderDetails from "../components/orderPagesNew/ModalOrderDetails";
 import ModalRefund from "../components/orderPagesNew/ModalRefund";
+import ModalConfirm from "../components/orderPagesNew/ModalConfirm";
 
 const Orderpages = () => {
   const [data, setData] = useState([]);
@@ -32,7 +33,9 @@ const Orderpages = () => {
   // const [isOfferSubmitted, setIsOfferSubmitted] = useState(false);
   const [history, setHistory] = useState([]);
   const [showRefundModal, setShowRefundModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [refund, setRefund] = useState(null);
+  const [confirm, setConfirm] = useState(null);
 
   const role = useSelector((state) => state.auth.role);
   const idUser = useSelector((state) => state.auth.id);
@@ -98,6 +101,7 @@ const Orderpages = () => {
           (item) =>
             item.status === "VALIDATING" ||
             item.status === "CHECKING" ||
+            item.status === "PAYMENT" ||
             item.status === "SHIPPING"
         );
       }
@@ -109,7 +113,7 @@ const Orderpages = () => {
       setLoading(false);
 
       // open modal if receivedProductId exist
-      if(receivedProductId) {
+      if (receivedProductId) {
         openModal(receivedProductId);
         receivedProductId = null;
       }
@@ -138,12 +142,13 @@ const Orderpages = () => {
   /* History function */
   const handleHistory = (orderItemId) => {
     setShowHistoryModal(true);
+    console.log("history modal", showHistoryModal);
     axios
       .get(
         `http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${selectedOrder.id}/${orderItemId}`
       )
       .then((res) => {
-        console.log(res);
+        console.log("History", res.data);
         setHistory(res.data);
         console.log("Berhasil");
       })
@@ -209,6 +214,21 @@ const Orderpages = () => {
         }
       )
       .then((response) => {
+        // send notification to vendor
+        axios
+          .post("http://rsudsamrat.site:8990/api/v1/notifikasi", {
+            orderId: selectedOrder.id,
+            orderItemId: refund.id,
+            status: "REFUND",
+            message: `Refund untuk produk ${refund.productName} berhasil.`,
+          })
+          .then((response) => {
+            console.log("Notifikasi berhasil dikirim", response);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+
         handleSetOrderItemStatus("REFUND", refund.id);
         // Handle the response
         console.log("Refund updated:", response.data);
@@ -232,12 +252,41 @@ const Orderpages = () => {
       });
   };
 
+  const handleSubmitConfirm = () => {
+    axios
+      .put(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
+        {
+          status: "CHECKING",
+        }
+      )
+      .then((response) => {
+        handleSetOrderItemStatus("CHECKED", confirm.id);
+        // send notification to vendor
+        axios
+          .post("http://rsudsamrat.site:8990/api/v1/notifikasi", {
+            sender: role,
+            senderId: idUser,
+            receiver: selectedOrder.orderItems[0].product.vendor.name,
+            receiverId: selectedOrder.orderItems[0].product.vendor.id,
+            message: `Pesanan ${selectedOrder.orderItems[0].productName} telah diterima.`,
+          })
+          .then((res) => {
+            console.log("Notifikasi berhasil dikirim");
+          })
+          .catch((err) => console.log(err));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   const handleConfirm = (orderItemId) => {
-    console.log("selectedOrder", selectedOrder.id);
-    handleSetOrderItemStatus("CHECKED", orderItemId);
-    setActionToastHeader("Konfirmasi Berhasil");
-    setActionToastBody(`Order berhasil dikonfirmasi.`);
-    setShowActionToast(true);
+    const selectedOrderItem = selectedOrder.orderItems.find(
+      (orderItem) => orderItem.id === orderItemId
+    );
+    setConfirm(selectedOrderItem);
+    setShowConfirmModal(true);
   };
 
   const handleOffer = (orderItemId) => {
@@ -490,8 +539,19 @@ const Orderpages = () => {
       {showRefundModal && (
         <ModalRefund
           refund={refund}
+          selectedOrder={selectedOrder}
           onClose={() => setShowRefundModal(null)}
           onSubmit={() => handleSubmitRefund()}
+        />
+      )}
+
+      {/* Confirm Modal */}
+      {showConfirmModal && (
+        <ModalConfirm
+          confirm={confirm}
+          selectedOrder={selectedOrder}
+          onClose={() => setShowConfirmModal(null)}
+          onSubmit={() => handleSubmitConfirm()}
         />
       )}
 
@@ -530,11 +590,19 @@ const Orderpages = () => {
           >
             Shipping
           </button>
+          {role === "PANPEN" && (
+            <button
+              className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={() => handleFilterStatus("CHECKING")}
+            >
+              Checking
+            </button>
+          )}
           <button
             className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
-            onClick={() => handleFilterStatus("CHECKING")}
+            onClick={() => handleFilterStatus("PAYMENT")}
           >
-            Checking
+            Payment
           </button>
         </div>
 

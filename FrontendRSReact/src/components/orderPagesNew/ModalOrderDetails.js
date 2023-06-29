@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import printOrderItem from "./printOrderItem";
 import { useEffect } from "react";
+import PrintBeritaAcara from "./PrintBeritaAcara";
 
 const ModalOrderDetails = ({
   onClose,
@@ -35,6 +36,10 @@ const ModalOrderDetails = ({
 
   const allItemsAccepted = selectedOrder.orderItems.every(
     (orderItem) => orderItem.status === "ACCEPTED"
+  );
+
+  const allItemsChecked = selectedOrder.orderItems.every(
+    (orderItem) => orderItem.status === "CHECKED"
   );
 
   useEffect(() => {
@@ -158,6 +163,30 @@ const ModalOrderDetails = ({
       .catch((err) => console.log(err));
     onClose();
     window.location.reload();
+  };
+
+  const handlePrintBeritaAcara = () => {
+    axios
+      .put(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
+        {
+          status: "PAYMENT",
+        }
+      )
+      .then((response) => {
+        axios
+          .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+            sender: role,
+            senderId: id,
+            receiver: selectedOrder.vendor.name,
+            receiverId: selectedOrder.vendor.id,
+            message: `THIS ORDER IS PAYMENT, BY ${role}`,
+          })
+          .catch((err) => console.log(err));
+        console.log(response);
+      })
+      .catch((err) => console.log(err));
+    onClose();
   };
 
   const fileInputRef = useRef(null);
@@ -299,8 +328,8 @@ const ModalOrderDetails = ({
       }
     });
 
-    return [...vendorItemsMap].map(([vendorName, orderItems]) => (
-      <React.Fragment key={vendorName}>
+    return [...vendorItemsMap].map(([vendorName, orderItems], index) => (
+      <React.Fragment key={index}>
         <div className="flex flex-col gap-2 ">
           <h2 className="font-medium text-xl text-slate-600">Best Vendor</h2>
           <hr />
@@ -317,8 +346,8 @@ const ModalOrderDetails = ({
             </thead>
             <tbody>
               {/* body */}
-              {orderItems.map((orderItem) => (
-                <ProductItem orderItem={orderItem} key={orderItem.id} />
+              {orderItems.map((orderItem, index) => (
+                <ProductItem orderItem={orderItem} key={index} />
               ))}
               {/* {productItem()} */}
             </tbody>
@@ -424,6 +453,19 @@ const ModalOrderDetails = ({
               onClick={() => printOrderItem(selectedOrder.orderItems)}
             >
               Print
+            </button>
+          )}
+          {/* display if all the items status is CHECKED */}
+          {allItemsChecked && (
+            <button
+              type="button"
+              className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={() => {
+                PrintBeritaAcara(selectedOrder);
+                handlePrintBeritaAcara();
+              }}
+            >
+              Print Berita Acara
             </button>
           )}
         </div>
