@@ -1,5 +1,109 @@
 <template>
-  <Transition name="modal">
+  <!-- Open the modal using ID.showModal() method -->
+  <dialog
+    :open="show"
+    class="modal modal-bottom sm:modal-middle bg-gray-600 bg-opacity-90 pt-5 pb-5"
+  >
+    <div class="relative w-full max-w-2xl max-h-full overflow-y-auto">
+      <!-- Modal content -->
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+        <!-- Modal header -->
+        <div
+          class="flex items-center justify-between p-5 border-b rounded-t dark:border-gray-600"
+        >
+          <h3 class="text-xl font-medium text-gray-900 dark:text-white">
+            ADD PRODUCT
+          </h3>
+          <button
+            type="button"
+            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+            data-modal-hide="top-left-modal"
+            @click="handleCloseClick"
+          >
+            <FontAwesomeIcon icon="fa-solid fa-xmark" />
+          </button>
+        </div>
+        <!-- Modal body -->
+        <form @submit.prevent="Submitform">
+          <div class="p-6 space-y-2">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-bold text-white text-lg"
+                  >Product Name :</span
+                >
+              </label>
+              <input type="text" class="input input-sm" />
+            </div>
+            <div class="flex justify-around">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-bold text-white text-lg"
+                    >Price:</span
+                  >
+                </label>
+                <input type="number" class="input input-sm w-min" />
+              </div>
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-bold text-white text-lg"
+                    >Quantity:</span
+                  >
+                </label>
+                <input type="number" class="input input-sm w-min" />
+              </div>
+            </div>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-bold text-white text-lg"
+                  >Description :</span
+                >
+              </label>
+              <input type="text" class="input input-sm" />
+            </div>
+            <!-- Input Images -->
+            <div class="flex items-center justify-center w-full">
+              <label
+                for="dropzone-file"
+                class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+              >
+                <div
+                  class="flex flex-col items-center justify-center pt-5 pb-6"
+                >
+                  <font-awesome-icon icon="fa-solid fa-cloud-arrow-up" />
+                  <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="font-semibold">Click to upload</span> or drag
+                    and drop
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    ONLY JPG FILE (MAX. 800x400px)
+                  </p>
+                </div>
+                <input id="dropzone-file" type="file" class="hidden" />
+              </label>
+            </div>
+
+            <p
+              class="text-base text-center font-bold leading-relaxed text-gray-500 dark:text-gray-400"
+            >
+              PHOTO UPLOADED WILL APPEAR HERE
+            </p>
+          </div>
+          <div
+            class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600"
+          >
+            <button
+              data-modal-hide="top-left-modal"
+              type="submit"
+              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </dialog>
+  <!-- <Transition name="modal">
     <div v-if="show" class="modal-mask">
       <div class="modal-container">
         <div class="modal-header">
@@ -147,7 +251,7 @@
         </div>
       </div>
     </div>
-  </Transition>
+  </Transition> -->
 </template>
 
 <script>
@@ -220,36 +324,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.containerProduct {
-  display: flex;
-  justify-content: center;
-}
-
-.box {
-  display: contents;
-  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
-}
-
-.form-left {
-  display: grid;
-  gap: 20px;
-}
-
-.form-right {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-left: 10px;
-}
-
-.close-button {
-  justify-content: flex-end;
-  cursor: pointer;
-}
-
-.dropdown {
-  padding-top: 10px;
-}
-</style>
