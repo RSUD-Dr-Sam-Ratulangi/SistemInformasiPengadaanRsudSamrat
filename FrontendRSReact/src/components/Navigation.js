@@ -93,7 +93,7 @@ const Navigation = () => {
           }`}
           onClick={() => handleTabClick(`/${linkTo}`)}
         >
-          <span className="items-center justify-center d-flex">{name}</span>
+          <span className="items-center justify-center d-flex" style={{fontSize: "22px"}}>{name}</span>
         </Link>
       </li>
     );
