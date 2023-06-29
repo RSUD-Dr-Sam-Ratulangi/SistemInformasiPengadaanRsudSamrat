@@ -8,6 +8,8 @@ import {
 } from "react-icons/md";
 import axios from "axios";
 
+import "../assets/css/pages/products.css";
+
 export default function ProductPages() {
   const navigate = useNavigate();
 
@@ -70,7 +72,13 @@ export default function ProductPages() {
 
   useEffect(() => {
     if (carts) {
-      localStorage.setItem("carts", JSON.stringify(carts));
+      if (compareCurrentVendorWithLocalStorageCartsVendor()) {
+        localStorage.setItem("carts", JSON.stringify(carts));
+      }
+      else {
+        setCarts(cartsInitialValues());
+        localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
+      }
     } else if (vendors.length > 0) {
       setCarts(cartsInitialValues());
       localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
@@ -171,6 +179,27 @@ export default function ProductPages() {
     return newFilteredProducts;
   }
 
+  function compareCurrentVendorWithLocalStorageCartsVendor() {
+    let isSame = true;
+    
+    // length check
+    if (vendors.length !== carts.length) {
+      isSame = false;
+    }
+
+    // vendorUUID check
+    if(isSame) {
+      for (let counter = 0; counter < vendors.length; counter++) {
+        if (vendors[counter].vendoruuid !== carts[counter].vendorUUID) {
+          isSame = false;
+        }
+      }
+    }
+
+    console.log("isSame", isSame);
+    return isSame;
+  }
+
   function cartsInitialValues() {
     if (vendors.length > 0) {
       const newCarts = vendors.map((vendor) => {
@@ -207,7 +236,6 @@ export default function ProductPages() {
       setSelectedProduct(null);
     } else {
       setSelectedProduct(newSelectedProduct);
-      window.quantityModal.showModal();
     }
 
     setShowSelectedProductModal(!showSelectedProductModal);
@@ -287,8 +315,6 @@ export default function ProductPages() {
   function handleCartsOnClick() {
     if (showCartsModal) {
       setCartsModalSelectedVendor(null);
-    } else {
-      window.ordersModal.showModal();
     }
 
     setShowCartsModal(!showCartsModal);
@@ -450,116 +476,124 @@ export default function ProductPages() {
   return (
     <>
       {/* Cart Modal */}
-      <dialog id="ordersModal" className="modal">
-        <form method="dialog" className="modal-box">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MdShoppingCart className="text-2xl text-primary-1" />
-              <h3 className="text-xl font-bold">Cart</h3>
-            </div>
-            <div className="dropdown dropdown-end">
-              <label
-                tabIndex={0}
-                className="relative w-full pr-12 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-              >
-                Select Vendor
-                <MdArrowDropDown className="absolute text-2xl right-4" />
-              </label>
-              <ul
-                tabIndex={0}
-                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-              >
-                {showCartsModal &&
+      <div className={showCartsModal ? "overlay" : ""}>
+        {showCartsModal && (
+          <dialog className="modal" open>
+            <form method="dialog" className="modal-box">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MdShoppingCart className="text-2xl text-primary-1" />
+                  <h3 className="text-xl font-bold">Cart</h3>
+                </div>
+                <div className="dropdown dropdown-end">
+                  <label
+                    tabIndex={0}
+                    className="relative w-full pr-12 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  >
+                    Select Vendor
+                    <MdArrowDropDown className="absolute text-2xl right-4" />
+                  </label>
+                  <ul
+                    tabIndex={0}
+                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                  >
+                    {showCartsModal &&
+                      carts.map(
+                        (cart) =>
+                          cart.products.length > 0 && (
+                            <li
+                              key={cart.vendorUUID}
+                              onClick={() => handleCartsModalVendorSelection(cart)}
+                            >
+                              <a>{cart.vendorName}</a>
+                            </li>
+                          )
+                      )}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Cart Item */}
+              <div className="flex flex-col gap-2">
+                {!cartsModalSelectedVendor ? (
+                  <div>Select a vendor first</div>
+                ) : (
                   carts.map(
                     (cart) =>
-                      cart.products.length > 0 && (
-                        <li
-                          key={cart.vendorUUID}
-                          onClick={() => handleCartsModalVendorSelection(cart)}
-                        >
-                          <a>{cart.vendorName}</a>
-                        </li>
-                      )
-                  )}
-              </ul>
-            </div>
-          </div>
+                      cartsModalSelectedVendor.vendorUUID === cart.vendorUUID &&
+                      cart.products.map((product) => cartItem(product))
+                  )
+                )}
+              </div>
 
-          {/* Cart Item */}
-          <div className="flex flex-col gap-2">
-            {!cartsModalSelectedVendor ? (
-              <div>Select a vendor first</div>
-            ) : (
-              carts.map(
-                (cart) =>
-                  cartsModalSelectedVendor.vendorUUID === cart.vendorUUID &&
-                  cart.products.map((product) => cartItem(product))
-              )
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="modal-action">
-            <button
-              className="text-primary-1 btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
-              onClick={() => handleCartsOnClick()}
-            >
-              Close
-            </button>
-            <button
-              className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-              onClick={() => handleCartsModalCreate()}
-            >
-              Create
-            </button>
-          </div>
-        </form>
-      </dialog>
+              {/* Footer */}
+              <div className="modal-action">
+                <button
+                  className="text-primary-1 btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  onClick={() => handleCartsOnClick()}
+                >
+                  Close
+                </button>
+                <button
+                  className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  onClick={() => handleCartsModalCreate()}
+                >
+                  Create
+                </button>
+              </div>
+            </form>
+          </dialog>
+        )}
+      </div>
 
       {/* Quantity Modal */}
-      <dialog id="quantityModal" className="modal">
-        <form method="dialog" className="modal-box">
-          {/* Header */}
-          <div className="flex items-center gap-2 mb-2">
-            <MdInventory className="text-2xl text-primary-1" />
-            <h3 className="text-xl font-bold">Quantity</h3>
-          </div>
+      <div className={showSelectedProductModal ? "overlay" : ""}>
+        {showSelectedProductModal && (
+          <dialog className="modal" open>
+            <form method="dialog" className="modal-box">
+              {/* Header */}
+              <div className="flex items-center gap-2 mb-2">
+                <MdInventory className="text-2xl text-primary-1" />
+                <h3 className="text-xl font-bold">Quantity</h3>
+              </div>
 
-          {/* Cart Item */}
-          <div>
-            <input
-              id="search-input"
-              type="number"
-              value={selectedProductModalOrderQuantity}
-              onChange={(e) =>
-                handleSelectedProductModalOrderQuantityChange(e.target.value)
-              }
-              className="w-full input border-primary-1 focus:outline-primary-1 "
-            />
-            {!isSelectedProductModalOrderQuantityValueValid && (
-              <div>Quantity is not valid</div>
-            )}
-          </div>
+              {/* Cart Item */}
+              <div>
+                <input
+                  id="search-input"
+                  type="number"
+                  value={selectedProductModalOrderQuantity}
+                  onChange={(e) =>
+                    handleSelectedProductModalOrderQuantityChange(e.target.value)
+                  }
+                  className="w-full input border-primary-1 focus:outline-primary-1 "
+                />
+                {!isSelectedProductModalOrderQuantityValueValid && (
+                  <div>Quantity is not valid</div>
+                )}
+              </div>
 
-          {/* Footer */}
-          <div className="modal-action">
-            <button
-              className="text-primary-1 btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
-              onClick={handleProductOrderOnClick}
-            >
-              Close
-            </button>
-            <button
-              className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-              onClick={handleSelectedProductModalAddToCart}
-              disabled={!isSelectedProductModalOrderQuantityValueValid}
-            >
-              Order
-            </button>
-          </div>
-        </form>
-      </dialog>
+              {/* Footer */}
+              <div className="modal-action">
+                <button
+                  className="text-primary-1 btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  onClick={handleProductOrderOnClick}
+                >
+                  Close
+                </button>
+                <button
+                  className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  onClick={handleSelectedProductModalAddToCart}
+                  disabled={!isSelectedProductModalOrderQuantityValueValid}
+                >
+                  Order
+                </button>
+              </div>
+            </form>
+          </dialog>
+        )}
+      </div>
 
       <div className="container flex px-[6.5rem] mx-auto flex-col md:flex-row">
         <div className="bg-red w-[256px] pr-3">
