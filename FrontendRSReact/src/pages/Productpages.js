@@ -72,7 +72,13 @@ export default function ProductPages() {
 
   useEffect(() => {
     if (carts) {
-      localStorage.setItem("carts", JSON.stringify(carts));
+      if (compareCurrentVendorWithLocalStorageCartsVendor()) {
+        localStorage.setItem("carts", JSON.stringify(carts));
+      }
+      else {
+        setCarts(cartsInitialValues());
+        localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
+      }
     } else if (vendors.length > 0) {
       setCarts(cartsInitialValues());
       localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
@@ -171,6 +177,27 @@ export default function ProductPages() {
 
     // console.log(`selectedVendorUUID (${selectedVendorUUID}) | minimumQuantity (${minimumQuantity}) | statusList (${statusList.map(status => status)}) | searchQuery (${searchQuery}) | categoryName (${categoryName}) | subCategoryName (${subCategoryName})`);
     return newFilteredProducts;
+  }
+
+  function compareCurrentVendorWithLocalStorageCartsVendor() {
+    let isSame = true;
+    
+    // length check
+    if (vendors.length !== carts.length) {
+      isSame = false;
+    }
+
+    // vendorUUID check
+    if(isSame) {
+      for (let counter = 0; counter < vendors.length; counter++) {
+        if (vendors[counter].vendoruuid !== carts[counter].vendorUUID) {
+          isSame = false;
+        }
+      }
+    }
+
+    console.log("isSame", isSame);
+    return isSame;
   }
 
   function cartsInitialValues() {
