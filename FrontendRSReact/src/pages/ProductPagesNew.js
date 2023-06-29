@@ -51,9 +51,7 @@ export default function ProductPagesNew() {
   }, []);
 
   useEffect(() => {
-    setFilteredProducts(
-      filterProducts({})
-    );
+    setFilteredProducts(filterProducts({}));
   }, [products, selectedVendorUUID]);
 
   useEffect(() => {
@@ -83,10 +81,10 @@ export default function ProductPagesNew() {
   async function getVendors() {
     try {
       const res = await axios.get(
-        "http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=2&size=25"
+        "http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=0&size=25"
       );
       setVendors(res.data);
-      // console.log("vendors", res.data);
+      console.log("vendors", res.data);
     } catch (err) {
       console.log("Unable to get vendors", err.message);
     }
@@ -592,7 +590,9 @@ export default function ProductPagesNew() {
             <button
               className="text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2 btn-wide"
               onClick={() => handleCartsOnClick()}
-              disabled={(carts) ? carts.every((cart) => cart.products.length === 0) : true}
+              disabled={
+                carts ? carts.every((cart) => cart.products.length === 0) : true
+              }
             >
               <MdShoppingCart className="text-2xl" />
               Cart
