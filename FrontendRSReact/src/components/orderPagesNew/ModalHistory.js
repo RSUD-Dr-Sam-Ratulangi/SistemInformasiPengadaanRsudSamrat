@@ -36,8 +36,8 @@ const ModalHistory = ({ history }) => {
               </tr>
             </thead>
             <tbody>
-              {history.map((e, i) => (
-                <tr key={i}>
+              {history.map((e) => (
+                <tr key={e.id}>
                   <td>{e.productName}</td>
                   <td>{e.bidPrice}</td>
                   <td>{e.bidPriceChange}</td>

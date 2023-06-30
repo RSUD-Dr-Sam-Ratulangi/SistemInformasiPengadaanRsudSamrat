@@ -93,6 +93,7 @@ const Orderpages = () => {
             item.status === "NEGOTIATION" ||
             item.status === "CANCEL" ||
             item.status === "SHIPPING" ||
+            item.status === "CHECKING" ||
             item.status === "VALIDATING"
         );
       }
@@ -101,9 +102,11 @@ const Orderpages = () => {
           (item) =>
             item.status === "VALIDATING" ||
             item.status === "CHECKING" ||
-            item.status === "PAYMENT" ||
             item.status === "SHIPPING"
         );
+        if (role === "KEU") {
+          uniqueData = uniqueData.filter((item) => item.status === "PAYMENT");
+        }
       }
 
       setData(uniqueData);
@@ -253,6 +256,7 @@ const Orderpages = () => {
   };
 
   const handleSubmitConfirm = () => {
+    // if all the selectedOrder.orderItems is
     axios
       .put(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
@@ -295,6 +299,41 @@ const Orderpages = () => {
     );
     setSelectedOrderItem(selectedOrderItem);
     setShowOfferModal(true);
+  };
+
+  const handleAcceptOrder = (orderItemId) => {
+    const selectedOrderItem = selectedOrder.orderItems.find(
+      (orderItem) => orderItem.id === orderItemId
+    );
+    axios
+      .put(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/items/${selectedOrderItem.id}`,
+        {
+          orderItemId: selectedOrderItem.id,
+          bidPrice: selectedOrderItem.bidPrice,
+          status: "ACCEPTED",
+          message: "Order accepted",
+        }
+      )
+      .then((response) => {
+        // Handle the response
+        console.log("Order accepted:", response.data);
+        // Close the offer modal
+        setShowOfferModal(false);
+        // Update the state to show the success modal
+        // setIsOfferSubmitted(true);
+        // Update the state
+        setSelectedOrder(response.data);
+        // Show the toast
+        setActionToastHeader("Order Accepted");
+        setActionToastBody(
+          `Your offer for the product ${selectedOrderItem.product.name} has been accepted.`
+        );
+        setShowActionToast(true);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleOfferSubmit = () => {
@@ -478,6 +517,7 @@ const Orderpages = () => {
           handleHistory={handleHistory}
           handleDetailProduct={handleDetailProduct}
           handleOffer={handleOffer}
+          handleOfferAccepted={handleAcceptOrder}
           handleRefund={handleRefund}
           handleConfirm={handleConfirm}
           handleOpenSubmitModal={handleOpenSubmitModal}
@@ -590,14 +630,15 @@ const Orderpages = () => {
           >
             Shipping
           </button>
-          {role === "PANPEN" && (
-            <button
-              className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
-              onClick={() => handleFilterStatus("CHECKING")}
-            >
-              Checking
-            </button>
-          )}
+          {role === "PANPEN" ||
+            (role === "PPKOM" && (
+              <button
+                className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={() => handleFilterStatus("CHECKING")}
+              >
+                Checking
+              </button>
+            ))}
           <button
             className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
             onClick={() => handleFilterStatus("PAYMENT")}
