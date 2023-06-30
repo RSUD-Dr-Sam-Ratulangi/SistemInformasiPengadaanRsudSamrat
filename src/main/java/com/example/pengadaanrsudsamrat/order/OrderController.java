@@ -5,11 +5,18 @@ import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemRequestDTO;
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemUpdateRequestDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -210,10 +217,30 @@ public class OrderController {
         return ResponseEntity.ok(updatedOrder);
     }
 
-    @GetMapping("/top")
+    @GetMapping("/top-vendor")
     public ResponseEntity<List<TopVendorResponseDTO>> getTopVendorsByOrdersAndPurchase(@RequestParam("limit") int limit) {
         List<TopVendorResponseDTO> topVendors = orderService.getTopVendorsByOrdersAndPurchase(limit);
         return ResponseEntity.ok(topVendors);
+    }
+
+    @GetMapping("/top-product")
+    public ResponseEntity<List<TopProductResponseDTO>> getTopProductsByPurchase(@RequestParam("limit") int limit) {
+        List<TopProductResponseDTO> topProducts = orderService.getTopProductsByPurchase(limit);
+        return ResponseEntity.ok(topProducts);
+    }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<MonthlyExpenseDTO> getMonthlyExpense(@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM") YearMonth yearMonth) {
+        LocalDate date = yearMonth.atDay(1);
+        MonthlyExpenseDTO monthlyExpense = orderService.getMonthlyExpense(date);
+        return new ResponseEntity<>(monthlyExpense, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/weekly")
+    public ResponseEntity<WeeklyExpenseDTO> getWeeklyExpense() {
+        WeeklyExpenseDTO weeklyExpenseDTO = orderService.getWeeklyExpense();
+        return new ResponseEntity<>(weeklyExpenseDTO, HttpStatus.OK);
     }
 
 

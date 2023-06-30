@@ -36,7 +36,9 @@ import org.springframework.web.client.RestTemplate;
 import javax.validation.Valid;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -730,8 +732,7 @@ public class OrderServiceImpl implements OrderService {
         return mapToTopVendorResponseDTOList(results);
     }
 
-
-
+    //extender todo: move to utility class instead in the service
     private List<TopVendorResponseDTO> mapToTopVendorResponseDTOList(List<Object[]> results) {
         List<TopVendorResponseDTO> dtos = new ArrayList<>();
         for (Object[] result : results) {
@@ -748,25 +749,62 @@ public class OrderServiceImpl implements OrderService {
         return dtos;
     }
 
-
-
-
-
-
-
-    private BigDecimal calculateTotalAmount(List<OrderItemModel> orderItems) {
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (OrderItemModel orderItem : orderItems) {
-            BigDecimal bidPrice = BigDecimal.valueOf(orderItem.getBidPrice());
-            BigDecimal quantity = BigDecimal.valueOf(orderItem.getQuantity());
-            BigDecimal itemTotalAmount = bidPrice.multiply(quantity);
-            totalAmount = totalAmount.add(itemTotalAmount);
-        }
-        return totalAmount;
+    @Override
+    public List<TopProductResponseDTO> getTopProductsByPurchase(int limit) {
+        List<Object[]> results = orderRepository.findTopProductsByPurchase(limit);
+        return mapToTopProductResponseDTOList(results);
     }
 
+    //extender todo: move to utility class instead in the service
+    private List<TopProductResponseDTO> mapToTopProductResponseDTOList(List<Object[]> results) {
+        List<TopProductResponseDTO> dtos = new ArrayList<>();
+        for (Object[] result : results) {
+            String productName = (String) result[0];
+            String vendorName = (String) result[1];
+            BigDecimal totalPurchase = BigDecimal.valueOf((Double) result[2]);
 
+            TopProductResponseDTO dto = new TopProductResponseDTO();
+            dto.setProductName(productName);
+            dto.setVendorName(vendorName);
+            dto.setTotalPurchase(totalPurchase);
 
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+
+    @Override
+    public MonthlyExpenseDTO getMonthlyExpense(LocalDate date) {
+        LocalDate startOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate endOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
+
+        LocalDateTime startDateTime = startOfMonth.atStartOfDay();
+        LocalDateTime endDateTime = endOfMonth.atTime(LocalTime.MAX);
+
+        BigDecimal totalExpense = orderRepository.findMonthlyExpense(startDateTime, endDateTime);
+
+        MonthlyExpenseDTO monthlyExpenseDTO = new MonthlyExpenseDTO();
+        monthlyExpenseDTO.setStartDate(startOfMonth);
+        monthlyExpenseDTO.setEndDate(endOfMonth);
+        monthlyExpenseDTO.setTotalExpense(totalExpense);
+
+        return monthlyExpenseDTO;
+    }
+
+    @Override
+    public WeeklyExpenseDTO getWeeklyExpense() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        BigDecimal totalExpense = orderRepository.findWeeklyExpense(startOfWeek, endOfWeek);
+
+        WeeklyExpenseDTO weeklyExpenseDTO = new WeeklyExpenseDTO();
+        weeklyExpenseDTO.setStartDate(startOfWeek);
+        weeklyExpenseDTO.setEndDate(endOfWeek);
+        weeklyExpenseDTO.setTotalExpense(totalExpense);
+
+        return weeklyExpenseDTO;
+    }
 
 
 

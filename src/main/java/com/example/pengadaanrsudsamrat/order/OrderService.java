@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -94,8 +96,10 @@ public interface OrderService {
     //OrderItemResponseDTO createOrderItem(OrderItemRequestDTO orderItemRequestDTO);
     List<TopVendorResponseDTO> getTopVendorsByOrdersAndPurchase(int limit);
 
+    List<TopProductResponseDTO> getTopProductsByPurchase(int limit);
 
+    MonthlyExpenseDTO getMonthlyExpense(LocalDate date);
 
-
+    WeeklyExpenseDTO getWeeklyExpense();
 }
 
