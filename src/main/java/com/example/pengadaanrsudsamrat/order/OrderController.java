@@ -151,15 +151,14 @@ public class OrderController {
     }
 
     @GetMapping("/orders/items/product-stock")
-    public ResponseEntity<Page<OrderItemQuantityExchangeResponseDTO>> getAllOrderItemsWithProductStock(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+    public ResponseEntity<List<OrderItemQuantityExchangeResponseDTO>> getAllOrderItemsWithProductStock(
             @RequestParam(required = false) String sortBy) {
 
-        Page<OrderItemQuantityExchangeResponseDTO> orderItemDTOPage = orderService.getAllOrderItemsWithProductStock(page, size, sortBy);
+        List<OrderItemQuantityExchangeResponseDTO> orderItemDTOList = orderService.getAllOrderItemsWithProductStock(sortBy);
 
-        return ResponseEntity.ok().body(orderItemDTOPage);
+        return ResponseEntity.ok().body(orderItemDTOList);
     }
+
 
 
     @GetMapping("/revenue-and-stock")
