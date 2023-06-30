@@ -10,6 +10,7 @@ public interface BidExchangeHistoryService {
 
     BidExchangeHistoryResponseDTO createBidExchangeHistory(BidExchangeHistoryRequestDTO requestDTO);
 
-
     List<BidItemDTO> getBidItemsByOrderIdAndBidItemId(Long orderId, Long bidItemId);
+
+    List<BidExchangeHistoryResponseDTO> getAllByOrderId(Long orderId);
 }
