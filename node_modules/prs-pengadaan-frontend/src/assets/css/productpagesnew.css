@@ -1,0 +1,25 @@
+.list-group {
+    width: 200px; /* Mengatur lebar list group */
+    position: absolute; /* Menjadikannya absolut */
+    left: 0; /* Menempatkannya di sudut kiri halaman */
+    top: 0; /* Menempatkannya di sudut kiri halaman */
+  }
+  
+  .list-group-item {
+    border: none; /* Menghapus border item list group */
+    padding: 8px; /* Mengatur padding item list group */
+  }
+  
+  .list-group-item:hover {
+    background-color: #f8f9fa; /* Memberikan warna latar belakang saat dihover */
+    cursor: pointer; /* Mengubah kursor saat dihover */
+  }
+  
+  .ms-2 {
+    margin-left: 0.5rem !important; /* Mengatur margin kiri pada div dengan class ms-2 */
+  }
+  
+  .me-auto {
+    margin-right: auto !important; /* Mengatur margin kanan pada div dengan class me-auto */
+  }
+  
