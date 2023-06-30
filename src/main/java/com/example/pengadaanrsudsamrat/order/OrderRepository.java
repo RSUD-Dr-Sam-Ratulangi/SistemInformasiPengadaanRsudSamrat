@@ -68,4 +68,11 @@ public interface OrderRepository extends JpaRepository<OrderModel,Long> {
                                  @Param("endOfWeek") LocalDateTime endOfWeek);
 
 
+    @Query("SELECT SUM(oi.quantity * oi.bidPrice) FROM OrderModel o " +
+            "JOIN o.orderItems oi " +
+            "JOIN oi.product p " +
+            "WHERE o.orderDate >= :startOfDay AND o.orderDate <= :endOfDay")
+    BigDecimal findDailyExpense(@Param("startOfDay") LocalDateTime startOfDay,
+                                @Param("endOfDay") LocalDateTime endOfDay);
+
 }

@@ -243,5 +243,11 @@ public class OrderController {
         return new ResponseEntity<>(weeklyExpenseDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/daily")
+    public ResponseEntity<DailyExpenseDTO> getDailyExpense() {
+        DailyExpenseDTO dailyExpense = orderService.getDailyExpense();
+        return new ResponseEntity<>(dailyExpense, HttpStatus.OK);
+    }
+
 
 }

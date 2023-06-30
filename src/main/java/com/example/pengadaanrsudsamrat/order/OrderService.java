@@ -101,5 +101,7 @@ public interface OrderService {
     MonthlyExpenseDTO getMonthlyExpense(LocalDate date);
 
     WeeklyExpenseDTO getWeeklyExpense();
+
+    DailyExpenseDTO getDailyExpense();
 }
 

@@ -806,6 +806,19 @@ public class OrderServiceImpl implements OrderService {
         return weeklyExpenseDTO;
     }
 
+    @Override
+    public DailyExpenseDTO getDailyExpense() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = now.toLocalDate().atTime(23, 59, 59);
+
+        BigDecimal totalExpense = orderRepository.findDailyExpense(startOfDay, endOfDay);
+
+        DailyExpenseDTO dailyExpenseDTO = new DailyExpenseDTO(now, totalExpense);
+        return dailyExpenseDTO;
+    }
+
+
 
 
 }
