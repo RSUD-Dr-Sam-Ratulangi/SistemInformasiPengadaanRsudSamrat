@@ -46,49 +46,30 @@
 
         <div class="buttons" v-if="selectedItem !== null">
           <div v-if="selectedItem.status === 'OFFER'">
-            <button class="btn btn-primary" @click.prevent="acceptBid">
+            <button class="button is-primary" @click.prevent="acceptBid">
               Accept
             </button>
-            <button class="btn btn-danger" @click="showModalRejected">
+            <button class="button is-danger" @click="showModalRejected">
               Reject
             </button>
-            <button class="btn btn-info">See Details</button>
+            <button class="button is-info">See Details</button>
             <button @click="showModalHistory" class="button is-light">
               See History
             </button>
           </div>
 
-          <!-- Refund upload file -->
-          <div v-if="selectedItem.status === 'REFUND'">
-            <p>Upload Foto, barang yang akan dikirim kembali</p>
-            <label
-              class="block text-sm font-medium text-gray-900 dark:text-white"
-              for="file_input"
-              >Upload file</label
-            >
-            <input
-              class="block text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-              id="file_input"
-              type="file"
-              @change="uploadRefundItem"
-            />
-            <button
-              class="btn btn-success mt-3"
-              v-if="refundFile.length > 0"
-              @click="uploadRefund"
-            >
-              Upload
-            </button>
-          </div>
+          <!-- <div v-if="selectedItem.status === 'PENDING' || selectedItem.status === 'REJECTED' || selectedItem.status === 'ACCEPTED'" style="padding-right: 5px">
+            <button class="button is-info">See Details<span style="font-size: 12px;">(Comming Soon)</span></button>
+          </div> -->
 
           <div
             v-if="selectedItem.status === 'ACCEPTED'"
             style="padding-right: 5px"
           >
-            <button class="btn btn-primary">
+            <button class="button is-primary">
               Kirim <span style="font-size: 12px">(Comming Soon)</span>
             </button>
-            <button @click="showModalHistory" class="btn btn-error">
+            <button @click="showModalHistory" class="button is-light">
               See History
             </button>
           </div>
@@ -252,7 +233,6 @@ export default {
       rejectBidInputBid: "",
       rejectBidInputMessage: "",
       selectedFile: [],
-      refundFile: [],
     };
   },
   created() {
@@ -310,11 +290,11 @@ export default {
               senderId: this.vendorid,
               receiver: ppRole,
               receiverId: ppIds,
-              message: `${this.orders.id},Your Product ${this.selectedItem.product.name} Is Accepted `,
+              message: `Your Product ${this.selectedItem.product.name} Is Accepted `,
             })
             .then((res) =>
               alert(
-                `${this.orders.id},Your Product ${this.selectedItem.product.name} Is Accepted `
+                `Your Product ${this.selectedItem.product.name} Is Accepted `
               )
             )
             .catch((err) => console.log(err));
@@ -351,6 +331,14 @@ export default {
           const ppIds = this.employee[1].id;
           console.log(response.data);
           this.showRejectModal = false;
+<<<<<<< HEAD
+          //Post history
+          axios.post(
+            "http://rsudsamrat.site:8090/api/bid-exchange/history",
+            {}
+          );
+=======
+>>>>>>> 3da99218c36d0ad9acd7f62ffaab52feede58a0f
           //Post notif
           axios
             .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
@@ -358,7 +346,7 @@ export default {
               senderId: this.vendorid,
               receiver: ppRole,
               receiverId: ppIds,
-              message: `${this.orders.id},Your Product ${this.selectedItem.product.name} Rejected `,
+              message: `Your Product ${this.selectedItem.product.name} Rejected `,
             })
             .then((res) =>
               confirm(
@@ -378,9 +366,6 @@ export default {
     uploadFaktur() {
       const ppRole = this.employee[1].role;
       const ppIds = this.employee[1].id;
-      const panpenRole = this.employee[3].role;
-      const panpenIds = this.employee[3].id;
-
       console.log(`File ${this.selectedFile} berhasil di upload`);
       axios
         .put(
@@ -390,7 +375,6 @@ export default {
           }
         )
         .then((res) => {
-          //Send notif to PP
           console.log(res.data);
           axios
             .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
@@ -400,19 +384,7 @@ export default {
               receiverId: ppIds,
               message: `FAKTUR TELAH DIKIRIM BERSAMA FILE ${this.selectedFile}. `,
             })
-            .then((res) => {
-              //Send Notif to panpen
-              axios
-                .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-                  sender: this.username,
-                  senderId: this.vendorid,
-                  receiver: panpenRole,
-                  receiverId: panpenIds,
-                  message: `${panpenRole} mendapatkan notifikasi pemeriksaan barang, order id ${this.orders.id}. `,
-                })
-                .then((res) => console.log(res))
-                .catch((err) => console.log(err));
-            })
+            .then((res) => console.log(res))
             .catch((err) => console.log(err));
         })
         .catch((err) => console.log(err));
@@ -428,7 +400,7 @@ export default {
           "http://rsudsamrat.site:8080/employee"
         );
         this.employee = response.data;
-        console.log("employee", response.data);
+        console.log(response.data);
       } catch (err) {
         console.log(err);
       }
@@ -442,38 +414,6 @@ export default {
 
       // Reset the input value to allow selecting the same file again
       event.target.value = "";
-    },
-    async uploadRefundItem(event) {
-      const File = event.target.files[0];
-
-      this.refundFile.push(File);
-    },
-    async uploadRefund() {
-      const panpenRole = this.employee[3].role;
-      const panpenIds = this.employee[3].id;
-      console.log(`File ${this.refundFile[0].name} berhasil diupload`);
-      try {
-        const res = axios.put(
-          `http://rsudsamrat.site:8080/pengadaan/dev/v1/orderitems/${this.selectedItem.id}/status`,
-          {
-            orderItemId: this.selectedItem.id,
-            status: "RESEND",
-          }
-        );
-      } catch (err) {
-        console.log(err);
-      }
-      //Send Notif to panpen
-      axios
-        .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-          sender: this.username,
-          senderId: this.vendorid,
-          receiver: panpenRole,
-          receiverId: panpenIds,
-          message: `${panpenRole} mendapatkan notifikasi orderItem sudah di kirim lagi, order id ${this.orders.id}. `,
-        })
-        .then((res) => console.log("notif dikirim", res))
-        .catch((err) => console.log(err));
     },
   },
   components: { FontAwesomeIcon },

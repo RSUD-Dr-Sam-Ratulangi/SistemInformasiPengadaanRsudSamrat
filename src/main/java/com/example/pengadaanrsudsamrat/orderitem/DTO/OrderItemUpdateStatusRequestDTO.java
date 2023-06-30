@@ -1,4 +1,4 @@
-package com.example.pengadaanrsudsamrat.orderitem.dto;
+package com.example.pengadaanrsudsamrat.orderitem.DTO;
 
 import com.example.pengadaanrsudsamrat.orderitem.OrderItemModel;
 

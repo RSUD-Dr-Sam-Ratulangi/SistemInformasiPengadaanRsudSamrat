@@ -52,7 +52,9 @@
 </template>
 
 <script>
+import { onMounted } from "vue";
 import store from "../../config/stateAuth/state.js";
+import { onClickOutside } from "@vueuse/core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
@@ -67,6 +69,9 @@ export default {
       username: "",
       password: "",
     };
+  },
+  mounted() {
+    onClickOutside(this.$refs.signInToggle, this.closeModal());
   },
 
   computed: {

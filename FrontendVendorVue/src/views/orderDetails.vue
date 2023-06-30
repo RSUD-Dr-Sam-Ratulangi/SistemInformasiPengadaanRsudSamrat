@@ -15,7 +15,7 @@
           <td>{{ datas.orderDate }}</td>
           <td>{{ datas.status }}</td>
           <td>
-            <button @click="selectOrdersItem(datas)" class="btn btn-primary">
+            <button @click="selectOrdersItem(datas)" class="button is-primary">
               Detail
             </button>
           </td>
