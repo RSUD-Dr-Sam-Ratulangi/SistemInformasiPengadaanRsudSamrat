@@ -36,7 +36,9 @@ import org.springframework.web.client.RestTemplate;
 import javax.validation.Valid;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -544,39 +546,38 @@ public class OrderServiceImpl implements OrderService {
 
 
 //pertukaran stock dan pembelian
-    @Override
-    public Page<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(int page, int size, String sortBy) {
-        if (sortBy == null) {
-            sortBy = "orderDate"; // Set default sort order to orderDate
-        }
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
-        Page<OrderModel> orders = orderRepository.findAll(pageable);
-
-        List<OrderItemQuantityExchangeResponseDTO> orderItemDTOList = new ArrayList<>();
-        for (OrderModel orderModel : orders) {
-            List<OrderItemModel> orderItems = orderModel.getOrderItems();
-            for (OrderItemModel orderItem : orderItems) {
-                OrderItemQuantityExchangeResponseDTO orderItemDTO = new OrderItemQuantityExchangeResponseDTO();
-                orderItemDTO.setOrderId(orderModel.getId());
-                orderItemDTO.setOrderItemId(orderItem.getId());
-                if (orderItem.getProduct() != null) {
-                    if (orderItem.getProduct().getVendor() != null) {
-                        orderItemDTO.setVendor(modelMapper.map(orderItem.getProduct().getVendor(), VendorResponseDTO.class));
-                    }
-                    orderItemDTO.setProduct(modelMapper.map(orderItem.getProduct(), ProductResponseDTO.class));
-                    orderItemDTO.setProductQuantity(orderItem.getProduct().getQuantity());
-                    orderItemDTO.setProductTotalStock(orderItem.getProduct().getQuantity() - orderItem.getQuantity());
-                }
-                orderItemDTO.setOrderItemQuantity(orderItem.getQuantity());
-                orderItemDTO.setOrderDate(orderModel.getOrderDate());
-                orderItemDTO.setStatus(orderModel.getStatus());
-                orderItemDTOList.add(orderItemDTO);
-            }
-        }
-
-        return new PageImpl<>(orderItemDTOList, pageable, orderItemDTOList.size());
+@Override
+public List<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(String sortBy) {
+    if (sortBy == null) {
+        sortBy = "orderDate"; // Set default sort order to orderDate
     }
+
+    List<OrderModel> orders = orderRepository.findAll(Sort.by(sortBy).descending());
+
+    List<OrderItemQuantityExchangeResponseDTO> orderItemDTOList = new ArrayList<>();
+    for (OrderModel orderModel : orders) {
+        List<OrderItemModel> orderItems = orderModel.getOrderItems();
+        for (OrderItemModel orderItem : orderItems) {
+            OrderItemQuantityExchangeResponseDTO orderItemDTO = new OrderItemQuantityExchangeResponseDTO();
+            orderItemDTO.setOrderId(orderModel.getId());
+            orderItemDTO.setOrderItemId(orderItem.getId());
+            if (orderItem.getProduct() != null) {
+                if (orderItem.getProduct().getVendor() != null) {
+                    orderItemDTO.setVendor(modelMapper.map(orderItem.getProduct().getVendor(), VendorResponseDTO.class));
+                }
+                orderItemDTO.setProduct(modelMapper.map(orderItem.getProduct(), ProductResponseDTO.class));
+                orderItemDTO.setProductQuantity(orderItem.getProduct().getQuantity());
+                orderItemDTO.setProductTotalStock(orderItem.getProduct().getQuantity() - orderItem.getQuantity());
+            }
+            orderItemDTO.setOrderItemQuantity(orderItem.getQuantity());
+            orderItemDTO.setOrderDate(orderModel.getOrderDate());
+            orderItemDTO.setStatus(orderModel.getStatus());
+            orderItemDTOList.add(orderItemDTO);
+        }
+    }
+
+    return orderItemDTOList;
+}
 
 
 
@@ -730,8 +731,7 @@ public class OrderServiceImpl implements OrderService {
         return mapToTopVendorResponseDTOList(results);
     }
 
-
-
+    //extender todo: move to utility class instead in the service
     private List<TopVendorResponseDTO> mapToTopVendorResponseDTOList(List<Object[]> results) {
         List<TopVendorResponseDTO> dtos = new ArrayList<>();
         for (Object[] result : results) {
@@ -748,24 +748,74 @@ public class OrderServiceImpl implements OrderService {
         return dtos;
     }
 
-
-
-
-
-
-
-    private BigDecimal calculateTotalAmount(List<OrderItemModel> orderItems) {
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (OrderItemModel orderItem : orderItems) {
-            BigDecimal bidPrice = BigDecimal.valueOf(orderItem.getBidPrice());
-            BigDecimal quantity = BigDecimal.valueOf(orderItem.getQuantity());
-            BigDecimal itemTotalAmount = bidPrice.multiply(quantity);
-            totalAmount = totalAmount.add(itemTotalAmount);
-        }
-        return totalAmount;
+    @Override
+    public List<TopProductResponseDTO> getTopProductsByPurchase(int limit) {
+        List<Object[]> results = orderRepository.findTopProductsByPurchase(limit);
+        return mapToTopProductResponseDTOList(results);
     }
 
+    //extender todo: move to utility class instead in the service
+    private List<TopProductResponseDTO> mapToTopProductResponseDTOList(List<Object[]> results) {
+        List<TopProductResponseDTO> dtos = new ArrayList<>();
+        for (Object[] result : results) {
+            String productName = (String) result[0];
+            String vendorName = (String) result[1];
+            BigDecimal totalPurchase = BigDecimal.valueOf((Double) result[2]);
 
+            TopProductResponseDTO dto = new TopProductResponseDTO();
+            dto.setProductName(productName);
+            dto.setVendorName(vendorName);
+            dto.setTotalPurchase(totalPurchase);
+
+            dtos.add(dto);
+        }
+        return dtos;
+    }
+
+    @Override
+    public MonthlyExpenseDTO getMonthlyExpense(LocalDate date) {
+        LocalDate startOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate endOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
+
+        LocalDateTime startDateTime = startOfMonth.atStartOfDay();
+        LocalDateTime endDateTime = endOfMonth.atTime(LocalTime.MAX);
+
+        BigDecimal totalExpense = orderRepository.findMonthlyExpense(startDateTime, endDateTime);
+
+        MonthlyExpenseDTO monthlyExpenseDTO = new MonthlyExpenseDTO();
+        monthlyExpenseDTO.setStartDate(startOfMonth);
+        monthlyExpenseDTO.setEndDate(endOfMonth);
+        monthlyExpenseDTO.setTotalExpense(totalExpense);
+
+        return monthlyExpenseDTO;
+    }
+
+    @Override
+    public WeeklyExpenseDTO getWeeklyExpense() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDateTime endOfWeek = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        BigDecimal totalExpense = orderRepository.findWeeklyExpense(startOfWeek, endOfWeek);
+
+        WeeklyExpenseDTO weeklyExpenseDTO = new WeeklyExpenseDTO();
+        weeklyExpenseDTO.setStartDate(startOfWeek);
+        weeklyExpenseDTO.setEndDate(endOfWeek);
+        weeklyExpenseDTO.setTotalExpense(totalExpense);
+
+        return weeklyExpenseDTO;
+    }
+
+    @Override
+    public DailyExpenseDTO getDailyExpense() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = now.toLocalDate().atTime(23, 59, 59);
+
+        BigDecimal totalExpense = orderRepository.findDailyExpense(startOfDay, endOfDay);
+
+        DailyExpenseDTO dailyExpenseDTO = new DailyExpenseDTO(now, totalExpense);
+        return dailyExpenseDTO;
+    }
 
 
 

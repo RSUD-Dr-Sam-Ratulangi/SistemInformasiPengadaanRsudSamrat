@@ -1,0 +1,74 @@
+/* Nav styles */
+nav {
+    background-color: #333;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
+  }
+  
+  nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  nav li {
+    float: left;
+  }
+  
+  nav li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+  
+  nav li a:hover {
+    background-color: #111;
+  }
+  
+  nav .active {
+    background-color: #ff2121;
+  }
+  
+  /* Icon styles */
+  .notification-icon,
+  .profile-icon,
+  .logout-icon {
+    position: absolute;
+    top: 10px;
+    font-size: 18px;
+    color: white;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 50%;
+  }
+  
+  .notification-icon {
+    right: 105px;
+  }
+  
+  .profile-icon {
+    right: 60px;
+  }
+  
+  .logout-icon {
+    right: 15px;
+  }
+  
+  /* Dashboard styles */
+  .dashboard {
+    padding-top: 64px; /* tinggi navigation + jarak dari atas */
+    height: calc(100vh - 64px); /* tinggi layar - tinggi navigation */
+    /* overflow-y: scroll; */
+  }
+  
+  /* Footer styles */
+  .footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
+  
