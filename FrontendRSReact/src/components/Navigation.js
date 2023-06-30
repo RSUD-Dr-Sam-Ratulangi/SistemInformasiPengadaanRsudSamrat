@@ -99,6 +99,10 @@ const Navigation = () => {
     );
   }
 
+  if (isSignInPage) {
+    return null;
+  }
+
   return (
     <div>
       <div className="hidden lg:flex items-center justify-between w-full p-2 border-b border-slate-200">

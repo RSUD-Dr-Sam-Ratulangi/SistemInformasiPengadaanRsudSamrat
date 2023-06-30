@@ -20,6 +20,7 @@ const ModalOrderDetails = ({
   handleHistory,
   handleDetailProduct,
   handleOffer,
+  handleOfferAccepted,
   handleRefund,
   handleConfirm,
   handleOpenSubmitModal,
@@ -52,9 +53,17 @@ const ModalOrderDetails = ({
   useEffect(() => {
     if (
       selectedOrder.orderItems.every((order) => order.status === "OFFER") ||
-      selectedOrder.orderItems.every((order) => order.status === "ACCEPTED")
+      selectedOrder.orderItems.every((order) => order.status === "ACCEPTED") ||
+      selectedOrder.orderItems.every((order) => order.status === "REFUND") ||
+      selectedOrder.orderItems.every((order) => order.status === "CHECKED")
     ) {
       setNegotiable(false);
+    }
+    if (
+      selectedOrder.status === "ORDER" ||
+      selectedOrder.status === "NEGOTIATION"
+    ) {
+      setNegotiable(true);
     }
   }, [selectedOrder]);
 
@@ -175,12 +184,28 @@ const ModalOrderDetails = ({
       )
       .then((response) => {
         axios
-          .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-            sender: role,
-            senderId: id,
-            receiver: selectedOrder.vendor.name,
-            receiverId: selectedOrder.vendor.id,
-            message: `THIS ORDER IS PAYMENT, BY ${role}`,
+          .get(`http://rsudsamrat.site:8080/employee`)
+          .then((response) => {
+            // map the response.data and get the id of each employee and push it to employeeList
+            let employeeList = [];
+            let employeeNameList = [];
+            response.data.map((employee) => {
+              employeeList.push(employee.id);
+              employeeNameList.push(employee.name);
+            });
+            console.log(employeeList);
+            axios
+              .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+                sender: role,
+                senderId: id,
+                receiver: employeeNameList,
+                receiverId: employeeList,
+                message: `THIS ORDER IS PAYMENT, BY ${role}`,
+              })
+              .then((response) => {
+                console.log("berhasil mengirim notifikasi ke KEUANGAN");
+              })
+              .catch((err) => console.log(err));
           })
           .catch((err) => console.log(err));
         console.log(response);
@@ -236,6 +261,13 @@ const ModalOrderDetails = ({
 
   const ProductItem = ({ orderItem }) => {
     console.log("--productItem--", orderItem);
+
+    const calculateTotalPrice = () => {
+      // get total price by multiplying quantity with price
+      const totalPrice = orderItem.quantity * orderItem.product.price;
+      return totalPrice;
+    };
+
     return (
       <tr>
         <td className="font-bold">{orderItem.id}</td>
@@ -244,7 +276,12 @@ const ModalOrderDetails = ({
           <span className="text-sm text-black">x{orderItem.quantity}</span>
         </td>
         <td>
-          Rp <span>{orderItem.totalAmount}</span>
+          Rp{" "}
+          <span>
+            {orderItem.totalAmount === 0
+              ? calculateTotalPrice()
+              : orderItem.totalAmount}
+          </span>
         </td>
         <td
           className="cursor-pointer hover:text-primary-1 transition-all duration-300 ease-in-out font-semibold"
@@ -264,23 +301,35 @@ const ModalOrderDetails = ({
               tabIndex={0}
               className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
             >
-              {selectedOrder.status === "SHIPPING" && (
-                <>
+              {selectedOrder.status === "ORDER" ||
+                (selectedOrder.status === "NEGOTIATION" && (
                   <li>
-                    <a onClick={() => handleConfirm(orderItem.id)}>
+                    <a onClick={() => handleOfferAccepted(orderItem.id)}>
                       <MdCheck className="text-xl text-success" />
-                      Confirm
+                      Accept Order
                     </a>
                   </li>
-                  <hr />
-                  <li>
-                    <a onClick={() => handleRefund(orderItem.id)}>
-                      <MdSettingsBackupRestore className="text-xl text-slate-500" />
-                      Refund
-                    </a>
-                  </li>
-                </>
-              )}
+                ))}
+              {(orderItem.status === "ACCEPTED" ||
+                orderItem.status === "RESEND") &&
+                (selectedOrder.status === "SHIPPING" ||
+                  selectedOrder.status === "CHECKING") && (
+                  <>
+                    <li>
+                      <a onClick={() => handleConfirm(orderItem.id)}>
+                        <MdCheck className="text-xl text-success" />
+                        Confirm
+                      </a>
+                    </li>
+                    <hr />
+                    <li>
+                      <a onClick={() => handleRefund(orderItem.id)}>
+                        <MdSettingsBackupRestore className="text-xl text-slate-500" />
+                        Refund
+                      </a>
+                    </li>
+                  </>
+                )}
               <hr />
               <li>
                 <a
@@ -354,15 +403,16 @@ const ModalOrderDetails = ({
           </table>
         </div>
         <div className="flex gap-2 my-2">
-          {orderItems.every((orderItem) => orderItem.status === "ACCEPTED") && (
-            <button
-              className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-              onClick={() => handleSetStatusValidating("VALIDATING")}
-            >
-              Change Status
-            </button>
-          )}
-          {role === "PP" && (
+          {orderItems.every((orderItem) => orderItem.status === "ACCEPTED") &&
+            selectedOrder.status === "NEGOTIATION" && (
+              <button
+                className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={() => handleSetStatusValidating("VALIDATING")}
+              >
+                Change Status
+              </button>
+            )}
+          {role === "PPKOM" && selectedOrder.status === "VALIDATING" && (
             <>
               <button
                 className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
@@ -420,7 +470,7 @@ const ModalOrderDetails = ({
               ))}
             </div>
           )}
-          {allItemsAccepted && (
+          {allItemsChecked && (
             <div>
               <input
                 type="file"
@@ -429,7 +479,10 @@ const ModalOrderDetails = ({
                 onChange={handleFileChange}
               />
               <button
-                onClick={handleUploadClick}
+                onClick={() => {
+                  handleUploadClick();
+                  handlePrintBeritaAcara();
+                }}
                 className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
                 disabled={selectedFiles.length === 1}
               >
@@ -462,7 +515,6 @@ const ModalOrderDetails = ({
               className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
               onClick={() => {
                 PrintBeritaAcara(selectedOrder);
-                handlePrintBeritaAcara();
               }}
             >
               Print Berita Acara
