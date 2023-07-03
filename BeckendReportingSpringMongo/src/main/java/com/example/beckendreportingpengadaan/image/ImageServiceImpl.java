@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,13 +48,6 @@ public class ImageServiceImpl implements ImageService {
         image.setProductUuid(createImageDTO.getProductUuid());
         image.setImages(imageList);
 
-        try {
-            image = imageRepository.save(image);
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Handle the exception as per your requirements
-        }
-
         // Generate image URLs based on the saved image data
         ImageProcessor imageProcessor = new ImageProcessor();
         List<String> imageUrls = imageProcessor.generateImageUrls(image.getImages());
@@ -78,6 +72,15 @@ public class ImageServiceImpl implements ImageService {
             responseImageUrls.add(imageUrl);
         }
 
+        image.setImageUrls(responseImageUrls);
+
+        try {
+            image = imageRepository.save(image);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle the exception as per your requirements
+        }
+
         ResponseImageDTO response = new ResponseImageDTO();
         response.setId(image.getId());
         response.setProductId(image.getProductId());
@@ -94,9 +97,14 @@ public class ImageServiceImpl implements ImageService {
 
         for (ImageModel image : images) {
             ResponseImageDTO responseDTO = modelMapper.map(image, ResponseImageDTO.class);
+            responseDTO.setImageUrls(image.getImageUrls());
             responseDTOList.add(responseDTO);
         }
 
         return responseDTOList;
     }
+
+
+
+
 }

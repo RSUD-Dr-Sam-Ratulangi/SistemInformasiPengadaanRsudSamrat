@@ -1,5 +1,4 @@
-package com.example.beckendreportingpengadaan.image;
-
+package com.example.beckendreportingpengadaan.FakturOrder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,14 +11,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Document(collection = "images")
-public class ImageModel {
+@Document(collection = "FakturOrder")
+public class FakturOrder {
     @Id
     private String id;
-    private String productId;
-    private String productUuid;
-    private List<Binary> images;
-    private List<String> imageUrls;
-
+    private String orderId;
+    private List<Binary> files;
+    private List<String> fileUrls;
 }
 

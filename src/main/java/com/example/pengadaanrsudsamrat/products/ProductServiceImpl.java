@@ -106,6 +106,7 @@ public class ProductServiceImpl implements ProductService {
         }
         product.setSubcategories(subcategories);
         product.setStatus(productRequestDTO.getStatus());
+        product.setImageUrl(productRequestDTO.getImageUrl());
         ProductModel savedProduct = productRepository.save(product);
         return modelMapper.map(savedProduct, ProductResponseDTO.class);
     }

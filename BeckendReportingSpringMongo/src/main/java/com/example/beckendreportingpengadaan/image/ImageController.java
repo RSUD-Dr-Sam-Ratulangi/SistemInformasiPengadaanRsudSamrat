@@ -16,10 +16,12 @@ import java.util.List;
 public class ImageController {
 
     private final ImageService imageService;
+    private final ImageRepository imageRepository;
 
     @Autowired
-    public ImageController(ImageService imageService) {
+    public ImageController(ImageService imageService, ImageRepository imageRepository) {
         this.imageService = imageService;
+        this.imageRepository = imageRepository;
     }
 
     @PostMapping
@@ -28,6 +30,14 @@ public class ImageController {
                                                          @RequestParam("images") MultipartFile[] images) throws IOException {
         CreateImageDTO createImageDTO = new CreateImageDTO(productId, productUuid, List.of(images));
         ResponseImageDTO responseDTO = imageService.createImages(createImageDTO);
+
+        // Save the URLs in the database
+        ImageModel image = imageRepository.findById(responseDTO.getId()).orElse(null);
+        if (image != null) {
+            image.setImageUrls(responseDTO.getImageUrls());
+            imageRepository.save(image);
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
