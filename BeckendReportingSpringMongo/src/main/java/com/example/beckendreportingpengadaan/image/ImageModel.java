@@ -19,7 +19,7 @@ public class ImageModel {
     private String productId;
     private String productUuid;
     private List<Binary> images;
-
+    private List<String> imageUrls;
 
 }
 
