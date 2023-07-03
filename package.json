@@ -5,6 +5,7 @@
     "html2pdf.js": "^0.10.1",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.5.29",
+    "prs-pengadaan-frontend": "file:FrontendRSReact",
     "react-router-dom": "^6.11.2"
   }
 }

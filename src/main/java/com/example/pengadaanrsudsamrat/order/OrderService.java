@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -80,7 +82,7 @@ public interface OrderService {
     Page<OrderItemInOrderResponseDTO> getAllOrderItemsInOrders(int page, int size, String sortBy);
     Page<OrderItemInOrderDetailResponseDTO> getAllOrderItemsInOrderDetails(int page, int size, String sortBy);
 
-    Page<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(int page, int size, String sortBy);
+    List<OrderItemQuantityExchangeResponseDTO> getAllOrderItemsWithProductStock(String sortBy);
     List<OrderItemProductInOrderRavanueAndStockResponseDTO> getOrderItemProductInOrderRevenueAndStock(Long productId);
     List<OrderItemProductInOrderRavanueAndStockResponseDTO> getVendorProductRevenue(String vendorUUID);
     List<OrderModel> searchOrderItems(String keyword);
@@ -94,8 +96,12 @@ public interface OrderService {
     //OrderItemResponseDTO createOrderItem(OrderItemRequestDTO orderItemRequestDTO);
     List<TopVendorResponseDTO> getTopVendorsByOrdersAndPurchase(int limit);
 
+    List<TopProductResponseDTO> getTopProductsByPurchase(int limit);
 
+    MonthlyExpenseDTO getMonthlyExpense(LocalDate date);
 
+    WeeklyExpenseDTO getWeeklyExpense();
 
+    DailyExpenseDTO getDailyExpense();
 }
 

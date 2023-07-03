@@ -36,6 +36,12 @@ public class BidExchangeHistoryController {
         }
     }
 
+    @GetMapping("/history/{orderId}")
+    public ResponseEntity<List<BidExchangeHistoryResponseDTO>> getAllByOrderId(@PathVariable Long orderId) {
+        List<BidExchangeHistoryResponseDTO> historyDTOs = bidExchangeHistoryService.getAllByOrderId(orderId);
+        return ResponseEntity.ok(historyDTOs);
+    }
+
 
 }
 

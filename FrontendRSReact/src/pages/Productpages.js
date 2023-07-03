@@ -71,17 +71,23 @@ export default function ProductPages() {
   }, [selectedCategory, selectedSubCategory]);
 
   useEffect(() => {
-    if (carts) {
-      if (compareCurrentVendorWithLocalStorageCartsVendor()) {
-        localStorage.setItem("carts", JSON.stringify(carts));
+    if (vendors.length > 0) {
+      if (carts) {
+        if (compareCurrentVendorWithLocalStorageCartsVendor()) {
+          console.log("one");
+          localStorage.setItem("carts", JSON.stringify(carts));
+        }
+        else {
+          console.log("two");
+          setCarts(cartsInitialValues());
+          localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
+        }
       }
       else {
+        console.log("three");
         setCarts(cartsInitialValues());
         localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
       }
-    } else if (vendors.length > 0) {
-      setCarts(cartsInitialValues());
-      localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
     }
   }, [vendors, carts]);
 
@@ -196,7 +202,6 @@ export default function ProductPages() {
       }
     }
 
-    console.log("isSame", isSame);
     return isSame;
   }
 

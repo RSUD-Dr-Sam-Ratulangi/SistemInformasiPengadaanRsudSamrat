@@ -83,6 +83,17 @@ public class BidExchangeHistoryServiceImpl implements BidExchangeHistoryService 
     }
 
 
+    @Override
+    public List<BidExchangeHistoryResponseDTO> getAllByOrderId(Long orderId) {
+        List<BidExchangeHistoryModel> historyModels = bidExchangeHistoryRepository.findAllByOrderId(orderId);
+        List<BidExchangeHistoryResponseDTO> responseDTOs = new ArrayList<>();
+        for (BidExchangeHistoryModel historyModel : historyModels) {
+            BidExchangeHistoryResponseDTO responseDTO = modelMapper.map(historyModel, BidExchangeHistoryResponseDTO.class);
+            responseDTOs.add(responseDTO);
+        }
+        return responseDTOs;
+    }
+
 
 
 

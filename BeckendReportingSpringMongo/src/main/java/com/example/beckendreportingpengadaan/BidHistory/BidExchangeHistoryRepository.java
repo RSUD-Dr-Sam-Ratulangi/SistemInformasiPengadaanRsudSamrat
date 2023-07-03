@@ -6,5 +6,9 @@ import java.util.List;
 
 public interface BidExchangeHistoryRepository extends MongoRepository<BidExchangeHistoryModel, String> {
 
+
+
     List<BidExchangeHistoryModel> findByOrderIdAndBidItemsId(Long orderId, Long bidItemId);
+
+    List<BidExchangeHistoryModel> findAllByOrderId(Long orderId);
 }

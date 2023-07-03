@@ -3,16 +3,17 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
-import ModalHistory from "../components/orderPagesNew/ModalHistory";
-import ModalOrderItem from "../components/orderPagesNew/ModalOrderItem";
-// import ModalAcceptedOffer from "../components/orderPagesNew/ModalAcceptedOffer";
-// import ModalSubmittedOffer from "../components/orderPagesNew/ModalSubmittedOffer";
-import ModalOffer from "../components/orderPagesNew/ModalOffer";
-import ModalPayoutDetails from "../components/orderPagesNew/ModalPayoutDetails";
-import ModalProductDetails from "../components/orderPagesNew/ModalProductDetails";
-import ModalOrderDetails from "../components/orderPagesNew/ModalOrderDetails";
-import ModalRefund from "../components/orderPagesNew/ModalRefund";
-import ModalConfirm from "../components/orderPagesNew/ModalConfirm";
+import ModalHistory from "../components/orderPages/ModalHistory";
+import ModalOrderItem from "../components/orderPages/ModalOrderItem";
+// import ModalAcceptedOffer from "../components/orderPages/ModalAcceptedOffer";
+// import ModalSubmittedOffer from "../components/orderPages/ModalSubmittedOffer";
+import ModalOffer from "../components/orderPages/ModalOffer";
+import ModalPayoutDetails from "../components/orderPages/ModalPayoutDetails";
+import ModalProductDetails from "../components/orderPages/ModalProductDetails";
+import ModalOrderDetails from "../components/orderPages/ModalOrderDetails";
+import ModalRefund from "../components/orderPages/ModalRefund";
+import ModalConfirm from "../components/orderPages/ModalConfirm";
+import ModalShipping from "../components/orderPages/ModalShipping";
 
 const Orderpages = () => {
   const [data, setData] = useState([]);
@@ -35,7 +36,9 @@ const Orderpages = () => {
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [refund, setRefund] = useState(null);
+  const [shipping, setShipping] = useState(null);
   const [confirm, setConfirm] = useState(null);
+  const [showShippingModal, setShowShippingModal] = useState(false);
 
   const role = useSelector((state) => state.auth.role);
   const idUser = useSelector((state) => state.auth.id);
@@ -93,6 +96,7 @@ const Orderpages = () => {
             item.status === "NEGOTIATION" ||
             item.status === "CANCEL" ||
             item.status === "SHIPPING" ||
+            item.status === "CHECKING" ||
             item.status === "VALIDATING"
         );
       }
@@ -101,9 +105,11 @@ const Orderpages = () => {
           (item) =>
             item.status === "VALIDATING" ||
             item.status === "CHECKING" ||
-            item.status === "PAYMENT" ||
             item.status === "SHIPPING"
         );
+        if (role === "KEU") {
+          uniqueData = uniqueData.filter((item) => item.status === "PAYMENT");
+        }
       }
 
       setData(uniqueData);
@@ -140,12 +146,12 @@ const Orderpages = () => {
   };
 
   /* History function */
-  const handleHistory = (orderItemId) => {
+  const handleHistory = () => {
     setShowHistoryModal(true);
     console.log("history modal", showHistoryModal);
     axios
       .get(
-        `http://rsudsamrat.site:8090/api/bid-exchange/bid-items/${selectedOrder.id}/${orderItemId}`
+        `http://rsudsamrat.site:8990/api/bid-exchange/history/${selectedOrder.id}`
       )
       .then((res) => {
         console.log("History", res.data);
@@ -253,6 +259,7 @@ const Orderpages = () => {
   };
 
   const handleSubmitConfirm = () => {
+    // if all the selectedOrder.orderItems is
     axios
       .put(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
@@ -295,6 +302,41 @@ const Orderpages = () => {
     );
     setSelectedOrderItem(selectedOrderItem);
     setShowOfferModal(true);
+  };
+
+  const handleAcceptOrder = (orderItemId) => {
+    const selectedOrderItem = selectedOrder.orderItems.find(
+      (orderItem) => orderItem.id === orderItemId
+    );
+    axios
+      .put(
+        `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/items/${selectedOrderItem.id}`,
+        {
+          orderItemId: selectedOrderItem.id,
+          bidPrice: selectedOrderItem.bidPrice,
+          status: "ACCEPTED",
+          message: "Order accepted",
+        }
+      )
+      .then((response) => {
+        // Handle the response
+        console.log("Order accepted:", response.data);
+        // Close the offer modal
+        setShowOfferModal(false);
+        // Update the state to show the success modal
+        // setIsOfferSubmitted(true);
+        // Update the state
+        setSelectedOrder(response.data);
+        // Show the toast
+        setActionToastHeader("Order Accepted");
+        setActionToastBody(
+          `Your offer for the product ${selectedOrderItem.product.name} has been accepted.`
+        );
+        setShowActionToast(true);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   const handleOfferSubmit = () => {
@@ -467,6 +509,13 @@ const Orderpages = () => {
     }
   };
 
+  const handleShipping = (orderItemId) => {
+    // set shipping modal open
+    setShowShippingModal(true);
+
+    setShipping(orderItemId);
+  };
+
   return (
     <>
       {/* Order Details Modal */}
@@ -476,8 +525,10 @@ const Orderpages = () => {
           selectedOrder={selectedOrder}
           selectedOrderItem={selectedOrderItem}
           handleHistory={handleHistory}
+          handleShipping={handleShipping}
           handleDetailProduct={handleDetailProduct}
           handleOffer={handleOffer}
+          handleOfferAccepted={handleAcceptOrder}
           handleRefund={handleRefund}
           handleConfirm={handleConfirm}
           handleOpenSubmitModal={handleOpenSubmitModal}
@@ -527,11 +578,20 @@ const Orderpages = () => {
           selectedOrderItem={selectedOrderItem}
         />
       )}
+
       {/* History Modal */}
       {showHistoryModal && (
         <ModalHistory
           history={history}
           onClose={() => setShowHistoryModal(null)}
+        />
+      )}
+
+      {/* History Modal */}
+      {showShippingModal && (
+        <ModalShipping
+          shipping={shipping}
+          onClose={() => setShowShippingModal(null)}
         />
       )}
 
@@ -590,14 +650,15 @@ const Orderpages = () => {
           >
             Shipping
           </button>
-          {role === "PANPEN" && (
-            <button
-              className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
-              onClick={() => handleFilterStatus("CHECKING")}
-            >
-              Checking
-            </button>
-          )}
+          {role === "PANPEN" ||
+            (role === "PPKOM" && (
+              <button
+                className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={() => handleFilterStatus("CHECKING")}
+              >
+                Checking
+              </button>
+            ))}
           <button
             className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
             onClick={() => handleFilterStatus("PAYMENT")}
