@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { MdLocalShipping } from "react-icons/md";
 
 const ModalShipping = ({ shipping, onClose }) => {
+  const [shippingData, setShippingData] = useState([]);
   useEffect(() => {
     console.log("modal shipping", window.shippingModal.open);
     if (!window.shippingModal.open) {
@@ -11,11 +13,55 @@ const ModalShipping = ({ shipping, onClose }) => {
 
   useEffect(() => {
     // fetch data here using "shipping props"
+    axios
+      .get(`http://rsudsamrat.site:8990/order-status/status-entry/${shipping}`)
+      .then((res) => {
+        console.log(res.data);
+        // reverse the array
+
+        setShippingData(res.data.statusList.reverse());
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
+
+  const timeAgo = (time) => {
+    const now = new Date();
+    const then = new Date(time);
+    const seconds = Math.round((now - then) / 1000);
+    const minutes = Math.round(seconds / 60);
+    const hours = Math.round(minutes / 60);
+    const days = Math.round(hours / 24);
+    const weeks = Math.round(days / 7);
+    const months = Math.round(days / 30);
+    const years = Math.round(days / 365);
+
+    if (seconds < 60) {
+      return "Just now";
+    } else if (minutes < 60) {
+      return `${minutes} minutes ago`;
+    } else if (hours < 24) {
+      return `${hours} hours ago`;
+    } else if (days < 7) {
+      return `${days} days ago`;
+    } else if (weeks < 4) {
+      return `${weeks} weeks ago`;
+    } else if (months < 12) {
+      return `${months} months ago`;
+    } else {
+      return `${years} years ago`;
+    }
+  };
+
+  const getCurrentStatus = (status) => {
+    // Compare the current status with the status in the shippingData object
+    return shippingData.some((data) => data.status === status) ? "success" : "";
+  };
 
   return (
     <dialog id="shippingModal" className="modal">
-      <div className="modal-box max-w-3xl">
+      <div className="max-w-5xl modal-box">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -24,59 +70,82 @@ const ModalShipping = ({ shipping, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            className="absolute btn btn-sm btn-circle btn-ghost right-2 top-2"
           >
             ✕
           </button>
         </div>
         <div className="modal-body">
           <div>
-            <ul className="steps w-full">
-              <li data-content="●" className="step step-neutral">
-                Ordered
+            <ul className="w-full steps">
+              <li
+                data-content="●"
+                className={`step step-${getCurrentStatus("ORDER")}`}
+              >
+                ORDER
               </li>
-              <li data-content="●" className="step step-neutral">
-                Shipping
+              <li
+                data-content="●"
+                className={`step step-${getCurrentStatus("NEGOTIATION")}`}
+              >
+                NEGOTIATION
               </li>
-              <li data-content="✓" className="step step-neutral">
-                Received
+              <li
+                data-content="●"
+                className={`step step-${getCurrentStatus("CHECKING")}`}
+              >
+                CHECKING
+              </li>
+              <li
+                data-content="●"
+                className={`step step-${getCurrentStatus("VALIDATING")}`}
+              >
+                VALIDATING
+              </li>
+              <li
+                data-content="●"
+                className={`step step-${getCurrentStatus("SHIPPING")}`}
+              >
+                SHIPPING
+              </li>
+              <li
+                data-content="●"
+                className={`step step-${getCurrentStatus("PAYMENT")}`}
+              >
+                PAYMENT
+              </li>
+              <li
+                data-content="●"
+                className={`step step-${getCurrentStatus("CANCEL")}`}
+              >
+                CANCEL
+              </li>
+              <li
+                data-content="✓"
+                className={`step step-${getCurrentStatus("COMPLETE")}`}
+              >
+                COMPLETE
               </li>
             </ul>
           </div>
           <div>
-            <ul className="steps steps-vertical w-full">
-              <li className="step step-primary w-full">
-                <div className="flex w-full justify-start">
-                  <span className="font-semibold w-44 text-start">
-                    6 Jul 2023 | 15:07
-                  </span>
-                  On Courier
-                </div>
-              </li>
-              <li className="step">
-                <div className="flex w-full justify-start">
-                  <span className="font-semibold w-44 text-start">
-                    5 Jul 2023 | 05:07
-                  </span>
-                  Arrived in Tondano
-                </div>
-              </li>
-              <li className="step">
-                <div className="flex w-full justify-start">
-                  <span className="font-semibold w-44 text-start">
-                    4 Jul 2023 | 01:07
-                  </span>
-                  Arrived in Minahasa
-                </div>
-              </li>
-              <li className="step">
-                <div className="flex w-full justify-start">
-                  <span className="font-semibold w-44 text-start">
-                    3 Jul 2023 | 21:07
-                  </span>
-                  Shipped
-                </div>
-              </li>
+            <ul className="w-full steps steps-vertical">
+              {shippingData.map((data, i) => (
+                <li
+                  key={i}
+                  data-content="✓"
+                  className={`w-full step ${
+                    i === 0 ? "step-success" : "step-neutral"
+                  }`}
+                >
+                  <div className="flex justify-start w-full">
+                    <span className="font-semibold w-44 text-start">
+                      {timeAgo(data.timestamp)}
+                    </span>
+                    {data.status}
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
