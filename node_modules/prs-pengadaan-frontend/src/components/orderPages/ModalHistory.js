@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { MdHandshake } from "react-icons/md";
+import { MdHandshake, MdHistory } from "react-icons/md";
 
 const ModalHistory = ({ history }) => {
   useEffect(() => {
@@ -9,27 +9,33 @@ const ModalHistory = ({ history }) => {
     }
   }, [history]);
 
-  if (history) {
-    return <div>Hello modal</div>;
-  }
+  // convert this time "2023-06-28T20:14:53" to text "2 hours ago"
+  const timeAgo = (time) => {
+    const now = new Date();
+    const then = new Date(time);
+    const seconds = Math.round((now - then) / 1000);
+    const minutes = Math.round(seconds / 60);
+    const hours = Math.round(minutes / 60);
+    const days = Math.round(hours / 24);
+    const weeks = Math.round(days / 7);
+    const months = Math.round(days / 30);
+    const years = Math.round(days / 365);
 
-  const filterSameHistory = (history) => {
-    // filter 100% same history
-    let filteredHistory = [];
-    for (let i = 0; i < history.length; i++) {
-      let isSame = false;
-      for (let j = 0; j < filteredHistory.length; j++) {
-        if (history[i].id === filteredHistory[j].id) {
-          isSame = true;
-          break;
-        }
-      }
-      if (!isSame) {
-        filteredHistory.push(history[i]);
-      }
+    if (seconds < 60) {
+      return "Just now";
+    } else if (minutes < 60) {
+      return `${minutes} minutes ago`;
+    } else if (hours < 24) {
+      return `${hours} hours ago`;
+    } else if (days < 7) {
+      return `${days} days ago`;
+    } else if (weeks < 4) {
+      return `${weeks} weeks ago`;
+    } else if (months < 12) {
+      return `${months} months ago`;
+    } else {
+      return `${years} years ago`;
     }
-    console.log("filteredHistory", filteredHistory);
-    return filteredHistory;
   };
 
   return (
@@ -39,7 +45,7 @@ const ModalHistory = ({ history }) => {
         <form>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <MdHandshake className="text-2xl text-primary-1" />
+              <MdHistory className="text-2xl text-primary-1" />
               <h3 className="text-xl font-bold">History</h3>
             </div>
             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
@@ -48,32 +54,32 @@ const ModalHistory = ({ history }) => {
           </div>
         </form>
         <div className="modal-body">
-          <p>See your History</p>
           <table className="table">
             <thead>
               <tr>
+                <th>No</th>
                 <th>Product Name</th>
                 <th>Bid Price</th>
                 <th>Price Change</th>
                 <th>Status</th>
                 <th>Messages</th>
+                <th>Time</th>
               </tr>
             </thead>
             <tbody>
-              {filterSameHistory.map((e, i) => (
-                <tr key={i}>
+              {history?.map((e, i) => (
+                <tr key={e.id}>
+                  <td>{i}</td>
                   <td>{e.productName}</td>
                   <td>{e.bidPrice}</td>
                   <td>{e.bidPriceChange}</td>
                   <td>{e.status}</td>
                   <td>{e.message}</td>
+                  <td>{timeAgo(e.orderDate)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-        <div className="modal-footer">
-          <p>See Your history Order</p>
         </div>
       </div>
     </dialog>
