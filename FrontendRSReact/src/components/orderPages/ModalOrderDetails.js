@@ -31,6 +31,7 @@ const ModalOrderDetails = ({
   setActionToastHeader,
   setActionToastBody,
   fetchData,
+  postShippingStatus,
 }) => {
   const role = useSelector((state) => state.auth.role);
   const id = useSelector((state) => state.auth.id);
@@ -185,6 +186,7 @@ const ModalOrderDetails = ({
         }
       )
       .then((response) => {
+        postShippingStatus("PAYMENT", selectedOrder.id);
         axios
           .get(`http://rsudsamrat.site:8080/employee`)
           .then((response) => {
@@ -285,7 +287,7 @@ const ModalOrderDetails = ({
               : orderItem.totalAmount}
           </span>
         </td>
-        <td className="cursor-pointer hover:text-primary-1 transition-all duration-300 ease-in-out font-semibold">
+        <td className="font-semibold transition-all duration-300 ease-in-out cursor-pointer hover:text-primary-1">
           {orderItem.status}
         </td>
         <td>
@@ -300,15 +302,6 @@ const ModalOrderDetails = ({
               tabIndex={0}
               className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
             >
-              {selectedOrder.status === "SHIPPING" && (
-                <li>
-                  <a onClick={() => handleShipping(orderItem.id)}>
-                    <MdLocalShipping className="text-xl text-orange-500" />
-                    Shipping
-                  </a>
-                </li>
-              )}
-              <hr />
               {selectedOrder.status === "ORDER" ||
                 (selectedOrder.status === "NEGOTIATION" && (
                   <li>
@@ -388,7 +381,7 @@ const ModalOrderDetails = ({
     return [...vendorItemsMap].map(([vendorName, orderItems], index) => (
       <React.Fragment key={index}>
         <div className="flex flex-col gap-2 ">
-          <h2 className="font-medium text-xl text-slate-600">Best Vendor</h2>
+          <h2 className="text-xl font-medium text-slate-600">Best Vendor</h2>
           <hr />
           <table className="table table-pin-rows">
             {/* head */}
@@ -415,7 +408,10 @@ const ModalOrderDetails = ({
             selectedOrder.status === "NEGOTIATION" && (
               <button
                 className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                onClick={() => handleSetStatusValidating("VALIDATING")}
+                onClick={() => {
+                  handleSetStatusValidating("VALIDATING");
+                  postShippingStatus("VALIDATING", selectedOrder.id);
+                }}
               >
                 Change Status
               </button>
@@ -424,13 +420,19 @@ const ModalOrderDetails = ({
             <>
               <button
                 className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                onClick={() => handleSetStatusNego("NEGOTIATION")}
+                onClick={() => {
+                  handleSetStatusNego("NEGOTIATION");
+                  postShippingStatus("NEGOTIATION", selectedOrder.id);
+                }}
               >
                 Cancel Negotiation
               </button>
               <button
                 className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                onClick={() => handleSetStatusCancel("CANCEL")}
+                onClick={() => {
+                  handleSetStatusCancel("CANCEL");
+                  postShippingStatus("CANCEL", selectedOrder.id);
+                }}
               >
                 Cancel Order
               </button>
@@ -444,7 +446,7 @@ const ModalOrderDetails = ({
 
   return (
     <dialog id="detailsModal" className="modal">
-      <div className="modal-box max-w-4xl">
+      <div className="max-w-4xl modal-box">
         <form method="dialog">
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
@@ -452,7 +454,7 @@ const ModalOrderDetails = ({
               <MdInventory className="text-2xl text-primary-1" />
               <h3 className="text-xl font-bold">Order Details</h3>
             </div>
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+            <button className="absolute btn btn-sm btn-circle btn-ghost right-2 top-2">
               ✕
             </button>
           </div>
@@ -462,7 +464,7 @@ const ModalOrderDetails = ({
         </form>
 
         {/* Footer */}
-        <div className="modal-action mt-12">
+        <div className="mt-12 modal-action">
           {selectedFiles && (
             <div>
               {selectedFiles.map((file, index) => (

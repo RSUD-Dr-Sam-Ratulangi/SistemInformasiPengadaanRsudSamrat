@@ -1,0 +1,96 @@
+#dashboard-page {
+  padding: 20px;
+  top: 50px; /* Adjust the top value as needed to align with your header */
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background-color: #fff;
+}
+
+#dashboard-page .welcome-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+#dashboard-page .cards-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+#dashboard-page .cards-wrapper .cards-wrapper-bottom {
+  border: 1px solid red;
+}
+
+#dashboard-page .card {
+  flex: 1;
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#dashboard-page .card .title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#dashboard-page .card .body {
+  font-size: 24px;
+}
+
+#dashboard-page .top-contents-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 80px;
+}
+
+#dashboard-page .top-content {
+  flex: 1;
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+
+#dashboard-page .top-content .detail .title {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+#dashboard-page .top-content .detail ol li:first-child {
+  margin-top: 32px;
+}
+#dashboard-page .top-content .detail ol li {
+  margin-bottom: 20px;
+}
+#dashboard-page .top-content .detail ol li:last-child {
+  margin-bottom: 0;
+}
+
+#dashboard-page .top-content .detail .body {
+  font-size: 16px;
+}
+
+
+
+@media(max-width: 1440px) {
+  #dashboard-page .top-contents-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+
+
+@media (max-width: 720px) {
+  #dashboard-page .cards-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #dashboard-page .top-content {
+    flex-direction: column;
+  }
+}
