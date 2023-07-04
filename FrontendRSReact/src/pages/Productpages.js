@@ -223,9 +223,9 @@ export default function ProductPages() {
     console.log("handleSeePendingProductsOnClick");
     setFilteredProducts(
       filterProducts({
-        statusList: ["PENDING"]
+        statusList: ["PENDING"],
       })
-    )
+    );
   }
 
   function handleSelectedCategoriesAndSelectedSubCategoryChange(
@@ -617,7 +617,7 @@ export default function ProductPages() {
           <button
             className="flex-1 text-md text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
             onClick={handleSeePendingProductsOnClick}
-            style={{marginTop: "28px"}}
+            style={{ marginTop: "28px" }}
           >
             See Pending Products
           </button>
