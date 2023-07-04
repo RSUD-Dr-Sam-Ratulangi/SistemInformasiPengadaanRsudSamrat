@@ -16,7 +16,7 @@ import ModalRefund from "../components/orderPages/ModalRefund";
 import ModalConfirm from "../components/orderPages/ModalConfirm";
 import ModalShipping from "../components/orderPages/ModalShipping";
 
-import logo from '../assets/images/logo.jpg';
+import logo from "../assets/images/logo.jpg";
 
 const Orderpages = () => {
   const [data, setData] = useState([]);
@@ -42,7 +42,11 @@ const Orderpages = () => {
   const [shipping, setShipping] = useState(null);
   const [confirm, setConfirm] = useState(null);
   const [showShippingModal, setShowShippingModal] = useState(false);
-  const [filterDateFromOlderToNewer, setFilterDateFromOlderToNewer] = useState(true);
+  const [filterDateFromOlderToNewer, setFilterDateFromOlderToNewer] =
+    useState(true);
+
+  const [searchId, setSearchId] = useState("");
+  const [filterDate, setFilterDate] = useState("");
 
   const role = useSelector((state) => state.auth.role);
   const idUser = useSelector((state) => state.auth.id);
@@ -593,7 +597,7 @@ const Orderpages = () => {
 
   const cetakPDF = () => {
     let rows = "";
-    filteredStatusData.forEach(data => {
+    filteredStatusData.forEach((data) => {
       const row = `
         <tr>
           <th>${data.orderId}</th>
@@ -664,10 +668,39 @@ const Orderpages = () => {
     const element = document.createElement("div");
     element.innerHTML = HTMLToBeConvertedToPDF;
     const options = {
-      margin: [20, 20, 20, 20]
+      margin: [20, 20, 20, 20],
     };
 
     html2pdf().set(options).from(element).save();
+  };
+
+  // handle search by id and filter by date
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const filteredData = data.filter((order) => order.orderId == searchId);
+    setFilteredStatusData(filteredData);
+
+    console.log("search id", searchId);
+
+    console.log("filtered data", filteredData);
+
+    setSearchId("");
+  };
+
+  const handleFilterDate = (e) => {
+    e.preventDefault();
+    const filteredData = data.filter((order) => {
+      const orderDate = new Date(order.orderDate);
+      const filterDateNow = new Date(filterDate);
+      console.log("order date", orderDate);
+      console.log("filter date", filterDateNow);
+      return (
+        orderDate.toLocaleDateString() === filterDateNow.toLocaleDateString()
+      );
+    });
+    setFilteredStatusData(filteredData);
+
+    setFilterDate("");
   };
 
   return (
@@ -836,6 +869,38 @@ const Orderpages = () => {
           </button>
         </div>
         <div className="flex gap-2 mb-2 items-center justify-center">
+          {/* search by id */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              placeholder="Search by ID"
+              value={searchId}
+              onChange={(e) => setSearchId(e.target.value)}
+            />
+            <button
+              className="flex-1 text-white btn btn-outline border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={handleSearch}
+            >
+              search
+            </button>
+          </div>
+          {/* filter by date */}
+          <div className="flex gap-2">
+            <input
+              type="date"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              placeholder="Filter by Date"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+            />
+            <button
+              className="flex-1 text-white btn btn-outline border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={handleFilterDate}
+            >
+              filter
+            </button>
+          </div>
           <button
             className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
             onClick={cetakPDF}
