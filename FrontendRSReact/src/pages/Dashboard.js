@@ -131,7 +131,8 @@ const Dashboard = () => {
   }, [topFiveOrderedProducts]);
 
   function handleCetakPDFTopFiveVendorsOnClick() {
-    const head = "<tr><th>No.</th><th>Vendor Name</th><th>Total Purchase Value</th></tr>"
+    const head =
+      "<tr><th>No.</th><th>Vendor Name</th><th>Total Purchase Value</th></tr>";
 
     let rows = "";
     topFiveVendors.forEach((item, index) => {
@@ -145,11 +146,12 @@ const Dashboard = () => {
       rows += row;
     });
 
-    createPDF('Top Five Vendors by Purchase Value', head, rows);
+    createPDF("Top Five Vendors by Purchase Value", head, rows);
   }
 
   function handleCetakPDFTopFiveOrderedProductsOnClick() {
-    const head = "<tr><th>No.</th><th>Product Name</th><th>Total Purchase Value</th></tr>"
+    const head =
+      "<tr><th>No.</th><th>Product Name</th><th>Total Purchase Value</th></tr>";
 
     let rows = "";
     topFiveOrderedProducts.forEach((item, index) => {
@@ -163,10 +165,8 @@ const Dashboard = () => {
       rows += row;
     });
 
-    createPDF('Top Five Products by Purchase Value', head, rows);
+    createPDF("Top Five Products by Purchase Value", head, rows);
   }
-
-  
 
   async function getTotalVendor() {
     try {
@@ -372,7 +372,7 @@ const Dashboard = () => {
     const element = document.createElement("div");
     element.innerHTML = HTMLToBeConvertedToPDF;
     const options = {
-      margin: [20, 20, 20, 20]
+      margin: [20, 20, 20, 20],
     };
 
     html2pdf().set(options).from(element).save();
@@ -463,75 +463,78 @@ const Dashboard = () => {
 
           <div className="mt-12 top-contents-wrapper">
             {/* Top Vendors */}
-            {topFiveVendors
-              ? (
-                <div className="top-content">
-                  <div className="top-content-detail-chart-wrapper">
-                    <div className="detail">
-                      <p className="title">Top 5 Vendors by Highest Purchase Value</p>
-                      <ol>
-                        {topFiveVendors.map((vendor, index) => (
-                          <li key={index}>
-                            <p className="body">
-                              <b>{vendor.vendorName}</b>
-                            </p>
-                            <p className="body">
-                              Total purchase value:{" "}
-                              {formatToRp(vendor.totalPurchase)}
-                            </p>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                    <div className="chart">
-                      <canvas ref={topFiveVendorsChartRef} />
-                    </div>
+            {topFiveVendors ? (
+              <div className="top-content">
+                <div className="top-content-detail-chart-wrapper">
+                  <div className="detail">
+                    <p className="title">
+                      Top 5 Vendors by Highest Purchase Value
+                    </p>
+                    <ol>
+                      {topFiveVendors.map((vendor, index) => (
+                        <li key={index}>
+                          <p className="body">
+                            <b>{vendor.vendorName}</b>
+                          </p>
+                          <p className="body">
+                            Total purchase value:{" "}
+                            {formatToRp(vendor.totalPurchase)}
+                          </p>
+                        </li>
+                      ))}
+                    </ol>
                   </div>
-                  <button
-                    className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                    onClick={handleCetakPDFTopFiveVendorsOnClick}
-                  >
-                    Cetak PDF (Top 5 Vendors)</button>
+                  <div className="chart">
+                    <canvas ref={topFiveVendorsChartRef} />
+                  </div>
                 </div>
-              )
-              : <p className="body">Loading data ...</p>
-            }
+                <button
+                  className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  onClick={handleCetakPDFTopFiveVendorsOnClick}
+                >
+                  Cetak PDF (Top 5 Vendors)
+                </button>
+              </div>
+            ) : (
+              <p className="body">Loading data ...</p>
+            )}
 
             {/* Top Products */}
-            {topFiveOrderedProducts
-              ? (
-                <div className="top-content">
-                  <div className="top-content-detail-chart-wrapper">
-                    <div className="detail">
-                      <p className="title">Top 5 Products by Total Purchase Value</p>
-                      <ol>
-                        {topFiveOrderedProducts.map((orderedProduct, index) => (
-                          <li key={index}>
-                            <p className="body">
-                              <b>{orderedProduct.productName}</b>
-                            </p>
-                            <p className="body">
-                              Total Purchase Value:{" "}
-                              {formatToRp(orderedProduct.totalPurchase)}
-                            </p>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                    <div className="chart">
-                      <canvas ref={topFiveOrderedProductsChartRef} />
-                    </div>
+            {topFiveOrderedProducts ? (
+              <div className="top-content">
+                <div className="top-content-detail-chart-wrapper">
+                  <div className="detail">
+                    <p className="title">
+                      Top 5 Products by Total Purchase Value
+                    </p>
+                    <ol>
+                      {topFiveOrderedProducts.map((orderedProduct, index) => (
+                        <li key={index}>
+                          <p className="body">
+                            <b>{orderedProduct.productName}</b>
+                          </p>
+                          <p className="body">
+                            Total Purchase Value:{" "}
+                            {formatToRp(orderedProduct.totalPurchase)}
+                          </p>
+                        </li>
+                      ))}
+                    </ol>
                   </div>
-                  <button
-                    className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                    onClick={handleCetakPDFTopFiveOrderedProductsOnClick}
-                  >
-                    Cetak PDF (Top 5 Products)
-                  </button>
+                  <div className="chart">
+                    <canvas ref={topFiveOrderedProductsChartRef} />
+                  </div>
                 </div>
-              )
-              : <p className="body">Loading data ...</p>
-            }
+                <button
+                  className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  onClick={handleCetakPDFTopFiveOrderedProductsOnClick}
+                >
+                  Cetak PDF (Top 5 Products)
+                </button>
+              </div>
+            ) : (
+              <p className="body">Loading data ...</p>
+            )}
           </div>
         </main>
       )}
