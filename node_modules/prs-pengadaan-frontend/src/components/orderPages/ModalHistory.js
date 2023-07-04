@@ -38,6 +38,8 @@ const ModalHistory = ({ history, onClose }) => {
     }
   };
 
+  console.log("history", history);
+
   return (
     <dialog id="historyModal" className="modal">
       <div className="max-w-3xl modal-box">
@@ -68,14 +70,14 @@ const ModalHistory = ({ history, onClose }) => {
               </tr>
             </thead>
             <tbody>
-              {history?.map((e, i) => (
+              {history.map((e, i) => (
                 <tr key={e.id}>
                   <td>{i}</td>
-                  <td>{e.productName}</td>
-                  <td>{e.bidPrice}</td>
-                  <td>{e.bidPriceChange}</td>
+                  <td>{e.bidItems[0].productName}</td>
+                  <td>{e.bidItems[0].bidPrice}</td>
+                  <td>{e.bidItems[0].bidPriceChange}</td>
                   <td>{e.status}</td>
-                  <td>{e.message}</td>
+                  <td>{e.bidItems[0].message}</td>
                   <td>{timeAgo(e.orderDate)}</td>
                 </tr>
               ))}

@@ -2,6 +2,7 @@ package com.example.pengadaanrsudsamrat.orderitem;
 
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemRequestDTO;
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemResponseDTO;
+import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemUpdateStatusRequestDTO;
 import com.example.pengadaanrsudsamrat.products.ProductModel;
 import com.example.pengadaanrsudsamrat.products.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -72,5 +73,18 @@ public class OrderItemServiceImpl implements OrderItemService {
         List<OrderItemModel> orderItemModels = orderItemRepository.findAll();
         Type listType = new TypeToken<List<OrderItemResponseDTO>>(){}.getType();
         return modelMapper.map(orderItemModels, listType);
+    }
+
+    @Override
+    public void updateOrderItemStatus(OrderItemUpdateStatusRequestDTO requestDTO) {
+        Long orderItemId = requestDTO.getOrderItemId();
+        OrderItemModel.OrderItemStatus newStatus = requestDTO.getStatus();
+
+        OrderItemModel orderItemModel = orderItemRepository.findById(orderItemId)
+                .orElseThrow(EntityNotFoundException::new);
+
+        orderItemModel.setStatus(newStatus);
+
+        orderItemRepository.save(orderItemModel);
     }
 }
