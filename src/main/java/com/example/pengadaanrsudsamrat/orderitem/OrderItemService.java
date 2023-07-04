@@ -2,6 +2,7 @@ package com.example.pengadaanrsudsamrat.orderitem;
 
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemRequestDTO;
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemResponseDTO;
+import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemUpdateStatusRequestDTO;
 
 import java.util.List;
 
@@ -38,4 +39,6 @@ public interface OrderItemService {
      * @return the all order items
      */
     List<OrderItemResponseDTO> getAllOrderItems();
+
+    void updateOrderItemStatus(OrderItemUpdateStatusRequestDTO requestDTO);
 }

@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import Chart from "chart.js/auto";
+import html2pdf from "html2pdf.js";
 import ModalShipping from "../components/orderPages/ModalShipping";
 
 import "../assets/css/dashboardnew.css";
+import logo from "../assets/images/logo.jpg";
 
 const Card = ({ title, data, bgColor = "#F7F7F7" }) => {
   return (
@@ -128,13 +130,51 @@ const Dashboard = () => {
     }
   }, [topFiveOrderedProducts]);
 
+  function handleCetakPDFTopFiveVendorsOnClick() {
+    const head = "<tr><th>No.</th><th>Vendor Name</th><th>Total Purchase Value</th></tr>"
+
+    let rows = "";
+    topFiveVendors.forEach((item, index) => {
+      const row = `
+        <tr>
+          <th>${index + 1}</th>
+          <th>${item.vendorName}</th>
+          <th>${formatToRp(item.totalPurchase)}</th>
+        </tr>
+      `;
+      rows += row;
+    });
+
+    createPDF('Top Five Vendors by Purchase Value', head, rows);
+  }
+
+  function handleCetakPDFTopFiveOrderedProductsOnClick() {
+    const head = "<tr><th>No.</th><th>Product Name</th><th>Total Purchase Value</th></tr>"
+
+    let rows = "";
+    topFiveOrderedProducts.forEach((item, index) => {
+      const row = `
+        <tr>
+          <th>${index + 1}</th>
+          <th>${item.productName}</th>
+          <th>${formatToRp(item.totalPurchase)}</th>
+        </tr>
+      `;
+      rows += row;
+    });
+
+    createPDF('Top Five Products by Purchase Value', head, rows);
+  }
+
+  
+
   async function getTotalVendor() {
     try {
       const res = await axios.get(
         "http://rsudsamrat.site:8080/pengadaan/dev/v1/vendors?page=2&size=25"
       );
       setTotalVendors(res.data);
-      // console.log('getTotalVendor', res.data);
+      // console.log("getTotalVendor", res.data);
     } catch (err) {
       console.log("Unable to get total vendor.", err.message);
     }
@@ -146,7 +186,7 @@ const Dashboard = () => {
         "http://rsudsamrat.site:8080/pengadaan/dev/v1/products/2/50"
       );
       setTotalProducts(res.data.content);
-      // console.log('getTotalProduct', res.data.content);
+      // console.log("getTotalProduct", res.data.content);
     } catch (err) {
       console.log("Unable to get total prodcut.", err.message);
     }
@@ -158,7 +198,7 @@ const Dashboard = () => {
         "http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/orders/items/product-stock"
       );
       setTotalOrderedProducts(res.data);
-      // console.log('getTotalOrderedProducts', res.data);
+      // console.log("getTotalOrderedProducts", res.data);
     } catch (err) {
       console.log("Unable to get ordered products.", err.message);
     }
@@ -170,7 +210,7 @@ const Dashboard = () => {
         "http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/daily"
       );
       setDailyExpenses(res.data);
-      // console.log('getDailyExpenses', res.data);
+      // console.log("getDailyExpenses", res.data);
     } catch (err) {
       console.log("Unable to get daily expenses.", err.message);
     }
@@ -182,7 +222,7 @@ const Dashboard = () => {
         "http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/weekly"
       );
       setWeeklyExpenses(res.data);
-      // console.log('getWeeklyExpenses', res.data);
+      // console.log("getWeeklyExpenses", res.data);
     } catch (err) {
       console.log("Unable to get weekly expenses.", err.message);
     }
@@ -198,7 +238,7 @@ const Dashboard = () => {
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/monthly?date=${year}-${month}`
       );
       setMonthlyExpenses(res.data);
-      // console.log('getMonthlyExpenses', res.data);
+      // console.log("getMonthlyExpenses", res.data);
     } catch (err) {
       console.log("Unable to get montly expenses.", err.message);
     }
@@ -233,7 +273,7 @@ const Dashboard = () => {
         }
       });
 
-      // console.log('filteredOrderedProducts', filteredOrderedProducts, 'newTnewTotalCancelledOrder', newTotalCancelledOrder);
+      // console.log("filteredOrderedProducts", filteredOrderedProducts, "newTnewTotalCancelledOrder", newTotalCancelledOrder);
       setTotalCancelledOrders(newTotalCancelledOrder);
     } catch (err) {
       console.log("Unable to set total cancelled order.", err.message);
@@ -248,7 +288,7 @@ const Dashboard = () => {
       setTopFiveVendors(
         res.data.sort((a, b) => b.totalPurchase - a.totalPurchase)
       );
-      // console.log('getTopFiveVendors', res.data.sort((a, b) => b.totalPurchase - a.totalPurchase));
+      // console.log("getTopFiveVendors", res.data.sort((a, b) => b.totalPurchase - a.totalPurchase));
     } catch (err) {
       console.log("Unable to get top vendors.", err.message);
     }
@@ -260,7 +300,7 @@ const Dashboard = () => {
         "http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/top-product?limit=5"
       );
       setTopFiveOrderedProducts(res.data);
-      // console.log('getTopFiveOrderedProducts', res.data);
+      // console.log("getTopFiveOrderedProducts", res.data);
     } catch (err) {
       console.log("Unable to set top five products.", err.message);
     }
@@ -275,6 +315,67 @@ const Dashboard = () => {
         .replace(".", ",")
         .replace(/\B(?=(\d{3})+(?!\d))/g, ".")
     );
+  }
+
+  function createPDF(title, head, rows) {
+    const HTMLToBeConvertedToPDF = `
+      <style>
+        @page {
+          size: letter;
+          margin: 1in;
+        }
+        body {
+          font-family: Arial, sans-serif;
+        }
+        h2 {
+          text-align: center;
+        }
+        table {
+          width: 100%;
+          margin-top: 20px;
+          border-collapse: collapse;
+        }
+        table td,
+        table th {
+          padding: 8px;
+          border: 1px solid #000;
+        }
+        table th {
+          background-color: #f2f2f2;
+          font-weight: bold;
+        }
+        img {
+          max-width: 50px;
+        }
+      </style>
+      <body>
+        <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
+          <img src=${logo} alt="Logo" className="logo" style="float: left; margin-right: 10px; height: 50px;">
+          <strong style="font-size: 16px;">PEMERINTAH KABUPATEN MINAHASA</strong>
+        </p>
+        <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
+          <strong style="font-size: 14px;">RUMAH SAKIT UMUM DAERAH DR. SAM RATULANGI TONDANO</strong>
+        </p>
+        <p style="text-align: center; font-size: 12px; line-height: 1;">
+          Jl. Suprapto Luaan Kecamatan Tondano Timur Telp. (0431) 321171 Fax. (0431) 321172
+        </p>
+        <hr style="border: none; height: 1px; background-color: #444444; opacity: 0.5; margin: 10px 0;">
+
+        <h2 style="text-align: center;"><b>${title}</b></h2>
+        <table>
+          ${head}
+          ${rows}
+        </table>
+      </body>
+    `;
+
+    const element = document.createElement("div");
+    element.innerHTML = HTMLToBeConvertedToPDF;
+    const options = {
+      margin: [20, 20, 20, 20]
+    };
+
+    html2pdf().set(options).from(element).save();
   }
 
   return (
@@ -362,66 +463,75 @@ const Dashboard = () => {
 
           <div className="mt-12 top-contents-wrapper">
             {/* Top Vendors */}
-            <div className="top-content">
-              <div className="detail">
-                <p className="title">Top 5 Vendors by Highest Purchase Value</p>
-                {topFiveVendors ? (
-                  <ol>
-                    {topFiveVendors.map((vendor, index) => (
-                      <li key={index}>
-                        <p className="body">
-                          <b>{vendor.vendorName}</b>
-                        </p>
-                        <p className="body">
-                          Total purchase value:{" "}
-                          {formatToRp(vendor.totalPurchase)}
-                        </p>
-                      </li>
-                    ))}
-                  </ol>
-                ) : (
-                  <p className="body">Loading data ...</p>
-                )}
-              </div>
-              <div className="chart">
-                {topFiveVendors ? (
-                  <canvas ref={topFiveVendorsChartRef} />
-                ) : (
-                  <p className="body">Loading data ...</p>
-                )}
-              </div>
-            </div>
+            {topFiveVendors
+              ? (
+                <div className="top-content">
+                  <div className="top-content-detail-chart-wrapper">
+                    <div className="detail">
+                      <p className="title">Top 5 Vendors by Highest Purchase Value</p>
+                      <ol>
+                        {topFiveVendors.map((vendor, index) => (
+                          <li key={index}>
+                            <p className="body">
+                              <b>{vendor.vendorName}</b>
+                            </p>
+                            <p className="body">
+                              Total purchase value:{" "}
+                              {formatToRp(vendor.totalPurchase)}
+                            </p>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                    <div className="chart">
+                      <canvas ref={topFiveVendorsChartRef} />
+                    </div>
+                  </div>
+                  <button
+                    className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                    onClick={handleCetakPDFTopFiveVendorsOnClick}
+                  >
+                    Cetak PDF (Top 5 Vendors)</button>
+                </div>
+              )
+              : <p className="body">Loading data ...</p>
+            }
 
             {/* Top Products */}
-            <div className="top-content">
-              <div className="detail">
-                <p className="title">Top 5 Products by Total Purchase Value</p>
-                {topFiveOrderedProducts ? (
-                  <ol>
-                    {topFiveOrderedProducts.map((orderedProduct, index) => (
-                      <li key={index}>
-                        <p className="body">
-                          <b>{orderedProduct.productName}</b>
-                        </p>
-                        <p className="body">
-                          Total Purchase Value:{" "}
-                          {formatToRp(orderedProduct.totalPurchase)}
-                        </p>
-                      </li>
-                    ))}
-                  </ol>
-                ) : (
-                  <p className="body">Loading data ...</p>
-                )}
-              </div>
-              <div className="chart">
-                {topFiveOrderedProducts ? (
-                  <canvas ref={topFiveOrderedProductsChartRef} />
-                ) : (
-                  <p className="body">Loading data ...</p>
-                )}
-              </div>
-            </div>
+            {topFiveOrderedProducts
+              ? (
+                <div className="top-content">
+                  <div className="top-content-detail-chart-wrapper">
+                    <div className="detail">
+                      <p className="title">Top 5 Products by Total Purchase Value</p>
+                      <ol>
+                        {topFiveOrderedProducts.map((orderedProduct, index) => (
+                          <li key={index}>
+                            <p className="body">
+                              <b>{orderedProduct.productName}</b>
+                            </p>
+                            <p className="body">
+                              Total Purchase Value:{" "}
+                              {formatToRp(orderedProduct.totalPurchase)}
+                            </p>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                    <div className="chart">
+                      <canvas ref={topFiveOrderedProductsChartRef} />
+                    </div>
+                  </div>
+                  <button
+                    className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                    onClick={handleCetakPDFTopFiveOrderedProductsOnClick}
+                  >
+                    Cetak PDF (Top 5 Products)
+                  </button>
+                </div>
+              )
+              : <p className="body">Loading data ...</p>
+            }
           </div>
         </main>
       )}

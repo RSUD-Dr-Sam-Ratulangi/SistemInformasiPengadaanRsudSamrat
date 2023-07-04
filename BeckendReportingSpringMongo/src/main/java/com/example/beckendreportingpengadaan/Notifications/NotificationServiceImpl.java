@@ -61,7 +61,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .orElseThrow(() -> new EntityNotFoundException("Notification not found"));
 
         // Do not update the notification status
-        // notification.setNotificationStatus(NotificationModel.NotificationStatus.READ);
+        notification.setNotificationStatus(NotificationModel.NotificationStatus.READ);
 
         NotificationModel updatedNotification = notificationRepository.save(notification);
 
