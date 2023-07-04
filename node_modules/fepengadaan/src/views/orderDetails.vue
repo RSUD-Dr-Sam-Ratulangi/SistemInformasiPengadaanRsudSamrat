@@ -24,24 +24,23 @@
     </table>
   </div>
 
-  <!-- Modals edit Product -->
-  <Teleport to="body">
-    <!-- pakai komponen modal, passing ke prop(lihat Editproduct.vue) -->
-    <modal
-      :show="showmodalSeeDetails"
-      :orders="selectedOrder"
-      @close="showmodalSeeDetails = false"
-    />
-  </Teleport>
+  <!-- <modal
+    :show="showmodalSeeDetails"
+    :orders="selectedOrder"
+    @close="showmodalSeeDetails = false"
+  /> -->
+
+  <detailsOrderNew :show="showmodalSeeDetails" :orders="selectedOrder" />
 </template>
 
 <script>
 import axios from "axios";
+import detailsOrderNew from "../components/modals/detailsOrderNew.vue";
 import modal from "../components/modals/DetailsOrder.vue";
 import { mapGetters } from "vuex";
 
 export default {
-  components: { modal },
+  components: { detailsOrderNew, modal },
 
   data() {
     return {
