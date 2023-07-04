@@ -1,15 +1,27 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const CommingSoon = () => {
+  const navigate = useNavigate();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      navigate('/');
+    }, 2500);
+  }, []);
+
   return (
-    <div>
-      <h1>Update</h1>
+    <div style={{padding: '80px'}}>
+      <h1>Coming soon.</h1>
+      <p>Redirecting to home page...</p>
+
+      {/* <h1>Update</h1>
       <p>THIS FUNCTION WILL BE COMING SOON.</p>
       <div className="dropdown">
         <button
@@ -35,7 +47,7 @@ const CommingSoon = () => {
             Something else here
           </a>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
