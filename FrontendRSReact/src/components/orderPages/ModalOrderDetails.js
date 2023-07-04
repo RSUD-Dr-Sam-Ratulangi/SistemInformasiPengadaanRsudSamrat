@@ -285,17 +285,25 @@ const ModalOrderDetails = ({
   const handleNotaChange = (event) => {
     console.log("event.target.files[0]", event.target.files[0]);
     const selectedNota = event.target.files[0];
+
+    const formData = new FormData();
+    formData.append("orderId", selectedOrder.id);
+    formData.append("files", selectedNota);
+
     axios
-      .post("http://rsudsamrat.site:8990/notas", {
-        orderId: selectedOrder.id,
-        files: selectedNota,
+      .post("http://rsudsamrat.site:8990/notas", formData)
+      .then((res) => {
+        console.log(res);
       })
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        handleSetStatusNego("COMPLETE");
+        postShippingStatus("COMPLETE", selectedOrder.id);
+      });
 
     setShowActionToast(true);
     setActionToastHeader("Berhasil");
-    setActionToastBody("Nota siap untuk diupload.");
+    setActionToastBody("Nota selesai diupload");
     setTimeout(() => {
       setShowActionToast(false);
       setActionToastHeader("");
