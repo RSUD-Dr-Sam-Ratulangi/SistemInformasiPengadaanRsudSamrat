@@ -6,5 +6,6 @@ public interface FakturOrderService {
 
 
     ResponseFakturOrderDTO createFakturOrder(CreateFakturOrderDTO createDTO) throws IOException;
+    ResponseFakturOrderDTO getByOrderId(String orderId);
 
 }
