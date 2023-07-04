@@ -21,15 +21,19 @@ const Navigation = () => {
 
   const id = useSelector((state) => state.auth.id);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const notifications = useSelector(state => state.notification.notifications);
+  const notifications = useSelector(
+    (state) => state.notification.notifications
+  );
 
   const [activeTab, setActiveTab] = useState(location.pathname);
   const [isOpen, setIsOpen] = useState(false);
   const [notificationsCount, setNotificationsCount] = useState(1);
   const [isSticky, setIsSticky] = useState(false);
   const [comingSoonToolTip, setComingSoonToolTip] = useState("");
-  const [comingSoonToolTipPosition, setComingSoonToolTipPosition] = useState({top: 0, left: 0});
- 
+  const [comingSoonToolTipPosition, setComingSoonToolTipPosition] = useState({
+    top: 0,
+    left: 0,
+  });
 
   const handleNotificationClick = () => {
     // setNotificationCount(0);
@@ -53,12 +57,12 @@ const Navigation = () => {
   const handleComingSoonMouseOnEnter = (e) => {
     const { pageX, pageY } = e;
     setComingSoonToolTip("Coming soon");
-    setComingSoonToolTipPosition({top: pageY, left: pageX});
+    setComingSoonToolTipPosition({ top: pageY, left: pageX });
   };
 
   const handleComingSoonMouseOnLeave = () => {
     setComingSoonToolTip("");
-    setComingSoonToolTipPosition({top: 0, left: 0});
+    setComingSoonToolTipPosition({ top: 0, left: 0 });
   };
 
   const isSignInPage = location.pathname === "/signIn";
@@ -88,10 +92,14 @@ const Navigation = () => {
         // .get(`http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/${id}`)
         .get(`http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/2`)
         .then((res) => {
-          const newNotificationCount = res.data.reduce((count, notification) => {
-            if (notification.notificationStatus === "UNREAD") return count + 1;
-            return count;
-          }, 0);
+          const newNotificationCount = res.data.reduce(
+            (count, notification) => {
+              if (notification.notificationStatus === "UNREAD")
+                return count + 1;
+              return count;
+            },
+            0
+          );
 
           setNotificationsCount(newNotificationCount);
           dispatch(updateNotifications(res.data));
@@ -102,10 +110,13 @@ const Navigation = () => {
   }
 
   function getNotificationsCount() {
-    const newNotificationsCount = notifications.reduce((count, notification) => {
-      if (notification.notificationStatus === "UNREAD") return count + 1;
-      return count;
-    }, 0);
+    const newNotificationsCount = notifications.reduce(
+      (count, notification) => {
+        if (notification.notificationStatus === "UNREAD") return count + 1;
+        return count;
+      },
+      0
+    );
 
     setNotificationsCount(newNotificationsCount);
   }
@@ -133,10 +144,23 @@ const Navigation = () => {
               : "text-dark"
           }`}
           onClick={() => handleTabClick(`/${linkTo}`)}
-          onMouseEnter={(name === "Request" || name === "Payments") ? e => handleComingSoonMouseOnEnter(e) : null}
-          onMouseLeave={(name === "Request" || name === "Payments") ? handleComingSoonMouseOnLeave : null}
+          onMouseEnter={
+            name === "Request" || name === "Payments"
+              ? (e) => handleComingSoonMouseOnEnter(e)
+              : null
+          }
+          onMouseLeave={
+            name === "Request" || name === "Payments"
+              ? handleComingSoonMouseOnLeave
+              : null
+          }
         >
-          <span className="items-center justify-center d-flex" style={{fontSize: "22px"}}>{name}</span>
+          <span
+            className="items-center justify-center d-flex"
+            style={{ fontSize: "22px" }}
+          >
+            {name}
+          </span>
         </Link>
       </li>
     );
@@ -256,7 +280,7 @@ const Navigation = () => {
             {navLink("Request", "vendor")}
             {navLink("Products", "products")}
             {navLink("Orders", "orders")}
-            {navLink("Vendor", "vendors")}
+            {navLink("Vendor", "vendor")}
             {navLink("Payments", "payments")}
           </ul>
         )}
