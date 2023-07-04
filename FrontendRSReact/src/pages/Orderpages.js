@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import html2pdf from "html2pdf.js";
 
 import ModalHistory from "../components/orderPages/ModalHistory";
 import ModalOrderItem from "../components/orderPages/ModalOrderItem";
@@ -14,6 +15,8 @@ import ModalOrderDetails from "../components/orderPages/ModalOrderDetails";
 import ModalRefund from "../components/orderPages/ModalRefund";
 import ModalConfirm from "../components/orderPages/ModalConfirm";
 import ModalShipping from "../components/orderPages/ModalShipping";
+
+import logo from '../assets/images/logo.jpg';
 
 const Orderpages = () => {
   const [data, setData] = useState([]);
@@ -39,6 +42,7 @@ const Orderpages = () => {
   const [shipping, setShipping] = useState(null);
   const [confirm, setConfirm] = useState(null);
   const [showShippingModal, setShowShippingModal] = useState(false);
+  const [filterDateFromOlderToNewer, setFilterDateFromOlderToNewer] = useState(true);
 
   const role = useSelector((state) => state.auth.role);
   const idUser = useSelector((state) => state.auth.id);
@@ -570,6 +574,98 @@ const Orderpages = () => {
     setShipping(orderItemId);
   };
 
+  const filterFilteredStatusDataUsingDate = () => {
+    const newFilteredStatusData = filteredStatusData.sort((a, b) => {
+      const dateA = new Date(a.orderDate);
+      const dateB = new Date(b.orderDate);
+
+      if (filterDateFromOlderToNewer) return dateA - dateB;
+      else if (!filterDateFromOlderToNewer) return dateB - dateA;
+    });
+
+    setFilterDateFromOlderToNewer(!filterDateFromOlderToNewer);
+    setFilteredStatusData(newFilteredStatusData);
+  };
+
+  const cetakPDF = () => {
+    let rows = "";
+    filteredStatusData.forEach(data => {
+      const row = `
+        <tr>
+          <th>${data.orderId}</th>
+          <th>${data.status}</th>
+          <th>${formatDate(data.orderDate)}</th>
+          <th>${new Date(data.orderDate).toLocaleTimeString()}</th>
+        </tr>
+      `;
+      rows += row;
+    });
+
+    const HTMLToBeConvertedToPDF = `
+      <style>
+        @page {
+          size: letter;
+          margin: 1in;
+        }
+        body {
+          font-family: Arial, sans-serif;
+        }
+        h2 {
+          text-align: center;
+        }
+        table {
+          width: 100%;
+          margin-top: 20px;
+          border-collapse: collapse;
+        }
+        table td,
+        table th {
+          padding: 8px;
+          border: 1px solid #000;
+        }
+        table th {
+          background-color: #f2f2f2;
+          font-weight: bold;
+        }
+        img {
+          max-width: 50px;
+        }
+      </style>
+      <body>
+        <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
+          <img src=${logo} alt="Logo" className="logo" style="float: left; margin-right: 10px; height: 50px;">
+          <strong style="font-size: 16px;">PEMERINTAH KABUPATEN MINAHASA</strong>
+        </p>
+        <p style="text-align: center; line-height: 1; margin-bottom: 5px;">
+          <strong style="font-size: 14px;">RUMAH SAKIT UMUM DAERAH DR. SAM RATULANGI TONDANO</strong>
+        </p>
+        <p style="text-align: center; font-size: 12px; line-height: 1;">
+          Jl. Suprapto Luaan Kecamatan Tondano Timur Telp. (0431) 321171 Fax. (0431) 321172
+        </p>
+        <hr style="border: none; height: 1px; background-color: #444444; opacity: 0.5; margin: 10px 0;">
+
+        <h2 style="text-align: center;"><b>Order List</b></h2>
+        <table>
+          <tr>
+            <th>ID</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Time</th>
+          </tr>
+          ${rows}
+        </table>
+      </body>
+    `;
+
+    const element = document.createElement("div");
+    element.innerHTML = HTMLToBeConvertedToPDF;
+    const options = {
+      margin: [20, 20, 20, 20]
+    };
+
+    html2pdf().set(options).from(element).save();
+  };
+
   return (
     <>
       {/* Order Details Modal */}
@@ -733,6 +829,15 @@ const Orderpages = () => {
             Completed
           </button>
         </div>
+        <div className="flex gap-2 mb-2 items-center justify-center">
+          <button
+            className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+            onClick={cetakPDF}
+            disabled={loading}
+          >
+            Cetak PDF
+          </button>
+        </div>
 
         <div className="overflow-x-auto">
           <table className="table table-pin-rows">
@@ -741,7 +846,7 @@ const Orderpages = () => {
               <tr>
                 <th>ID</th>
                 <th>Status</th>
-                <th>Date</th>
+                <th onClick={filterFilteredStatusDataUsingDate}>Date</th>
                 <th>Time</th>
                 <th>Actions</th>
               </tr>

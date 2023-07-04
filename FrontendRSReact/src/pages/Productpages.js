@@ -469,7 +469,7 @@ export default function ProductPages() {
         </button>
 
         <img
-          src="https://dummyimage.com/128x128/68B2A0/fff"
+          src={product.imageUrl ? product.imageUrl : "https://dummyimage.com/128x128/68B2A0/fff"}
           alt=""
           width={128}
           className="rounded-xl"
