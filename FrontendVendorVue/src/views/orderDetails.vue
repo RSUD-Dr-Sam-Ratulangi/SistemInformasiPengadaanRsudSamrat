@@ -24,13 +24,13 @@
     </table>
   </div>
 
-  <!-- <modal
+  <modal
     :show="showmodalSeeDetails"
     :orders="selectedOrder"
     @close="showmodalSeeDetails = false"
-  /> -->
+  />
 
-  <detailsOrderNew :show="showmodalSeeDetails" :orders="selectedOrder" />
+  <!-- <detailsOrderNew :show="showmodalSeeDetails" :orders="selectedOrder" /> -->
 </template>
 
 <script>
