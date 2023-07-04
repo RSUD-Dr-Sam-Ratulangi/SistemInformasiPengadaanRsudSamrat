@@ -15,13 +15,17 @@ import { logout } from "../config/auth/authSlice";
 
 const Navigation = () => {
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState(location.pathname);
-  const [isOpen, setIsOpen] = useState(false);
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const [notificationCount, setNotificationCount] = useState(1);
-  const [isSticky, setIsSticky] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const [activeTab, setActiveTab] = useState(location.pathname);
+  const [isOpen, setIsOpen] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(1);
+  const [isSticky, setIsSticky] = useState(false);
+  const [comingSoonToolTip, setComingSoonToolTip] = useState("");
+  const [comingSoonToolTipPosition, setComingSoonToolTipPosition] = useState({top: 0, left: 0});
+ 
 
   const handleNotificationClick = () => {
     // setNotificationCount(0);
@@ -40,6 +44,17 @@ const Navigation = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("role");
     navigate("/signIn");
+  };
+
+  const handleComingSoonMouseOnEnter = (e) => {
+    const { pageX, pageY } = e;
+    setComingSoonToolTip("Coming soon");
+    setComingSoonToolTipPosition({top: pageY, left: pageX});
+  };
+
+  const handleComingSoonMouseOnLeave = () => {
+    setComingSoonToolTip("");
+    setComingSoonToolTipPosition({top: 0, left: 0});
   };
 
   const isSignInPage = location.pathname === "/signIn";
@@ -92,6 +107,8 @@ const Navigation = () => {
               : "text-dark"
           }`}
           onClick={() => handleTabClick(`/${linkTo}`)}
+          onMouseEnter={(name === "Request" || name === "Payments") ? e => handleComingSoonMouseOnEnter(e) : null}
+          onMouseLeave={(name === "Request" || name === "Payments") ? handleComingSoonMouseOnLeave : null}
         >
           <span className="items-center justify-center d-flex" style={{fontSize: "22px"}}>{name}</span>
         </Link>
@@ -124,6 +141,21 @@ const Navigation = () => {
           {navLink("Vendor", "vendors")}
           {navLink("Payments", "payments")}
         </ul>
+
+        {comingSoonToolTip && (
+          <div
+            style={{
+              position: "fixed",
+              top: comingSoonToolTipPosition.top + "px",
+              left: comingSoonToolTipPosition.left + "px",
+              background: "#ccc",
+              padding: "5px",
+              borderRadius: "3px",
+            }}
+          >
+            {comingSoonToolTip}
+          </div>
+        )}
 
         <div className="flex items-center justify-center space-x-2">
           <ul className="flex items-center justify-center gap-2 m-0">
