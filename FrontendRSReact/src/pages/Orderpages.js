@@ -386,6 +386,7 @@ const Orderpages = () => {
         }
       )
       .then((response) => {
+        postShippingStatus("NEGOTIATION", selectedOrder.id);
         // Handle the response
         console.log("Offer updated:", response.data);
         // Close the offer modal
@@ -688,15 +689,15 @@ const Orderpages = () => {
           </button>
           <button
             className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
-            onClick={() => handleFilterStatus("VALIDATING")}
-          >
-            Validating
-          </button>
-          <button
-            className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
             onClick={() => handleFilterStatus("NEGOTIATION")}
           >
             Negotiation
+          </button>
+          <button
+            className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
+            onClick={() => handleFilterStatus("VALIDATING")}
+          >
+            Validating
           </button>
           <button
             className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
