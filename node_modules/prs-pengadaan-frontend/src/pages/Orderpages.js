@@ -211,6 +211,24 @@ const Orderpages = () => {
       });
   };
 
+  const postShippingStatus = (status, selectedOrderId) => {
+    console.log("order id", selectedOrderId, "status", status);
+    axios
+      .post(
+        ` http://rsudsamrat.site:8990/order-status/${selectedOrderId}/status`,
+        {
+          status: status,
+        }
+      )
+      .then((response) => {
+        // Handle the response
+        console.log("ITEM STATUS UPDATED", response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   const handleSubmitRefund = () => {
     axios
       .put(
@@ -236,6 +254,7 @@ const Orderpages = () => {
           });
 
         handleSetOrderItemStatus("REFUND", refund.id);
+        postShippingStatus("CHECKING", selectedOrder.id);
         // Handle the response
         console.log("Refund updated:", response.data);
         // Close the refund modal
@@ -269,6 +288,7 @@ const Orderpages = () => {
       )
       .then((response) => {
         handleSetOrderItemStatus("CHECKED", confirm.id);
+        postShippingStatus("CHECKING", selectedOrder.id);
         // send notification to vendor
         axios
           .post("http://rsudsamrat.site:8990/api/v1/notifikasi", {
@@ -537,6 +557,7 @@ const Orderpages = () => {
           setActionToastHeader={setActionToastHeader}
           setActionToastBody={setActionToastBody}
           fetchData={fetchData}
+          postShippingStatus={postShippingStatus}
         />
       )}
 
@@ -616,10 +637,10 @@ const Orderpages = () => {
       )}
 
       <div className="container flex flex-col px-[6.5rem] mx-auto">
-        <h1 className="font-bold text-xl mb-2">
+        <h1 className="mb-2 text-xl font-bold">
           <span className="text-primary-1">Order</span> Status
         </h1>
-        <div className="flex gap-2 mb-2 items-center justify-center">
+        <div className="flex items-center justify-center gap-2 mb-2">
           <button
             className="flex-1 text-white btn btn-outline border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
             onClick={() => handleFilterStatus("ALL")}
@@ -700,7 +721,7 @@ const Orderpages = () => {
                         onClick={() => {
                           openModal(order.orderId);
                         }}
-                        className="btn btn-sm bg-primary-1 text-white hover:bg-primary-2 hover:border-primary-2"
+                        className="text-white btn btn-sm bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
                       >
                         Details
                       </button>
