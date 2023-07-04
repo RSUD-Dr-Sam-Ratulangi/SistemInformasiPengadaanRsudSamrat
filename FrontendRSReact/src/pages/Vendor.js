@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-// import { Modal, Container, Form, Button, Table } from 'react-bootstrap';
-import { FaTrash, FaArrowCircleUp, FaPlus, FaEdit } from "react-icons/fa";
+import { MdDelete, MdCircle, MdPlusOne, MdModeEdit } from "react-icons/md";
 import { Link } from "react-router-dom";
 
 const Vendors = () => {
@@ -129,166 +128,245 @@ const Vendors = () => {
     setSearchTerm(event.target.value);
   };
 
-  // return (
-  //   <Container>
-  //     <Button className="btn btn-primary">ProccessReview</Button>
-  //     <Button
-  //       variant="primary"
-  //       onClick={handleShowModal}
-  //       style={{ backgroundColor: "#ccc", border: "none" }}
-  //     >
-  //       <FaPlus style={{ fontSize: "15px", color: "#000" }} />
-  //     </Button>
+  return (
+    <div className="container mx-auto">
+      <div className="flex gap-2 mt-12">
+        <button className="btn btn-primary">Proccess Review</button>
+        <button className="btn btn-info" onClick={handleShowModal}>
+          +
+        </button>
+      </div>
 
-  //     <div className="my-4">
-  //       <input
-  //         type="text"
-  //         className="form-control"
-  //         placeholder="Search by Name, Address, Phone Number"
-  //         value={searchTerm}
-  //         onChange={handleSearch}
-  //       />
-  //     </div>
+      <div className="my-4">
+        <input
+          type="text"
+          className="form-control w-full input input-primary"
+          placeholder="Search by Name, Address, Phone Number"
+          value={searchTerm}
+          onChange={handleSearch}
+        />
+      </div>
 
-  //     <Table striped bordered hover>
-  //       <thead>
-  //         <tr>
-  //           <th>ID</th>
-  //           <th>Vendor Name</th>
-  //           <th>No. Telp</th>
-  //           <th>Address</th>
-  //           <th>Action</th>
-  //         </tr>
-  //       </thead>
-  //       <tbody>
-  //         {data
-  //           .filter(
-  //             (vendor) =>
-  //               vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //               vendor.address
-  //                 .toLowerCase()
-  //                 .includes(searchTerm.toLowerCase()) ||
-  //               vendor.phoneNumber.includes(searchTerm)
-  //           )
-  //           .map((vendor) => (
-  //             <tr key={vendor.id}>
-  //               <td>{vendor.id}</td>
-  //               <td>{vendor.name}</td>
-  //               <td>{vendor.phoneNumber}</td>
-  //               <td>{vendor.address}</td>
-  //               <td>
-  //                 <Button className="button btn-primary">
-  //                   <FaArrowCircleUp />
-  //                 </Button>
-  //                 <Button
-  //                   className="button btn-primary"
-  //                   onClick={() => handleDelete(vendor.vendoruuid)}
-  //                 >
-  //                   <FaTrash />
-  //                 </Button>
-  //                 <Button
-  //                   className="button btn-primary"
-  //                   onClick={() => handleEdit(vendor)}
-  //                 >
-  //                   <FaEdit />
-  //                 </Button>
-  //               </td>
-  //             </tr>
-  //           ))}
-  //       </tbody>
-  //     </Table>
-  //     <Button
-  //       type="button"
-  //       className="button btn-primary"
-  //       onClick={() => setPage(page - 1)}
-  //       disabled={page === 0}
-  //     >
-  //       Previous Page
-  //     </Button>
-  //     <Button
-  //       type="button"
-  //       className="button btn-primary"
-  //       onClick={() => setPage(page + 1)}
-  //       disabled={data.length === 0}
-  //     >
-  //       Next Page
-  //     </Button>
+      <table className="table-auto w-full">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Vendor Name</th>
+            <th>No. Telp</th>
+            <th>Address</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data
+            .filter(
+              (vendor) =>
+                vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                vendor.address
+                  .toLowerCase()
+                  .includes(searchTerm.toLowerCase()) ||
+                vendor.phoneNumber.includes(searchTerm)
+            )
+            .map((vendor) => (
+              <tr key={vendor.id}>
+                <td>{vendor.id}</td>
+                <td>{vendor.name}</td>
+                <td>{vendor.phoneNumber}</td>
+                <td>{vendor.address}</td>
+                <td className="flex gap-2 justify-center">
+                  <button
+                    className="btn btn-error"
+                    onClick={() => handleDelete(vendor.vendoruuid)}
+                  >
+                    <MdDelete className="h-5 w-5" />
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleEdit(vendor)}
+                  >
+                    <MdModeEdit className="h-5 w-5" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+      <div className="mt-5">
+        <button
+          type="button"
+          className="btn btn-primary me-2"
+          onClick={() => setPage(page - 1)}
+          disabled={page === 0}
+        >
+          Previous Page
+        </button>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => setPage(page + 1)}
+          disabled={data.length === 0}
+        >
+          Next Page
+        </button>
+      </div>
 
-  //     <Modal
-  //       show={showModal}
-  //       onHide={handleCloseModal}
-  //       className="modal-background"
-  //     >
-  //       <Modal.Header closeButton>
-  //         <Modal.Title>
-  //           {editVendor ? "Edit Vendor" : "Create Vendor"}
-  //         </Modal.Title>
-  //       </Modal.Header>
-  //       <Modal.Body>
-  //         <Form
-  //           onSubmit={editVendor ? handleUpdateVendor : handleSubmitNewVendor}
-  //         >
-  //           <Form.Group controlId="name">
-  //             <Form.Label>Name</Form.Label>
-  //             <Form.Control
-  //               type="text"
-  //               name="name"
-  //               value={editVendor ? editVendor.name : newVendor.name}
-  //               onChange={
-  //                 editVendor ? handleChangeEditVendor : handleChangeNewVendor
-  //               }
-  //             />
-  //           </Form.Group>
-  //           <Form.Group controlId="address">
-  //             <Form.Label>Address</Form.Label>
-  //             <Form.Control
-  //               type="text"
-  //               name="address"
-  //               value={editVendor ? editVendor.address : newVendor.address}
-  //               onChange={
-  //                 editVendor ? handleChangeEditVendor : handleChangeNewVendor
-  //               }
-  //             />
-  //           </Form.Group>
-  //           <Form.Group controlId="phoneNumber">
-  //             <Form.Label>Phone Number</Form.Label>
-  //             <Form.Control
-  //               type="number"
-  //               name="phoneNumber"
-  //               value={
-  //                 editVendor ? editVendor.phoneNumber : newVendor.phoneNumber
-  //               }
-  //               onChange={
-  //                 editVendor ? handleChangeEditVendor : handleChangeNewVendor
-  //               }
-  //               required
-  //             />
-  //           </Form.Group>
-  //           <Button variant="primary" type="submit">
-  //             {editVendor ? "Update" : "Create"}
-  //           </Button>
-  //         </Form>
-  //       </Modal.Body>
-  //     </Modal>
+      {showModal && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div
+              className="fixed inset-0 transition-opacity"
+              aria-hidden="true"
+            >
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+            <div
+              className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="modal-headline"
+            >
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <form
+                  onSubmit={
+                    editVendor ? handleUpdateVendor : handleSubmitNewVendor
+                  }
+                >
+                  <div className="mb-4">
+                    <label
+                      htmlFor="name"
+                      className="block text-gray-700 text-sm font-bold mb-2"
+                    >
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={editVendor ? editVendor.name : newVendor.name}
+                      onChange={
+                        editVendor
+                          ? handleChangeEditVendor
+                          : handleChangeNewVendor
+                      }
+                      className="form-control input input-primary w-full"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="address"
+                      className="block text-gray-700 text-sm font-bold mb-2"
+                    >
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      id="address"
+                      name="address"
+                      value={
+                        editVendor ? editVendor.address : newVendor.address
+                      }
+                      onChange={
+                        editVendor
+                          ? handleChangeEditVendor
+                          : handleChangeNewVendor
+                      }
+                      className="form-control input input-primary w-full"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="phoneNumber"
+                      className="block text-gray-700 text-sm font-bold mb-2"
+                    >
+                      Phone Number
+                    </label>
+                    <input
+                      type="number"
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      value={
+                        editVendor
+                          ? editVendor.phoneNumber
+                          : newVendor.phoneNumber
+                      }
+                      onChange={
+                        editVendor
+                          ? handleChangeEditVendor
+                          : handleChangeNewVendor
+                      }
+                      className="form-control input input-primary w-full"
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary me-2">
+                    {editVendor ? "Update" : "Create"}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={handleCloseModal}
+                  >
+                    Cancel
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
-  //     <Modal show={showConfirmModal} onHide={handleCloseConfirmModal}>
-  //       <Modal.Header closeButton>
-  //         <Modal.Title>Confirm Vendor Creation</Modal.Title>
-  //       </Modal.Header>
-  //       <Modal.Body>
-  //         <p>Are you sure you want to create this vendor?</p>
-  //       </Modal.Body>
-  //       <Modal.Footer>
-  //         <Button variant="secondary" onClick={handleCloseConfirmModal}>
-  //           Cancel
-  //         </Button>
-  //         <Button variant="primary" onClick={handleConfirmCreate}>
-  //           Create
-  //         </Button>
-  //       </Modal.Footer>
-  //     </Modal>
-  //   </Container>
-  // );
+      {showConfirmModal && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div
+              className="fixed inset-0 transition-opacity"
+              aria-hidden="true"
+            >
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
+            <div
+              className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="modal-headline"
+            >
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <p>Are you sure you want to create this vendor?</p>
+              </div>
+              <div className="bg-white px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleConfirmCreate}
+                >
+                  Create
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handleCloseConfirmModal}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default Vendors;

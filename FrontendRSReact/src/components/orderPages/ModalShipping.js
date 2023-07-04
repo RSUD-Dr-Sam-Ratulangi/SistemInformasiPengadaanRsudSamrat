@@ -4,6 +4,9 @@ import { MdLocalShipping } from "react-icons/md";
 
 const ModalShipping = ({ shipping, onClose }) => {
   const [shippingData, setShippingData] = useState([]);
+  const [vendorData, setVendorData] = useState(null);
+  const [productData, setProductData] = useState(null);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     console.log("modal shipping", window.shippingModal.open);
     if (!window.shippingModal.open) {
@@ -24,8 +27,21 @@ const ModalShipping = ({ shipping, onClose }) => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
 
+    axios
+      .get(`http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${shipping}`)
+      .then((res) => {
+        console.log(res.data);
+        setVendorData(res.data.orderItems[0]);
+        setProductData(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [shipping]);
+
+  console.log("vendor data", vendorData);
   const timeAgo = (time) => {
     const now = new Date();
     const then = new Date(time);
@@ -77,9 +93,15 @@ const ModalShipping = ({ shipping, onClose }) => {
     }
   };
 
+  const calculateTotalPrice = (orderItem) => {
+    // get total price by multiplying quantity with price
+    const totalPrice = orderItem.quantity * orderItem.product.price;
+    return totalPrice;
+  };
+
   return (
     <dialog id="shippingModal" className="modal">
-      <div className="max-w-5xl modal-box ">
+      <div className="max-w-6xl modal-box ">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -149,31 +171,140 @@ const ModalShipping = ({ shipping, onClose }) => {
               )}
             </ul>
           </div>
-          <div>
-            <ul className="w-full steps steps-vertical">
-              {shippingData.map((data, i) => (
-                <li
-                  key={i}
-                  data-content={
-                    i === 0 ? (data.status === "CANCEL" ? "X" : "✓") : "●"
-                  }
-                  className={`w-full step step-${getCurrentStatus2(
-                    data.status,
-                    i
-                  )}`}
-                >
-                  <div className="flex justify-star items-center w-full">
-                    <span className="font-semibold w-40 text-start">
-                      {timeAgo(data.timestamp)}
-                    </span>
-                    <span className="text-sm w-48 text-start">
-                      {formatDateTime(data.timestamp)}
-                    </span>
-                    {data.status}
+          <div className="flex mt-5">
+            <div className="flex-1">
+              <ul className="w-full steps steps-vertical">
+                {shippingData.map((data, i) => (
+                  <li
+                    key={i}
+                    data-content={
+                      i === 0 ? (data.status === "CANCEL" ? "X" : "✓") : "●"
+                    }
+                    className={`w-full step step-${getCurrentStatus2(
+                      data.status,
+                      i
+                    )}`}
+                  >
+                    <div className="flex justify-star items-center w-full">
+                      <span className="font-semibold w-40 text-start">
+                        {timeAgo(data.timestamp)}
+                      </span>
+                      <span className="text-sm w-48 text-start">
+                        {formatDateTime(data.timestamp)}
+                      </span>
+                      {data.status}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex flex-col gap-2 ">
+              <div>
+                <h2 className="text-2xl font-semibold text-slate-600">
+                  Shipping Details
+                </h2>
+              </div>
+              {loading || !vendorData || !productData ? (
+                <div>Loading</div>
+              ) : (
+                <>
+                  <div className="flex gap-3">
+                    <div className="flex flex-col text-primary-1">
+                      Owner
+                      <span className="text-black font-medium w-40">
+                        {vendorData?.product?.vendor?.owner.username}
+                      </span>
+                    </div>
+                    <div className="flex flex-col text-primary-1">
+                      Phone Number
+                      <span className="text-black font-medium">
+                        {vendorData?.product?.vendor?.phoneNumber}
+                      </span>
+                    </div>
                   </div>
-                </li>
-              ))}
-            </ul>
+                  <div className="flex gap-3">
+                    <div className="flex flex-col text-primary-1">
+                      Name
+                      <span className="text-black font-medium w-40">
+                        {vendorData?.product?.vendor?.name}
+                      </span>
+                    </div>
+                    <div className="flex flex-col text-primary-1">
+                      Address
+                      <span className="text-black font-medium">
+                        {vendorData?.product?.vendor?.address}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="flex flex-col text-primary-1">
+                      Bid Price
+                      <span className="text-black font-medium w-40">
+                        {vendorData?.bidPrice}
+                      </span>
+                    </div>
+                    <div className="flex flex-col text-primary-1">
+                      Total Amount
+                      <span className="text-black font-medium">
+                        {vendorData?.totalAmount}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col text-primary-1">
+                    Quantity
+                    <span className="text-black font-medium">
+                      {vendorData?.quantity}
+                    </span>
+                  </div>
+                  <div>
+                    <table className="table table-pin-rows">
+                      {/* head */}
+                      <thead>
+                        <tr>
+                          <th>Order ID</th>
+                          <th>Img URL</th>
+                          <th>Product Name</th>
+                          <th>Final Price</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {/* body */}
+                        {productData.orderItems.map((orderItem, index) => (
+                          <tr>
+                            <td className="font-bold">{orderItem.id}</td>
+                            <td className="font-bold">
+                              <img
+                                src={orderItem.product.imageUrl}
+                                alt="product-img"
+                                width={64}
+                              />
+                            </td>
+                            <td className="font-medium text-primary-1">
+                              {orderItem.product.name}{" "}
+                              <span className="text-sm text-black">
+                                x{orderItem.quantity}
+                              </span>
+                            </td>
+                            <td>
+                              Rp{" "}
+                              <span>
+                                {orderItem.totalAmount === 0
+                                  ? calculateTotalPrice(orderItem)
+                                  : orderItem.totalAmount}
+                              </span>
+                            </td>
+                            <td className="font-semibold transition-all duration-300 ease-in-out cursor-pointer hover:text-primary-1">
+                              {orderItem.status}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
         <div className="modal-action">

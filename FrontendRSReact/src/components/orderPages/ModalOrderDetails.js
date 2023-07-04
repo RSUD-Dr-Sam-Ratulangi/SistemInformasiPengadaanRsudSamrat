@@ -653,7 +653,7 @@ const ModalOrderDetails = ({
                   className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
                   disabled={selectedFiles.length === 1}
                 >
-                  Upload Kwitansi
+                  Upload Faktur
                 </button>
               </div>
             </>
