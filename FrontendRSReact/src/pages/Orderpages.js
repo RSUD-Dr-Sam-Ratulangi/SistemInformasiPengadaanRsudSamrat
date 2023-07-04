@@ -145,10 +145,7 @@ const Orderpages = () => {
     }
   };
 
-  /* History function */
-  const handleHistory = () => {
-    setShowHistoryModal(true);
-    console.log("history modal", showHistoryModal);
+  const getHistory = async () => {
     axios
       .get(
         `http://rsudsamrat.site:8990/api/bid-exchange/history/${selectedOrder.id}`
@@ -159,6 +156,13 @@ const Orderpages = () => {
         console.log("Berhasil");
       })
       .catch((err) => console.log(err));
+  };
+
+  /* History function */
+  const handleHistory = () => {
+    setShowHistoryModal(true);
+    console.log("history modal", showHistoryModal);
+    getHistory();
   };
 
   const handleDetailProduct = async (productUuid) => {
@@ -578,7 +582,9 @@ const Orderpages = () => {
           onClose={handleModalOrderDetailsOnClose}
           selectedOrder={selectedOrder}
           selectedOrderItem={selectedOrderItem}
+          getHistory={getHistory}
           handleHistory={handleHistory}
+          history={history}
           handleShipping={handleShipping}
           handleDetailProduct={handleDetailProduct}
           handleOffer={handleOffer}

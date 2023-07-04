@@ -1,7 +1,7 @@
 import html2pdf from "html2pdf.js";
 import logo from "../../assets/images/logo.jpg";
 
-export default function printOrderItems(selectedOrderItems) {
+export default function printOrderItems(selectedOrderItems, history) {
   console.log("from print", selectedOrderItems);
   if (selectedOrderItems && selectedOrderItems.length > 0) {
     const taxRate = 0.11; // 11% tax rate
@@ -35,6 +35,52 @@ export default function printOrderItems(selectedOrderItems) {
       secondTableRows += row;
     });
 
+    const timeAgo = (time) => {
+      const now = new Date();
+      const then = new Date(time);
+      const seconds = Math.round((now - then) / 1000);
+      const minutes = Math.round(seconds / 60);
+      const hours = Math.round(minutes / 60);
+      const days = Math.round(hours / 24);
+      const weeks = Math.round(days / 7);
+      const months = Math.round(days / 30);
+      const years = Math.round(days / 365);
+
+      if (seconds < 60) {
+        return "Just now";
+      } else if (minutes < 60) {
+        return `${minutes} minutes ago`;
+      } else if (hours < 24) {
+        return `${hours} hours ago`;
+      } else if (days < 7) {
+        return `${days} days ago`;
+      } else if (weeks < 4) {
+        return `${weeks} weeks ago`;
+      } else if (months < 12) {
+        return `${months} months ago`;
+      } else {
+        return `${years} years ago`;
+      }
+    };
+
+    console.log("history", history);
+
+    let thirdTableRows = "";
+
+    history.forEach((e, i) => {
+      const row = `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${e.bidItems[0].productName}</td>
+        <td>${e.bidItems[0].bidPrice}</td>
+        <td>${e.bidItems[0].bidPriceChange}</td>
+        <td>${e.status}</td>
+        <td>${e.bidItems[0].message}</td>
+        <td>${timeAgo(e.orderDate)}</td>
+      </tr>`;
+      thirdTableRows += row;
+    });
+
     function calculateTotal(selectedOrderItems) {
       let total = 0;
       selectedOrderItems.forEach((selectedOrderItem) => {
@@ -52,6 +98,7 @@ export default function printOrderItems(selectedOrderItems) {
         }
         body {
           font-family: Arial, sans-serif;
+          font-size: 14px;
         }
         h2 {
           text-align: center;
@@ -131,6 +178,23 @@ export default function printOrderItems(selectedOrderItems) {
         <p>Pembayaran akan diproses sesuai dengan yang disepakati. Harap lanjutkan dengan pengaturan yang diperlukan untuk pengiriman produk.</p>
         <p>Jika Anda memiliki pertanyaan atau membutuhkan informasi lebih lanjut, jangan ragu untuk menghubungi kami.</p>
         <p>Terima kasih atas kerjasamanya.</p>
+        <br>
+        <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Product Name</th>
+                <th>Bid Price</th>
+                <th>Price Change</th>
+                <th>Status</th>
+                <th>Messages</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${thirdTableRows}
+            </tbody>
+          </table>
         <br>
         <div style="text-align: right;">
           <p>Hormat kami,</p>
