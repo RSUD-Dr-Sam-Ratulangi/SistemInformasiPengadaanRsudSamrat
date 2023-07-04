@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { MdHandshake, MdHistory } from "react-icons/md";
 
-const ModalHistory = ({ history }) => {
+const ModalHistory = ({ history, onClose }) => {
   useEffect(() => {
     console.log("modal history", window.historyModal.open);
     if (!window.historyModal.open) {
@@ -40,19 +40,20 @@ const ModalHistory = ({ history }) => {
 
   return (
     <dialog id="historyModal" className="modal">
-      <div className="modal-box max-w-3xl">
+      <div className="max-w-3xl modal-box">
         {/* Header */}
-        <form>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <MdHistory className="text-2xl text-primary-1" />
-              <h3 className="text-xl font-bold">History</h3>
-            </div>
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-              ✕
-            </button>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <MdHistory className="text-2xl text-primary-1" />
+            <h3 className="text-xl font-bold">History</h3>
           </div>
-        </form>
+          <button
+            onClick={onClose}
+            className="absolute btn btn-sm btn-circle btn-ghost right-2 top-2"
+          >
+            ✕
+          </button>
+        </div>
         <div className="modal-body">
           <table className="table">
             <thead>
