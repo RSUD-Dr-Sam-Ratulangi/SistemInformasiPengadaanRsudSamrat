@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class ImageProcessor {
-    public static final String BASE_URL = "http://rsudsamrat.site/images/";
+    public static final String BASE_URL = "https://rsudsamrat.site/images/";
     public static final String IMAGE_DIRECTORY = "/opt/lampp/htdocs/images/";
 
     public List<String> generateImageUrls(List<Binary> images) throws IOException {

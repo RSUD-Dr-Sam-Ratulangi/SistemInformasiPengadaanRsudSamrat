@@ -2,6 +2,7 @@ package com.example.pengadaanrsudsamrat.orderitem;
 
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemRequestDTO;
 import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemResponseDTO;
+import com.example.pengadaanrsudsamrat.orderitem.DTO.OrderItemUpdateStatusRequestDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,6 +69,13 @@ public class OrderItemController {
     public ResponseEntity<List<OrderItemResponseDTO>> getAllOrderItems() {
         List<OrderItemResponseDTO> orderItems = orderItemService.getAllOrderItems();
         return ResponseEntity.ok(orderItems);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<String> updateOrderItemStatus(@PathVariable("id") Long id, @RequestBody OrderItemUpdateStatusRequestDTO requestDTO) {
+        requestDTO.setOrderItemId(id);
+        orderItemService.updateOrderItemStatus(requestDTO);
+        return ResponseEntity.ok("Status updated successfully");
     }
 
 

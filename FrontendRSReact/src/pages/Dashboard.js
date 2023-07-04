@@ -3,13 +3,10 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import Chart from "chart.js/auto";
 import html2pdf from "html2pdf.js";
+import ModalShipping from "../components/orderPages/ModalShipping";
 
 import "../assets/css/dashboardnew.css";
 import logo from "../assets/images/logo.jpg";
-
-const Gap = ({ h = 0, w = 0 }) => {
-  return <div style={{ height: h, width: w }} />;
-};
 
 const Card = ({ title, data, bgColor = "#F7F7F7" }) => {
   return (
@@ -45,6 +42,9 @@ const Dashboard = () => {
   const topFiveVendorsChartInstance = useRef(null);
   const topFiveOrderedProductsChartRef = useRef(null);
   const topFiveOrderedProductsChartInstance = useRef(null);
+
+  const [modalShipping, setModalShipping] = useState(false);
+  const [shipping, setShipping] = useState(null);
 
   useEffect(() => {
     getTotalVendor();
@@ -380,11 +380,9 @@ const Dashboard = () => {
 
   return (
     <div id="dashboard-page">
-      <h2 className="welcome-title">
+      <h2 className="mb-12 welcome-title">
         Selamat Datang , {username} ({role})
       </h2>
-
-      <Gap h={40} />
 
       {!isLoggedIn ? (
         <div>
@@ -416,9 +414,7 @@ const Dashboard = () => {
             />
           </div>
 
-          <Gap h={16} />
-
-          <div className="cards-wrapper" style={{ color: "white" }}>
+          <div className="mt-4 cards-wrapper" style={{ color: "white" }}>
             <Card
               title="Daily Expenses"
               data={
@@ -444,9 +440,28 @@ const Dashboard = () => {
             />
           </div>
 
-          <Gap h={80} />
+          <div className="max-w-xl mx-auto mt-5">
+            <h2 className="mb-2 text-xl font-semibold">Shipping</h2>
+            <input
+              className="w-full input input-bordered"
+              type="text"
+              placeholder="Search Order ID"
+              onChange={(e) => setShipping(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  setModalShipping(true);
+                }
+              }}
+            />
+            {modalShipping && (
+              <ModalShipping
+                shipping={shipping}
+                onClose={() => setModalShipping(false)}
+              />
+            )}
+          </div>
 
-          <div className="top-contents-wrapper">
+          <div className="mt-12 top-contents-wrapper">
             {/* Top Vendors */}
             {topFiveVendors
               ? (

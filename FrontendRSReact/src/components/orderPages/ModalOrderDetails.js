@@ -31,6 +31,7 @@ const ModalOrderDetails = ({
   setActionToastHeader,
   setActionToastBody,
   fetchData,
+  postShippingStatus,
 }) => {
   const role = useSelector((state) => state.auth.role);
   const id = useSelector((state) => state.auth.id);
@@ -85,6 +86,13 @@ const ModalOrderDetails = ({
       )
         .then((response) => {
           setShowActionToast(true);
+          setActionToastHeader("Berhasil");
+          setActionToastBody("Data berhasil dihapus");
+          setTimeout(() => {
+            setShowActionToast(false);
+            setActionToastHeader("");
+            setActionToastBody("");
+          }, 3000);
 
           if (response.ok) {
             // Data berhasil dihapus, lakukan tindakan tambahan jika diperlukan
@@ -107,6 +115,11 @@ const ModalOrderDetails = ({
           console.error("Terjadi kesalahan:", error);
           setActionToastHeader("Gagal");
           setActionToastBody("Terjadi Kesalahan");
+          setTimeout(() => {
+            setShowActionToast(false);
+            setActionToastHeader("");
+            setActionToastBody("");
+          }, 3000);
           onClose();
         });
     }
@@ -173,7 +186,7 @@ const ModalOrderDetails = ({
       })
       .catch((err) => console.log(err));
     onClose();
-    window.location.reload();
+    // window.location.reload();
   };
 
   const handlePrintBeritaAcara = () => {
@@ -185,6 +198,7 @@ const ModalOrderDetails = ({
         }
       )
       .then((response) => {
+        postShippingStatus("PAYMENT", selectedOrder.id);
         axios
           .get(`http://rsudsamrat.site:8080/employee`)
           .then((response) => {
@@ -261,6 +275,31 @@ const ModalOrderDetails = ({
   //   }
   // }, [selectedOrder.Order])
 
+  const handleCheckFaktur = () => {
+    axios
+      .get(`http://rsudsamrat.site:8990/faktur-orders/${selectedOrder.id}`)
+      .then((response) => {
+        console.log(response);
+        if (response.data.length !== 0) {
+          // open link from new tab
+          window.open(response.data.fileUrls[0], "_blank");
+          console.log(response.data.fileUrls[0]);
+        } else {
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setShowActionToast(true);
+        setActionToastHeader("Gagal");
+        setActionToastBody("Faktur belum diupload.");
+        setTimeout(() => {
+          setShowActionToast(false);
+          setActionToastHeader("");
+          setActionToastBody("");
+        }, 3000);
+      });
+  };
+
   const ProductItem = ({ orderItem }) => {
     console.log("--productItem--", orderItem);
 
@@ -273,6 +312,9 @@ const ModalOrderDetails = ({
     return (
       <tr>
         <td className="font-bold">{orderItem.id}</td>
+        <td className="font-bold">
+          <img src={orderItem.product.imageUrl} alt="product-img" width={64} />
+        </td>
         <td className="font-medium text-primary-1">
           {orderItem.product.name}{" "}
           <span className="text-sm text-black">x{orderItem.quantity}</span>
@@ -285,7 +327,7 @@ const ModalOrderDetails = ({
               : orderItem.totalAmount}
           </span>
         </td>
-        <td className="cursor-pointer hover:text-primary-1 transition-all duration-300 ease-in-out font-semibold">
+        <td className="font-semibold transition-all duration-300 ease-in-out cursor-pointer hover:text-primary-1">
           {orderItem.status}
         </td>
         <td>
@@ -300,15 +342,6 @@ const ModalOrderDetails = ({
               tabIndex={0}
               className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
             >
-              {selectedOrder.status === "SHIPPING" && (
-                <li>
-                  <a onClick={() => handleShipping(orderItem.id)}>
-                    <MdLocalShipping className="text-xl text-orange-500" />
-                    Shipping
-                  </a>
-                </li>
-              )}
-              <hr />
               {selectedOrder.status === "ORDER" ||
                 (selectedOrder.status === "NEGOTIATION" && (
                   <li>
@@ -388,13 +421,14 @@ const ModalOrderDetails = ({
     return [...vendorItemsMap].map(([vendorName, orderItems], index) => (
       <React.Fragment key={index}>
         <div className="flex flex-col gap-2 ">
-          <h2 className="font-medium text-xl text-slate-600">Best Vendor</h2>
+          <h2 className="text-xl font-medium text-slate-600">Best Vendor</h2>
           <hr />
           <table className="table table-pin-rows">
             {/* head */}
             <thead>
               <tr>
                 <th>Order ID</th>
+                <th>Img URL</th>
                 <th>Product Name</th>
                 <th>Final Price</th>
                 <th>Status</th>
@@ -415,7 +449,10 @@ const ModalOrderDetails = ({
             selectedOrder.status === "NEGOTIATION" && (
               <button
                 className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                onClick={() => handleSetStatusValidating("VALIDATING")}
+                onClick={() => {
+                  handleSetStatusValidating("VALIDATING");
+                  postShippingStatus("VALIDATING", selectedOrder.id);
+                }}
               >
                 Change Status
               </button>
@@ -424,13 +461,19 @@ const ModalOrderDetails = ({
             <>
               <button
                 className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                onClick={() => handleSetStatusNego("NEGOTIATION")}
+                onClick={() => {
+                  handleSetStatusNego("NEGOTIATION");
+                  postShippingStatus("NEGOTIATION", selectedOrder.id);
+                }}
               >
                 Cancel Negotiation
               </button>
               <button
                 className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                onClick={() => handleSetStatusCancel("CANCEL")}
+                onClick={() => {
+                  handleSetStatusCancel("CANCEL");
+                  postShippingStatus("CANCEL", selectedOrder.id);
+                }}
               >
                 Cancel Order
               </button>
@@ -444,7 +487,7 @@ const ModalOrderDetails = ({
 
   return (
     <dialog id="detailsModal" className="modal">
-      <div className="modal-box max-w-4xl">
+      <div className="max-w-4xl modal-box">
         <form method="dialog">
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
@@ -452,7 +495,7 @@ const ModalOrderDetails = ({
               <MdInventory className="text-2xl text-primary-1" />
               <h3 className="text-xl font-bold">Order Details</h3>
             </div>
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+            <button className="absolute btn btn-sm btn-circle btn-ghost right-2 top-2">
               ✕
             </button>
           </div>
@@ -462,7 +505,7 @@ const ModalOrderDetails = ({
         </form>
 
         {/* Footer */}
-        <div className="modal-action mt-12">
+        <div className="mt-12 modal-action">
           {selectedFiles && (
             <div>
               {selectedFiles.map((file, index) => (
@@ -510,8 +553,11 @@ const ModalOrderDetails = ({
           >
             Payout Details
           </button>
-          <button className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2">
-            Check Status
+          <button
+            className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+            onClick={handleCheckFaktur}
+          >
+            Check Faktur
           </button>
           {allItemsAccepted && (
             <button

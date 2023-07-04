@@ -76,14 +76,12 @@ export default function ProductPages() {
         if (compareCurrentVendorWithLocalStorageCartsVendor()) {
           console.log("one");
           localStorage.setItem("carts", JSON.stringify(carts));
-        }
-        else {
+        } else {
           console.log("two");
           setCarts(cartsInitialValues());
           localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
         }
-      }
-      else {
+      } else {
         console.log("three");
         setCarts(cartsInitialValues());
         localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
@@ -187,14 +185,14 @@ export default function ProductPages() {
 
   function compareCurrentVendorWithLocalStorageCartsVendor() {
     let isSame = true;
-    
+
     // length check
     if (vendors.length !== carts.length) {
       isSame = false;
     }
 
     // vendorUUID check
-    if(isSame) {
+    if (isSame) {
       for (let counter = 0; counter < vendors.length; counter++) {
         if (vendors[counter].vendoruuid !== carts[counter].vendorUUID) {
           isSame = false;
@@ -223,9 +221,9 @@ export default function ProductPages() {
     console.log("handleSeePendingProductsOnClick");
     setFilteredProducts(
       filterProducts({
-        statusList: ["PENDING"]
+        statusList: ["PENDING"],
       })
-    )
+    );
   }
 
   function handleSelectedCategoriesAndSelectedSubCategoryChange(
@@ -343,6 +341,22 @@ export default function ProductPages() {
     setCarts(newCarts);
   }
 
+  const postShippingStatus = (status, selectedOrderId) => {
+    console.log("order id", selectedOrderId, "status", status);
+    axios
+      .post(`http://rsudsamrat.site:8990/order-status`, {
+        orderId: selectedOrderId,
+        status: status,
+      })
+      .then((response) => {
+        // Handle the response
+        console.log("ITEM STATUS UPDATED", response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   function handleCartsModalCreate() {
     axios
       .post("http://rsudsamrat.site:8080/pengadaan/dev/v1/orders", {})
@@ -367,6 +381,9 @@ export default function ProductPages() {
             newCarts.push(cart);
           }
         });
+
+        postShippingStatus("ORDER", res.data.id);
+        console.log("product res", res.data.id);
 
         axios
           .post(
@@ -509,7 +526,9 @@ export default function ProductPages() {
                           cart.products.length > 0 && (
                             <li
                               key={cart.vendorUUID}
-                              onClick={() => handleCartsModalVendorSelection(cart)}
+                              onClick={() =>
+                                handleCartsModalVendorSelection(cart)
+                              }
                             >
                               <a>{cart.vendorName}</a>
                             </li>
@@ -570,7 +589,9 @@ export default function ProductPages() {
                   type="number"
                   value={selectedProductModalOrderQuantity}
                   onChange={(e) =>
-                    handleSelectedProductModalOrderQuantityChange(e.target.value)
+                    handleSelectedProductModalOrderQuantityChange(
+                      e.target.value
+                    )
                   }
                   className="w-full input border-primary-1 focus:outline-primary-1 "
                 />
@@ -617,7 +638,7 @@ export default function ProductPages() {
           <button
             className="flex-1 text-md text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
             onClick={handleSeePendingProductsOnClick}
-            style={{marginTop: "28px"}}
+            style={{ marginTop: "28px" }}
           >
             See Pending Products
           </button>
@@ -749,17 +770,16 @@ export default function ProductPages() {
           </div>
 
           {/* Product List */}
-          {products.length > 0
-            ? (
-              <>
-                <div>Result: {filteredProducts.length}</div>
-                <div className="flex flex-wrap gap-4 mb-3">
-                  {filteredProducts.map((product) => productItem(product))}
-                </div>
-              </>
-            )
-            : <div>Loading products ...</div>
-          }
+          {products.length > 0 ? (
+            <>
+              <div>Result: {filteredProducts.length}</div>
+              <div className="flex flex-wrap gap-4 mb-3">
+                {filteredProducts.map((product) => productItem(product))}
+              </div>
+            </>
+          ) : (
+            <div>Loading products ...</div>
+          )}
 
           {/* Pagination */}
           {filteredProducts.length > 0 && (
