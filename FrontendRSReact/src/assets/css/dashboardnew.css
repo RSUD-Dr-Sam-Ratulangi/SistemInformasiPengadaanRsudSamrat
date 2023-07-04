@@ -50,8 +50,14 @@
 #dashboard-page .top-content {
   flex: 1;
   display: flex;
+  flex-direction: column;
   gap: 40px;
   align-items: center;
+}
+
+#dashboard-page .top-content-detail-chart-wrapper {
+  display: flex;
+  flex-direction: row;
 }
 
 #dashboard-page .top-content .detail .title {
@@ -90,7 +96,7 @@
     align-items: center;
   }
 
-  #dashboard-page .top-content {
+  #dashboard-page .top-content-detail-chart-wrapper {
     flex-direction: column;
   }
 }
