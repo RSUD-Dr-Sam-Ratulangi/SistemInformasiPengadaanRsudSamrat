@@ -86,6 +86,13 @@ const ModalOrderDetails = ({
       )
         .then((response) => {
           setShowActionToast(true);
+          setActionToastHeader("Berhasil");
+          setActionToastBody("Data berhasil dihapus");
+          setTimeout(() => {
+            setShowActionToast(false);
+            setActionToastHeader("");
+            setActionToastBody("");
+          }, 3000);
 
           if (response.ok) {
             // Data berhasil dihapus, lakukan tindakan tambahan jika diperlukan
@@ -108,6 +115,11 @@ const ModalOrderDetails = ({
           console.error("Terjadi kesalahan:", error);
           setActionToastHeader("Gagal");
           setActionToastBody("Terjadi Kesalahan");
+          setTimeout(() => {
+            setShowActionToast(false);
+            setActionToastHeader("");
+            setActionToastBody("");
+          }, 3000);
           onClose();
         });
     }
@@ -174,7 +186,7 @@ const ModalOrderDetails = ({
       })
       .catch((err) => console.log(err));
     onClose();
-    window.location.reload();
+    // window.location.reload();
   };
 
   const handlePrintBeritaAcara = () => {
@@ -263,6 +275,31 @@ const ModalOrderDetails = ({
   //   }
   // }, [selectedOrder.Order])
 
+  const handleCheckFaktur = () => {
+    axios
+      .get(`http://rsudsamrat.site:8990/faktur-orders/${selectedOrder.id}`)
+      .then((response) => {
+        console.log(response);
+        if (response.data.length !== 0) {
+          // open link from new tab
+          window.open(response.data.fileUrls[0], "_blank");
+          console.log(response.data.fileUrls[0]);
+        } else {
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setShowActionToast(true);
+        setActionToastHeader("Gagal");
+        setActionToastBody("Faktur belum diupload.");
+        setTimeout(() => {
+          setShowActionToast(false);
+          setActionToastHeader("");
+          setActionToastBody("");
+        }, 3000);
+      });
+  };
+
   const ProductItem = ({ orderItem }) => {
     console.log("--productItem--", orderItem);
 
@@ -275,6 +312,9 @@ const ModalOrderDetails = ({
     return (
       <tr>
         <td className="font-bold">{orderItem.id}</td>
+        <td className="font-bold">
+          <img src={orderItem.product.imageUrl} alt="product-img" width={64} />
+        </td>
         <td className="font-medium text-primary-1">
           {orderItem.product.name}{" "}
           <span className="text-sm text-black">x{orderItem.quantity}</span>
@@ -388,6 +428,7 @@ const ModalOrderDetails = ({
             <thead>
               <tr>
                 <th>Order ID</th>
+                <th>Img URL</th>
                 <th>Product Name</th>
                 <th>Final Price</th>
                 <th>Status</th>
@@ -512,8 +553,11 @@ const ModalOrderDetails = ({
           >
             Payout Details
           </button>
-          <button className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2">
-            Check Status
+          <button
+            className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+            onClick={handleCheckFaktur}
+          >
+            Check Faktur
           </button>
           {allItemsAccepted && (
             <button

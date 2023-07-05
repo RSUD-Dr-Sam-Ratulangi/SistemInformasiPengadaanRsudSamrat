@@ -12,16 +12,28 @@ import logo from "../assets/images/logo.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { logout } from "../config/auth/authSlice";
+import { updateNotifications } from "../config/notification/notificationSlice";
 
 const Navigation = () => {
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState(location.pathname);
-  const [isOpen, setIsOpen] = useState(false);
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const [notificationCount, setNotificationCount] = useState(1);
-  const [isSticky, setIsSticky] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const id = useSelector((state) => state.auth.id);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const notifications = useSelector(
+    (state) => state.notification.notifications
+  );
+
+  const [activeTab, setActiveTab] = useState(location.pathname);
+  const [isOpen, setIsOpen] = useState(false);
+  const [notificationsCount, setNotificationsCount] = useState(1);
+  const [isSticky, setIsSticky] = useState(false);
+  const [comingSoonToolTip, setComingSoonToolTip] = useState("");
+  const [comingSoonToolTipPosition, setComingSoonToolTipPosition] = useState({
+    top: 0,
+    left: 0,
+  });
 
   const handleNotificationClick = () => {
     // setNotificationCount(0);
@@ -42,10 +54,21 @@ const Navigation = () => {
     navigate("/signIn");
   };
 
+  const handleComingSoonMouseOnEnter = (e) => {
+    const { pageX, pageY } = e;
+    setComingSoonToolTip("Coming soon");
+    setComingSoonToolTipPosition({ top: pageY, left: pageX });
+  };
+
+  const handleComingSoonMouseOnLeave = () => {
+    setComingSoonToolTip("");
+    setComingSoonToolTipPosition({ top: 0, left: 0 });
+  };
+
   const isSignInPage = location.pathname === "/signIn";
 
   useEffect(() => {
-    getNotificationsCount();
+    getNotificationsCountFromBackEnd();
 
     const handleScroll = () => {
       const sticky = window.pageYOffset > 0;
@@ -59,14 +82,43 @@ const Navigation = () => {
     };
   }, []);
 
-  function getNotificationsCount() {
+  useEffect(() => {
+    getNotificationsCount();
+  }, [notifications]);
+
+  function getNotificationsCountFromBackEnd() {
     try {
       axios
-        .get("http://rsudsamrat.site:8990/api/v1/notifikasi")
-        .then((res) => setNotificationCount(res.data.content.length));
+        // .get(`http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/${id}`)
+        .get(`http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/2`)
+        .then((res) => {
+          const newNotificationCount = res.data.reduce(
+            (count, notification) => {
+              if (notification.notificationStatus === "UNREAD")
+                return count + 1;
+              return count;
+            },
+            0
+          );
+
+          setNotificationsCount(newNotificationCount);
+          dispatch(updateNotifications(res.data));
+        });
     } catch (e) {
       console.log("failed to get notifications. ", e);
     }
+  }
+
+  function getNotificationsCount() {
+    const newNotificationsCount = notifications.reduce(
+      (count, notification) => {
+        if (notification.notificationStatus === "UNREAD") return count + 1;
+        return count;
+      },
+      0
+    );
+
+    setNotificationsCount(newNotificationsCount);
   }
 
   const handleTabClick = (path) => {
@@ -92,8 +144,23 @@ const Navigation = () => {
               : "text-dark"
           }`}
           onClick={() => handleTabClick(`/${linkTo}`)}
+          onMouseEnter={
+            name === "Request" || name === "Payments"
+              ? (e) => handleComingSoonMouseOnEnter(e)
+              : null
+          }
+          onMouseLeave={
+            name === "Request" || name === "Payments"
+              ? handleComingSoonMouseOnLeave
+              : null
+          }
         >
-          <span className="items-center justify-center d-flex" style={{fontSize: "22px"}}>{name}</span>
+          <span
+            className="items-center justify-center d-flex"
+            style={{ fontSize: "22px" }}
+          >
+            {name}
+          </span>
         </Link>
       </li>
     );
@@ -125,6 +192,21 @@ const Navigation = () => {
           {navLink("Payments", "payments")}
         </ul>
 
+        {comingSoonToolTip && (
+          <div
+            style={{
+              position: "fixed",
+              top: comingSoonToolTipPosition.top + "px",
+              left: comingSoonToolTipPosition.left + "px",
+              background: "#ccc",
+              padding: "5px",
+              borderRadius: "3px",
+            }}
+          >
+            {comingSoonToolTip}
+          </div>
+        )}
+
         <div className="flex items-center justify-center space-x-2">
           <ul className="flex items-center justify-center gap-2 m-0">
             <li>
@@ -134,8 +216,8 @@ const Navigation = () => {
                 onClick={handleNotificationClick}
               >
                 <MdNotifications className="text-2xl" />
-                {notificationCount > 0 && (
-                  <span className="no-underline ">{notificationCount}</span>
+                {notificationsCount > 0 && (
+                  <span className="no-underline ">{notificationsCount}</span>
                 )}
               </Link>
             </li>
@@ -198,7 +280,7 @@ const Navigation = () => {
             {navLink("Request", "vendor")}
             {navLink("Products", "products")}
             {navLink("Orders", "orders")}
-            {navLink("Vendor", "vendors")}
+            {navLink("Vendor", "vendor")}
             {navLink("Payments", "payments")}
           </ul>
         )}

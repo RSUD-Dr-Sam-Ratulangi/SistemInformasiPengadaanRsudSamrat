@@ -219,7 +219,7 @@ export default function PrintBeritaAcara(selectedOrder) {
             }</span>
           </div>
         </div>
-        <p>Sebagai realisasi SPK/SP : temporary(108SPK-PPK/RS/I/203 Tgl. ${getCurrentDateNumber()} dengan jumlah/jenis barang: </p>
+        <p>Sebagai realisasi SPK/SP : 108SPK-PPK/RS/I/203 Tgl. ${getCurrentDateNumber()} dengan jumlah/jenis barang: </p>
         <p>Pengadaan Bahan Habis Pakai Laboratorium</p>
         <table>
           <tr>

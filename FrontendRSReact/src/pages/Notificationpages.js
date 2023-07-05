@@ -1,35 +1,50 @@
-import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
+import { updateNotifications } from "../config/notification/notificationSlice";
 import "../assets/css/notificationpages.css";
 
 const NotificationPages = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [notifications, setNotifications] = useState([]);
   const id = useSelector((state) => state.auth.id);
-
-  useEffect(() => {
-    getNotifications();
-  }, []);
+  const notifications = useSelector(state => state.notification.notifications);
 
   function handleCardOnClick(notification) {
     const orderId = notification.message.split(",")[0].trim();
+    
+    if (notification.notificationStatus === "UNREAD") {
+      changeNotificationStatusToRead(notification.id);
+    }
     navigate("/orders", { state: isNaN(orderId) ? null : orderId });
   }
 
-  function getNotifications() {
+  function changeNotificationStatusToRead(notificationId) {
     try {
-      axios
-        .get(`http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/${id}`)
-        .then((res) => {
-          setNotifications(res.data);
-          console.log("res.data", res.data);
-        });
-    } catch (e) {
-      console.log("failed to get notifications. ", e);
+      axios.put(`http://rsudsamrat.site:8990/api/v1/notifikasi/${notificationId}`, {
+        notificationStatus: ["READ"]
+      })
+      .then((res) =>{
+        if(res.status === 200) {
+          const newNotifications = notifications.map(notification => {
+            if(notificationId === notification.id) {
+              return {
+                ...notification,
+                notificationStatus: "READ"
+              };
+            }
+
+            return notification;
+          });
+
+          dispatch(updateNotifications(newNotifications));
+        }
+      });
+    }
+    catch (err) {
+      console.log("Unable to update notification status.", err.message);
     }
   }
 

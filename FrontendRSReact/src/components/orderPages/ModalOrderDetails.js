@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   MdInventory,
   MdMenu,
@@ -12,12 +12,12 @@ import {
 import { useSelector } from "react-redux";
 import axios from "axios";
 import printOrderItem from "./printOrderItem";
-import { useEffect } from "react";
 import PrintBeritaAcara from "./PrintBeritaAcara";
 
 const ModalOrderDetails = ({
   onClose,
   selectedOrder,
+  getHistory,
   handleHistory,
   handleDetailProduct,
   handleOffer,
@@ -32,11 +32,14 @@ const ModalOrderDetails = ({
   setActionToastBody,
   fetchData,
   postShippingStatus,
+  history,
 }) => {
   const role = useSelector((state) => state.auth.role);
   const id = useSelector((state) => state.auth.id);
   const [negotiable, setNegotiable] = useState(true);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedGambar, setSelectedGambar] = useState([]);
+  const [historyData, setHistoryData] = useState([]);
 
   const allItemsAccepted = selectedOrder.orderItems.every(
     (orderItem) => orderItem.status === "ACCEPTED"
@@ -45,6 +48,19 @@ const ModalOrderDetails = ({
   const allItemsChecked = selectedOrder.orderItems.every(
     (orderItem) => orderItem.status === "CHECKED"
   );
+
+  useEffect(() => {
+    axios
+      .get(
+        `http://rsudsamrat.site:8990/api/bid-exchange/history/${selectedOrder.id}`
+      )
+      .then((res) => {
+        console.log("History", res.data);
+        setHistoryData(res.data);
+        console.log("Berhasil");
+      })
+      .catch((err) => console.log(err));
+  }, []);
 
   useEffect(() => {
     console.log("modal order details", window.detailsModal.open);
@@ -236,6 +252,18 @@ const ModalOrderDetails = ({
     fileInputRef.current.click();
   };
 
+  const uploadNotaRef = useRef(null);
+
+  const handleUploadNotaClick = () => {
+    uploadNotaRef.current.click();
+  };
+
+  const uploadGambarRef = useRef(null);
+
+  const handleUploadGambar = () => {
+    uploadGambarRef.current.click();
+  };
+
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     // Save the selected file to array
@@ -244,6 +272,69 @@ const ModalOrderDetails = ({
     setShowActionToast(true);
     setActionToastHeader("Berhasil");
     setActionToastBody("File siap untuk diupload.");
+    setTimeout(() => {
+      setShowActionToast(false);
+      setActionToastHeader("");
+      setActionToastBody("");
+    }, 3000);
+
+    // Reset the input value to allow selecting the same file again
+    event.target.value = null;
+  };
+
+  const handleNotaChange = (event) => {
+    console.log("event.target.files[0]", event.target.files[0]);
+    const selectedNota = event.target.files[0];
+
+    const formData = new FormData();
+    formData.append("orderId", selectedOrder.id);
+    formData.append("files", selectedNota);
+
+    axios
+      .post("http://rsudsamrat.site:8990/notas", formData)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+        handleSetStatusNego("COMPLETE");
+        postShippingStatus("COMPLETE", selectedOrder.id);
+      });
+
+    setShowActionToast(true);
+    setActionToastHeader("Berhasil");
+    setActionToastBody("Nota selesai diupload");
+    setTimeout(() => {
+      setShowActionToast(false);
+      setActionToastHeader("");
+      setActionToastBody("");
+    }, 3000);
+
+    // Reset the input value to allow selecting the same file again
+    event.target.value = null;
+  };
+
+  const handleUploadGambarPost = () => {
+    axios
+      .post("http://rsudsamrat.site:8990/", {
+        files: selectedGambar,
+      })
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+  };
+
+  const handleUploadGambarChange = (event) => {
+    // allow only img file
+    const selectedGambar = event.target.files[0];
+    // Save the selected file to array
+    setSelectedGambar([...selectedGambar, selectedGambar]);
+
+    handleUploadGambarPost();
+    postShippingStatus("COMPLETE", selectedOrder.id);
+
+    setShowActionToast(true);
+    setActionToastHeader("Berhasil");
+    setActionToastBody("Gambar siap untuk diupload.");
     setTimeout(() => {
       setShowActionToast(false);
       setActionToastHeader("");
@@ -292,6 +383,30 @@ const ModalOrderDetails = ({
         setShowActionToast(true);
         setActionToastHeader("Gagal");
         setActionToastBody("Faktur belum diupload.");
+        setTimeout(() => {
+          setShowActionToast(false);
+          setActionToastHeader("");
+          setActionToastBody("");
+        }, 3000);
+      });
+  };
+
+  const handleCheckNota = () => {
+    axios
+      .get(`http://rsudsamrat.site:8990/notas/${selectedOrder.id}`)
+      .then((response) => {
+        console.log(response);
+        if (response.data.length !== 0) {
+          // open link from new tab
+          window.open(response.data.fileUrls[0], "_blank");
+          console.log(response.data.fileUrls[0]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setShowActionToast(true);
+        setActionToastHeader("Gagal");
+        setActionToastBody("Nota belum diupload.");
         setTimeout(() => {
           setShowActionToast(false);
           setActionToastHeader("");
@@ -487,7 +602,7 @@ const ModalOrderDetails = ({
 
   return (
     <dialog id="detailsModal" className="modal">
-      <div className="max-w-4xl modal-box">
+      <div className="max-w-5xl modal-box">
         <form method="dialog">
           {/* Header */}
           <div className="flex items-center justify-between mb-3">
@@ -505,7 +620,7 @@ const ModalOrderDetails = ({
         </form>
 
         {/* Footer */}
-        <div className="mt-12 modal-action">
+        <div className="mt-12 modal-action flex flex-wrap gap-2">
           {selectedFiles && (
             <div>
               {selectedFiles.map((file, index) => (
@@ -522,24 +637,26 @@ const ModalOrderDetails = ({
             </div>
           )}
           {allItemsChecked && (
-            <div>
-              <input
-                type="file"
-                style={{ display: "none" }}
-                ref={fileInputRef}
-                onChange={handleFileChange}
-              />
-              <button
-                onClick={() => {
-                  handleUploadClick();
-                  handlePrintBeritaAcara();
-                }}
-                className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                disabled={selectedFiles.length === 1}
-              >
-                Upload Surat
-              </button>
-            </div>
+            <>
+              <div>
+                <input
+                  type="file"
+                  style={{ display: "none" }}
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
+                <button
+                  onClick={() => {
+                    handleUploadClick();
+                    handlePrintBeritaAcara();
+                  }}
+                  className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  disabled={selectedFiles.length === 1}
+                >
+                  Upload Faktur
+                </button>
+              </div>
+            </>
           )}
           <button
             onClick={handleHistory}
@@ -559,26 +676,71 @@ const ModalOrderDetails = ({
           >
             Check Faktur
           </button>
-          {allItemsAccepted && (
-            <button
-              type="button"
-              className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-              onClick={() => printOrderItem(selectedOrder.orderItems)}
-            >
-              Print
-            </button>
-          )}
+          {allItemsAccepted ||
+            (selectedOrder.status === "PAYMENT" && (
+              <button
+                type="button"
+                className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={() => {
+                  printOrderItem(selectedOrder.orderItems, historyData);
+                }}
+              >
+                Print
+              </button>
+            ))}
           {/* display if all the items status is CHECKED */}
           {allItemsChecked && (
-            <button
-              type="button"
-              className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-              onClick={() => {
-                PrintBeritaAcara(selectedOrder);
-              }}
-            >
-              Print Berita Acara
-            </button>
+            <>
+              <button
+                type="button"
+                className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={() => {
+                  PrintBeritaAcara(selectedOrder);
+                }}
+              >
+                Print Berita Acara
+              </button>
+              <div>
+                <input
+                  type="file"
+                  style={{ display: "none" }}
+                  ref={uploadGambarRef}
+                  onChange={handleUploadGambarChange}
+                />
+                <button
+                  onClick={() => {
+                    handleUploadGambar();
+                  }}
+                  className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  disabled={selectedFiles.length === 1}
+                >
+                  Upload Gambar
+                </button>
+              </div>
+              <div>
+                <input
+                  type="file"
+                  style={{ display: "none" }}
+                  ref={uploadNotaRef}
+                  onChange={(e) => handleNotaChange(e)}
+                />
+                <button
+                  onClick={() => {
+                    handleUploadNotaClick();
+                  }}
+                  className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  disabled={selectedFiles.length === 1}
+                >
+                  Upload Nota
+                </button>
+              </div>
+              <button
+                className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={handleCheckNota}
+              >
+                Check Nota
+              </button>
+            </>
           )}
         </div>
       </div>

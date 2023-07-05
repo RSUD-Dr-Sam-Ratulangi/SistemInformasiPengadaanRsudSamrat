@@ -54,14 +54,32 @@ const ModalShipping = ({ shipping, onClose }) => {
     }
   };
 
+  const formatDateTime = (time) => {
+    const date = new Date(time);
+    return date.toLocaleString();
+  };
+
   const getCurrentStatus = (status) => {
-    // Compare the current status with the status in the shippingData object
+    if (shippingData.some((data) => data.status === "CANCEL")) {
+      return "error";
+    }
+
     return shippingData.some((data) => data.status === status) ? "success" : "";
+  };
+
+  const getCurrentStatus2 = (status, i) => {
+    if (status !== "CANCEL" && i === 0) {
+      return "success";
+    }
+
+    if (status === "CANCEL") {
+      return "error";
+    }
   };
 
   return (
     <dialog id="shippingModal" className="modal">
-      <div className="max-w-5xl modal-box">
+      <div className="max-w-5xl modal-box ">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -92,12 +110,6 @@ const ModalShipping = ({ shipping, onClose }) => {
               </li>
               <li
                 data-content="●"
-                className={`step step-${getCurrentStatus("CHECKING")}`}
-              >
-                CHECKING
-              </li>
-              <li
-                data-content="●"
                 className={`step step-${getCurrentStatus("VALIDATING")}`}
               >
                 VALIDATING
@@ -110,22 +122,31 @@ const ModalShipping = ({ shipping, onClose }) => {
               </li>
               <li
                 data-content="●"
+                className={`step step-${getCurrentStatus("CHECKING")}`}
+              >
+                CHECKING
+              </li>
+              <li
+                data-content="●"
                 className={`step step-${getCurrentStatus("PAYMENT")}`}
               >
                 PAYMENT
               </li>
-              <li
-                data-content="●"
-                className={`step step-${getCurrentStatus("CANCEL")}`}
-              >
-                CANCEL
-              </li>
-              <li
-                data-content="✓"
-                className={`step step-${getCurrentStatus("COMPLETE")}`}
-              >
-                COMPLETE
-              </li>
+              {shippingData.some((data) => data.status === "CANCEL") ? (
+                <li
+                  data-content="●"
+                  className={`step step-${getCurrentStatus("CANCEL")}`}
+                >
+                  CANCEL
+                </li>
+              ) : (
+                <li
+                  data-content="✓"
+                  className={`step step-${getCurrentStatus("COMPLETE")}`}
+                >
+                  COMPLETE
+                </li>
+              )}
             </ul>
           </div>
           <div>
@@ -133,14 +154,20 @@ const ModalShipping = ({ shipping, onClose }) => {
               {shippingData.map((data, i) => (
                 <li
                   key={i}
-                  data-content="✓"
-                  className={`w-full step ${
-                    i === 0 ? "step-success" : "step-neutral"
-                  }`}
+                  data-content={
+                    i === 0 ? (data.status === "CANCEL" ? "X" : "✓") : "●"
+                  }
+                  className={`w-full step step-${getCurrentStatus2(
+                    data.status,
+                    i
+                  )}`}
                 >
-                  <div className="flex justify-start w-full">
-                    <span className="font-semibold w-44 text-start">
+                  <div className="flex justify-star items-center w-full">
+                    <span className="font-semibold w-40 text-start">
                       {timeAgo(data.timestamp)}
+                    </span>
+                    <span className="text-sm w-48 text-start">
+                      {formatDateTime(data.timestamp)}
                     </span>
                     {data.status}
                   </div>

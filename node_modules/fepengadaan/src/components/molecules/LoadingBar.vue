@@ -1,5 +1,5 @@
 <template>
-  <progress class="progress is-small is-primary" max="100">15%</progress>
+  <span class="loading loading-spinner loading-lg"></span>
 </template>
 
 <script>
