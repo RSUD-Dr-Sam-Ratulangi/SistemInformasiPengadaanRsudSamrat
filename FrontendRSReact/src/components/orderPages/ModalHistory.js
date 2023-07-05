@@ -1,8 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { MdHandshake, MdHistory } from "react-icons/md";
 
 const ModalHistory = ({ history, onClose }) => {
+  const [newHistory, setNewHistory] = useState(null);
+
   useEffect(() => {
+    console.log('ModalHistory - history', history);
+    const newNewHistory = [];
+    history.forEach(item => {
+      item.bidItems.forEach(bidItem => {
+        newNewHistory.push({
+          ...bidItem,
+          status: item.status,
+          orderDate: item.orderDate
+        });
+      });
+    });
+    console.log('newNewHistory', newNewHistory);
+    setNewHistory(newNewHistory);
+
     console.log("modal history", window.historyModal.open);
     if (!window.historyModal.open) {
       window.historyModal.showModal();
@@ -70,14 +86,14 @@ const ModalHistory = ({ history, onClose }) => {
               </tr>
             </thead>
             <tbody>
-              {history.map((e, i) => (
-                <tr key={e.id}>
+              {newHistory && newHistory.map((e, i) => (
+                <tr key={i}>
                   <td>{i}</td>
-                  <td>{e.bidItems[0].productName}</td>
-                  <td>{e.bidItems[0].bidPrice}</td>
-                  <td>{e.bidItems[0].bidPriceChange}</td>
+                  <td>{e.productName}</td>
+                  <td>{e.bidPrice}</td>
+                  <td>{e.bidPriceChange}</td>
                   <td>{e.status}</td>
-                  <td>{e.bidItems[0].message}</td>
+                  <td>{e.message}</td>
                   <td>{timeAgo(e.orderDate)}</td>
                 </tr>
               ))}
