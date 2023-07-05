@@ -146,17 +146,17 @@ const Orderpages = () => {
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${orderId}`
       );
       console.log("orderssss", response.data);
-
+      getHistory(response.data.id);
       setSelectedOrder(response.data);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const getHistory = async () => {
+  const getHistory = async (selectedOrderId=null) => {
     axios
       .get(
-        `http://rsudsamrat.site:8990/api/bid-exchange/history/${selectedOrder.id}`
+        `http://rsudsamrat.site:8990/api/bid-exchange/history/${(selectedOrderId) ? selectedOrderId : selectedOrder.id}`
       )
       .then((res) => {
         console.log("History", res.data);
