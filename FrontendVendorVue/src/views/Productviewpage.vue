@@ -1,42 +1,11 @@
 <template>
   <div class="pl-5 pr-5">
-    <div class="header-status">
-      <h1>SMART SAMRAT PROCUREMENT</h1>
-      <p>
-        Layanan Informasi Pengadaan Barang & Jasa Rumah Sakit Umum DR Sam
-        Ratulangi Tondano
-      </p>
+    <div class="flex justify-center items-center">
+      <h1 class="text-lg font-bold">SMART SAMRAT PROCUREMENT</h1>
     </div>
-
-    <div class="box">
-      <h1>Search Your Products</h1>
-      <div class="container">
-        <div>
-          <div class="field has-addons">
-            <div class="control is-expanded">
-              <input
-                class="input is-fullwidth"
-                type="text"
-                placeholder="Search Products"
-                v-model="searchInput"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <button
-      class="button is-small"
-      style="margin-top: 5px"
-      @click="addProductModal()"
-    >
-      Add Product
-    </button>
-
     <div class="pr-2 pl-2">
       <div class="max-w-full overflow-x-auto">
-        <table class="table">
+        <table class="table table-xs">
           <thead>
             <tr>
               <th>Product Name</th>
@@ -66,7 +35,7 @@
               <td v-else>No Sub Category</td>
               <td>
                 <button
-                  class="btn btn-warning"
+                  class="btn btn-neutral"
                   @click="deleteProduct(product.productuuid, product.name)"
                 >
                   Delete
@@ -75,6 +44,10 @@
             </tr>
           </tbody>
         </table>
+
+        <button class="btn btn-primary btn-sm" @click="addProductModal()">
+          Add Product
+        </button>
       </div>
     </div>
   </div>
@@ -184,28 +157,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.header-status {
-  padding-top: 10px;
-}
-
-.box {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  /* Atur bayangan sesuai kebutuhan */
-  background-color: #f1f1f1;
-  /* Atur warna latar belakang sesuai kebutuhan */
-  margin-top: 2%;
-  background-image: url("../components/img/bckgrund.jpeg");
-}
-
-.boxSearch {
-  padding-bottom: 5px;
-  width: 100%;
-  align-items: center;
-  text-align: center;
-  height: auto;
-  background-color: rgb(255, 255, 255);
-  border: #555;
-}
-</style>

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <table class="table">
+  <div class="ml-10">
+    <table class="table table-sm">
       <thead>
         <tr>
           <th>Order ID</th>
@@ -24,13 +24,17 @@
     </table>
   </div>
 
-  <modal
+  <!-- <modal
     :show="showmodalSeeDetails"
     :orders="selectedOrder"
     @close="showmodalSeeDetails = false"
-  />
+  /> -->
 
-  <!-- <detailsOrderNew :show="showmodalSeeDetails" :orders="selectedOrder" /> -->
+  <detailsOrderNew
+    :show="showmodalSeeDetails"
+    :orders="selectedOrder"
+    @close="handleModalClose"
+  />
 </template>
 
 <script>
@@ -71,6 +75,11 @@ export default {
       this.showmodalSeeDetails = true;
       this.selectedOrder = order;
     },
+    handleModalClose() {
+      this.showmodalSeeDetails = false;
+      this.selectedOrder = null;
+    },
   },
+  emits: ["close"],
 };
 </script>

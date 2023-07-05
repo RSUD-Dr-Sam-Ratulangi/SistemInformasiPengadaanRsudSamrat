@@ -243,6 +243,7 @@ export default {
   props: {
     show: Boolean,
   },
+  emits: ["close"],
   data() {
     return {
       isActive: false,
@@ -291,6 +292,7 @@ export default {
         .catch((err) => {
           console.log(err);
         });
+      this.$emit("close");
     },
     async handleImageSelect(event) {
       const file = event.target.files[0];
