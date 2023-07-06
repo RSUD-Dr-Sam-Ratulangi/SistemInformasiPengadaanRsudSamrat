@@ -67,15 +67,25 @@ export default function printOrderItems(selectedOrderItems, history) {
 
     let thirdTableRows = "";
 
-    history.forEach((e, i) => {
+    const newHistory = [];
+    history.forEach(item => {
+      item.bidItems.forEach(bidItem => {
+        newHistory.push({
+          ...bidItem,
+          status: item.status,
+          orderDate: item.orderDate
+        });
+      });
+    });
+    newHistory.forEach((e, i) => {
       const row = `
       <tr>
         <td>${i + 1}</td>
-        <td>${e.bidItems[0].productName}</td>
-        <td>${e.bidItems[0].bidPrice}</td>
-        <td>${e.bidItems[0].bidPriceChange}</td>
+        <td>${e.productName}</td>
+        <td>${e.bidPrice}</td>
+        <td>${e.bidPriceChange}</td>
         <td>${e.status}</td>
-        <td>${e.bidItems[0].message}</td>
+        <td>${(e.message) ? e.message : ''}</td>
         <td>${timeAgo(e.orderDate)}</td>
       </tr>`;
       thirdTableRows += row;
