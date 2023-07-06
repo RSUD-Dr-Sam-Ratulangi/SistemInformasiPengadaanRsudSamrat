@@ -39,7 +39,6 @@ const ModalOrderDetails = ({
   const [negotiable, setNegotiable] = useState(true);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectedGambar, setSelectedGambar] = useState([]);
-  const [historyData, setHistoryData] = useState([]);
 
   const allItemsAccepted = selectedOrder.orderItems.every(
     (orderItem) => orderItem.status === "ACCEPTED"
@@ -48,19 +47,6 @@ const ModalOrderDetails = ({
   const allItemsChecked = selectedOrder.orderItems.every(
     (orderItem) => orderItem.status === "CHECKED"
   );
-
-  useEffect(() => {
-    axios
-      .get(
-        `http://rsudsamrat.site:8990/api/bid-exchange/history/${selectedOrder.id}`
-      )
-      .then((res) => {
-        console.log("History", res.data);
-        setHistoryData(res.data);
-        console.log("Berhasil");
-      })
-      .catch((err) => console.log(err));
-  }, []);
 
   useEffect(() => {
     console.log("modal order details", window.detailsModal.open);
@@ -683,7 +669,7 @@ const ModalOrderDetails = ({
                 type="button"
                 className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
                 onClick={() => {
-                  printOrderItem(selectedOrder.orderItems, historyData);
+                  printOrderItem(selectedOrder.orderItems, history);
                 }}
               >
                 Print
