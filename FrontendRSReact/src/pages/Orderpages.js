@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import html2pdf from "html2pdf.js";
 
 import ModalHistory from "../components/orderPages/ModalHistory";
@@ -58,13 +58,19 @@ const Orderpages = () => {
 
   const [filteredStatusData, setFilteredStatusData] = useState([]);
 
-  // productId (taken when user click card in notifications page)
-  const location = useLocation();
-  let receivedProductId = location.state;
+  // productId (taken when user click notification in navigation component)
+  const { receivedProductId } = useParams();
 
   useEffect(() => {
     fetchData();
   }, [role]);
+
+  useEffect(() => {
+    if (!isNaN(receivedProductId)) {
+      openModal(receivedProductId);
+      // receivedProductId = null;
+    }
+  }, [receivedProductId]);
 
   const fetchData = async () => {
     try {
@@ -126,11 +132,6 @@ const Orderpages = () => {
       console.log("order: ", response.data);
       setLoading(false);
 
-      // open modal if receivedProductId exist
-      if (receivedProductId) {
-        openModal(receivedProductId);
-        receivedProductId = null;
-      }
     } catch (error) {
       console.error(error);
     }
