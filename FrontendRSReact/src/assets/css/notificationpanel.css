@@ -1,0 +1,50 @@
+.notification-panel {
+  position: absolute;
+  right: 100px;
+  z-index: 9999;
+  height: 375px;
+  width: 500px;
+  padding: 16px; 
+  overflow: auto;
+  background-color: #F2F2F2;
+  border: 2px solid #68B2A0;
+  border-radius: 4px;
+}
+
+.notification-panel .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.notification-panel .header .title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.notification-panel .header .close-button {
+  padding: 4px;
+  border: 1px solid #68B2A0;
+  border-radius: 4px;
+}
+
+.notification-panel .header .close-button:hover {
+  background-color: #68B2A0;
+  cursor: pointer;
+}
+
+.notification-panel .item {
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.notification-panel .item:hover {
+  cursor: pointer;
+  background-color: #68B2A0;
+}
+
+.notification-panel .item .title {
+  font-weight: bold;
+  font-size: 16px;
+}
