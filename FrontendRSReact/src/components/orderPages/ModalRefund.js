@@ -19,26 +19,29 @@ const ModalRefund = ({ onSubmit, selectedOrder, refund }) => {
   }, [refund]);
 
   const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    // Save the selected file to array
-    setSelectedFiles([...selectedFiles, selectedFile]);
+    const files = event.target.files;
+    const fileList = Array.from(files);
 
-    // Reset the input value to allow selecting the same file again
+    setSelectedFiles([...selectedFiles, ...fileList]);
+
+    // Reset the input value to allow selecting the same files again
     event.target.value = null;
   };
 
   const handleUploadFile = () => {
-    console.log('selectedOrderItem', refund);
     const formData = new FormData();
-    formData.append('images', selectedFiles[0]);
+
+    selectedFiles.forEach((file) => {
+      formData.append('images', file);
+    });
+
     formData.append('product_id', refund?.product?.id);
     formData.append('product_uuid', refund?.product?.productuuid);
 
-    // post to /images
+    setSubmitable(true);
     axios
       .post('http://rsudsamrat.site:8990/images', formData)
       .then((res) => {
-        setSubmitable(true);
         console.log(res);
       })
       .catch((err) => console.log(err));
@@ -79,20 +82,20 @@ const ModalRefund = ({ onSubmit, selectedOrder, refund }) => {
           <h2 className='text-3xl font-semibold text-slate-600'>
             {/* {selectedOrderItem.product.name} */}
           </h2>
-          {selectedFiles && (
+          {selectedFiles.length > 0 && (
             <div>
               {selectedFiles.map((file, index) => (
                 <div
                   className='flex items-center justify-start gap-2'
                   key={index}>
-                  <p key={index}>{file.name}</p>
-                  <button
-                    className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'
-                    onClick={handleUploadFile}>
-                    Upload
-                  </button>
+                  <p>{file.name}</p>
                 </div>
               ))}
+              <button
+                className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'
+                onClick={handleUploadFile}>
+                Upload
+              </button>
             </div>
           )}
           <div>
@@ -101,12 +104,12 @@ const ModalRefund = ({ onSubmit, selectedOrder, refund }) => {
               style={{ display: 'none' }}
               ref={fileInputRef}
               onChange={handleFileChange}
+              multiple
             />
             <button
               onClick={handleUploadClick}
-              className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'
-              disabled={selectedFiles.length === 1}>
-              Upload Surat
+              className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'>
+              Upload Images
             </button>
           </div>
           <div className='flex flex-col gap-2'>
