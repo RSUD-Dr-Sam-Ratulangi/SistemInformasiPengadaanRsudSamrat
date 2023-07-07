@@ -260,7 +260,7 @@ const Orderpages = () => {
             orderId: selectedOrder.id,
             orderItemId: refund.id,
             status: 'REFUND',
-            message: `Refund untuk produk ${refund.productName} berhasil.`
+            message: `Refund untuk produk ${refund.product.name} berhasil.`
           })
           .then((response) => {
             console.log('Notifikasi berhasil dikirim', response);
@@ -280,7 +280,7 @@ const Orderpages = () => {
         // Show the toast
         setActionToastHeader('Refund Berhasil');
         setActionToastBody(
-          `Refund untuk produk ${refund.productName} berhasil.`
+          `Refund untuk produk ${refund.product.name} berhasil.`
         );
         setShowActionToast(true);
         setTimeout(() => {
@@ -807,7 +807,10 @@ const Orderpages = () => {
           confirm={confirm}
           selectedOrder={selectedOrder}
           onClose={() => setShowConfirmModal(null)}
-          onSubmit={() => handleSubmitConfirm()}
+          onSubmit={() => {
+            handleSubmitConfirm();
+            setShowConfirmModal(null);
+          }}
         />
       )}
 
@@ -821,49 +824,62 @@ const Orderpages = () => {
             onClick={() => handleFilterStatus('ALL')}>
             All
           </button>
-          <button
-            className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
-            onClick={() => handleFilterStatus('ORDER')}>
-            Order
-          </button>
-          <button
-            className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
-            onClick={() => handleFilterStatus('NEGOTIATION')}>
-            Negotiation
-          </button>
-          <button
-            className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
-            onClick={() => handleFilterStatus('VALIDATING')}>
-            Validating
-          </button>
-          <button
-            className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
-            onClick={() => handleFilterStatus('SHIPPING')}>
-            Shipping
-          </button>
-          {role === 'PANPEN' ||
-            (role === 'PPKOM' && (
-              <button
-                className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
-                onClick={() => handleFilterStatus('CHECKING')}>
-                Checking
-              </button>
-            ))}
-          <button
-            className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
-            onClick={() => handleFilterStatus('PAYMENT')}>
-            Payment
-          </button>
-          <button
-            className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
-            onClick={() => handleFilterStatus('CANCEL')}>
-            Cancel
-          </button>
-          <button
-            className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
-            onClick={() => handleFilterStatus('COMPLETE')}>
-            Completed
-          </button>
+          {role === 'PP' || role === 'PPKOM' ? (
+            <button
+              className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
+              onClick={() => handleFilterStatus('ORDER')}>
+              Order
+            </button>
+          ) : null}
+          {role === 'PP' || role === 'PPKOM' ? (
+            <button
+              className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
+              onClick={() => handleFilterStatus('NEGOTIATION')}>
+              Negotiation
+            </button>
+          ) : null}
+          {role === 'PP' || role === 'PPKOM' ? (
+            <button
+              className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
+              onClick={() => handleFilterStatus('VALIDATING')}>
+              Validating
+            </button>
+          ) : null}
+          {role === 'PP' || role === 'PPKOM' || role === 'PANPEN' ? (
+            <button
+              className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
+              onClick={() => handleFilterStatus('SHIPPING')}>
+              Shipping
+            </button>
+          ) : null}
+          {role === 'PP' || role === 'PPKOM' || role === 'PANPEN' ? (
+            <button
+              className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
+              onClick={() => handleFilterStatus('CHECKING')}>
+              Checking
+            </button>
+          ) : null}
+          {role === 'PP' || role === 'PPKOM' || role === 'KEU' ? (
+            <button
+              className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
+              onClick={() => handleFilterStatus('PAYMENT')}>
+              Payment
+            </button>
+          ) : null}
+          {role === 'PPKOM' ? (
+            <button
+              className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
+              onClick={() => handleFilterStatus('CANCEL')}>
+              Cancel
+            </button>
+          ) : null}
+          {role === 'PP' || role === 'PPKOM' || role === 'KEU' ? (
+            <button
+              className='flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2'
+              onClick={() => handleFilterStatus('COMPLETE')}>
+              Completed
+            </button>
+          ) : null}
         </div>
         <div className='flex items-center justify-center gap-2 mb-2'>
           {/* search by id */}

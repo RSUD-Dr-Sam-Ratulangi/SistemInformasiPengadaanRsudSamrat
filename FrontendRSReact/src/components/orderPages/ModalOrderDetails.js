@@ -358,8 +358,9 @@ const ModalOrderDetails = ({
       .then((response) => {
         console.log(response);
         if (response.data.length !== 0) {
-          // open link from new tab
-          window.open(response.data.fileUrls[0], '_blank');
+          // open link from new tab in https mode by cut the first 4 char from url (http) and replace with (https)
+          window.open(`https${response.data.fileUrls[0].slice(4)}`, '_blank');
+
           console.log(response.data.fileUrls[0]);
         } else {
         }
@@ -485,14 +486,19 @@ const ModalOrderDetails = ({
                 </li>
               )}
               <hr />
-              {selectedOrder.status !== 'CHECKING' && (
+              {selectedOrder.status !== 'CHECKING' &&
+              selectedOrder.status !== 'COMPLETED' &&
+              selectedOrder.status !== 'PAYMENT' &&
+              selectedOrder.status !== 'VALIDATING' &&
+              selectedOrder.status !== 'SHIPPING' &&
+              selectedOrder.status !== 'CANCEL' ? (
                 <li>
                   <a onClick={() => handleDeleteOrderItem(orderItem.id)}>
                     <MdDelete className='text-xl text-red-500' />
                     Delete
                   </a>
                 </li>
-              )}
+              ) : null}
             </ul>
           </div>
         </td>
@@ -612,7 +618,9 @@ const ModalOrderDetails = ({
               ))}
             </div>
           )}
-          {allItemsChecked && (
+          {allItemsChecked &&
+          selectedOrder.status !== 'COMPLETE' &&
+          selectedOrder.status !== 'CANCEL' ? (
             <>
               <div>
                 <input
@@ -631,6 +639,7 @@ const ModalOrderDetails = ({
                   Upload Berita Acara
                 </button>
               </div>
+
               <div>
                 <input
                   type='file'
@@ -647,6 +656,7 @@ const ModalOrderDetails = ({
                   Upload Gambar
                 </button>
               </div>
+
               <div>
                 <input
                   type='file'
@@ -664,7 +674,7 @@ const ModalOrderDetails = ({
                 </button>
               </div>
             </>
-          )}
+          ) : null}
           {selectedOrder.status !== 'ORDER' && (
             <button
               onClick={handlePayoutDetail}
@@ -672,26 +682,27 @@ const ModalOrderDetails = ({
               Payout Details
             </button>
           )}
-          {selectedOrder.status === 'SHIPPING' ||
-            (selectedOrder.status === 'PAYMENT' && (
-              <button
-                className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'
-                onClick={handleCheckFaktur}>
-                Check Faktur
-              </button>
-            ))}
-          {allItemsAccepted ||
-            selectedOrder.status === 'PAYMENT' ||
-            (selectedOrder.status === 'NEGOTIATION' && (
-              <button
-                type='button'
-                className='text-white btn btn-primary'
-                onClick={() => {
-                  printOrderItem(selectedOrder.orderItems, history);
-                }}>
-                Print
-              </button>
-            ))}
+          {selectedOrder.status === 'VALIDATING' ||
+          selectedOrder.status === 'CHECKING' ||
+          selectedOrder.status === 'COMPLETE' ||
+          selectedOrder.status === 'PAYMENT' ? (
+            <button
+              className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'
+              onClick={handleCheckFaktur}>
+              Check Faktur
+            </button>
+          ) : null}
+          {(selectedOrder.status === 'PAYMENT' && allItemsChecked) ||
+          (selectedOrder.status === 'NEGOTIATION' && allItemsAccepted) ? (
+            <button
+              type='button'
+              className='text-white btn btn-primary'
+              onClick={() => {
+                printOrderItem(selectedOrder.orderItems, history);
+              }}>
+              Print
+            </button>
+          ) : null}
 
           {/* display if all the items status is CHECKED */}
           {allItemsChecked && (
