@@ -8,13 +8,14 @@
       <h3 class="font-bold text-sm">Order Id: {{ orders.id }}</h3>
 
       <div class="mt-3 mb-2">
-        <table class="table table-fixed table-xs">
+        <table class="table table-xs">
           <thead>
             <tr>
               <th>id</th>
               <th>Product Name</th>
               <th>Quantity</th>
               <th>Harga</th>
+              <th>Total</th>
               <th>status</th>
               <th>Actions</th>
             </tr>
@@ -29,6 +30,7 @@
               </td>
               <td>{{ orderItem.quantity }}</td>
               <td>{{ orderItem.product.price }}</td>
+              <td>{{ orderItem.totalAmount }}</td>
               <td>{{ orderItem.status }}</td>
               <td @click="selectItem(orderItem)">
                 <div class="dropdown">
@@ -39,13 +41,7 @@
                     tabindex="0"
                     class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box"
                   >
-                    <div
-                      v-if="
-                        orders.status === 'NEGOTIATION' ||
-                        (orders.orderItems.status === 'OFFER' &&
-                          allItemsAccepted)
-                      "
-                    >
+                    <div v-if="orderItem.status === 'OFFER'">
                       <li>
                         <button class="btn btn-xs" @click="acceptBid">
                           ACCEPT
@@ -103,6 +99,8 @@
     </div>
   </dialog>
 
+  <Toast :message="infoMessage" :showToast="showToasts" />
+
   <rejectBid
     :showRB="showRejectModal"
     :orders="orders"
@@ -123,9 +121,10 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import axios from "axios";
 import rejectBid from "./DetailsOrder/rejectBid.vue";
 import { mapGetters } from "vuex";
+import Toast from "../molecules/Toast.vue";
 import showHistory from "./DetailsOrder/showHistory.vue";
 export default {
-  components: { FontAwesomeIcon, rejectBid, showHistory },
+  components: { FontAwesomeIcon, rejectBid, showHistory, Toast },
   props: {
     show: Boolean,
     orders: Object,
@@ -140,6 +139,8 @@ export default {
       accepted: "ACCEPTED",
       rejected: "REJECTED",
       selectedFile: [],
+      showToasts: false,
+      infoMessage: "",
     };
   },
   computed: {
@@ -321,6 +322,13 @@ export default {
         })
         .catch((err) => console.log(err));
       this.$emit("close");
+    },
+    showToast() {
+      this.showToasts = true;
+      this.infoMessage = "ORDER ID TIDAK DITEMUKAN, MOHON PERIKSA KEMBALI.";
+      setTimeout(() => {
+        this.showToasts = false;
+      }, 3000);
     },
     showModalReject() {
       this.showRejectModal = true;
