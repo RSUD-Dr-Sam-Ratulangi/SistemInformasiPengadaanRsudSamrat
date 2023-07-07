@@ -1,70 +1,91 @@
 <template>
-  <div class="pl-5 pr-5">
-    <div class="flex justify-center items-center">
-      <h1 class="text-lg font-bold">SMART SAMRAT PROCUREMENT</h1>
-    </div>
-    <div class="pr-2 pl-2">
-      <div class="max-w-full overflow-x-auto">
-        <table class="table table-xs">
-          <thead>
-            <tr>
-              <th>Product Name</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Status</th>
-              <th>Categories</th>
-              <th>Sub Categories</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="product in products" :key="product.id">
-              <td>{{ product.name }}</td>
-              <td>{{ product.price }}</td>
-              <td>{{ product.quantity }}</td>
-              <td>{{ product.status }}</td>
-              <td v-if="product.categories && product.categories.length > 0">
-                {{ product.categories[0].name }}
-              </td>
-              <td v-else>No category available</td>
-              <td
-                v-if="product.subcategories && product.subcategories.length > 0"
-              >
-                {{ product.subcategories[0].name }}
-              </td>
-              <td v-else>No Sub Category</td>
-              <td>
-                <button
-                  class="btn btn-neutral"
-                  @click="deleteProduct(product.productuuid, product.name)"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <button class="btn btn-primary btn-sm" @click="addProductModal()">
+  <!-- Filter/AddProduct -->
+  <div v-if="!isLoading">
+    <div class="flex flex-wrap justify-between items-end">
+      <div class="ml-10">
+        <select
+          class="select select-bordered select-sm max-w-xs mt-4"
+          v-model="selectedCategory"
+        >
+          <option disabled selected>Filter Produk</option>
+          <option value="SEMUA PRODUK">SEMUA PRODUK</option>
+          <option>BM</option>
+          <option>JASA</option>
+          <option>BPH</option>
+        </select>
+      </div>
+      <div>
+        <h1 class="text text-3xl font-extrabold">PRODUK {{ username }}</h1>
+      </div>
+      <div>
+        <button class="btn btn-sm btn-primary mr-10" @click="addProductModal">
           Add Product
         </button>
       </div>
     </div>
+    <!-- Product Card -->
+    <div
+      class="flex flex-wrap justify-center items-center overflow-x-auto mt-5"
+    >
+      <div
+        v-for="product in filteredProducts"
+        :key="product.id"
+        class="px-2 mb-4"
+      >
+        <div class="card card-normal bg-base-500 shadow-xl">
+          <figure>
+            <div class="border border-gray">
+              <img
+                v-if="product.imageUrl"
+                :src="product.imageUrl"
+                :alt="product.name"
+                style="height: 256px; width: 256px"
+              />
+              <img
+                v-else
+                src="https://dummyimage.com/256x256/68B2A0/fff"
+                alt="Placeholder"
+              />
+            </div>
+          </figure>
+          <div class="card-body">
+            <h2 class="card-title">
+              {{ product.name }}
+              <div class="badge badge-primary">{{ product.vendor.name }}</div>
+            </h2>
+            <h1 class="text text-xs">{{ product.description }}</h1>
+            <div class="card-actions justify-end">
+              <div
+                class="badge badge-outline"
+                v-if="product.categories && product.categories.length > 0"
+              >
+                {{ product.categories[0].name }}
+              </div>
+              <div
+                class="badge badge-outline"
+                v-if="product.subcategories && product.subcategories.length > 0"
+              >
+                {{ product.subcategories[0].name }}
+              </div>
+              <button
+                class="btn badger badge-outline btn-xs"
+                @click="deleteProduct(product.productuuid, product.name)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Modals edit Product -->
-  <Teleport to="body">
-    <!-- pakai komponen modal, passing ke prop(lihat Editproduct.vue) -->
-    <modal
-      :show="showmodaleditProduct"
-      :product="selectedProduct"
-      @close="showmodaleditProduct = false"
-    />
-  </Teleport>
+  <div class="flex justify-center items-center h-screen" v-if="isLoading">
+    <LoadingBar />
+    <h1 class="text text-lg font-extrabold">Loading Produk ...</h1>
+  </div>
 
-  <!-- Modals Add Product -->
   <Teleport to="body">
-    <!-- pakai komponen modal, passing ke prop(lihat Editproduct.vue) -->
     <modalAddProduct
       :show="showModalAddProduct"
       @close="showModalAddProduct = false"
@@ -78,7 +99,6 @@ import modal from "../components/modals/Editproduct.vue";
 import modalAddProduct from "../components/modals/AddProduct.vue";
 import LoadingBar from "../components/molecules/LoadingBar.vue";
 import { mapGetters } from "vuex";
-import { ref } from "vue";
 
 export default {
   name: "Productpagesview",
@@ -87,26 +107,32 @@ export default {
   data() {
     return {
       products: [],
-      searchInput: ref(""),
       connectionFailed: false,
       showModalAddProduct: false,
       showmodaleditProduct: false,
-      selectedProduct: null,
-      selectedUser: null,
+      selectedCategory: "SEMUA PRODUK",
       isLoading: false,
     };
   },
   computed: {
     ...mapGetters(["vendoruuid", "username"]),
     filteredProducts() {
-      if (this.searchInput === "") {
+      if (this.selectedCategory === "SEMUA PRODUK" || !this.selectedCategory) {
         return this.products;
+      } else if (this.selectedCategory) {
+        return this.products.filter((product) => {
+          const categoryMatch =
+            product.categories &&
+            product.categories.length > 0 &&
+            product.categories[0].name === this.selectedCategory;
+          const subcategoryMatch =
+            product.subcategories &&
+            product.subcategories.length > 0 &&
+            product.subcategories[0].name === this.selectedCategory;
+          return categoryMatch || subcategoryMatch;
+        });
       } else {
-        // Filter products based on search input
-        const searchTerm = this.searchInput.toLowerCase();
-        return this.products.filter((product) =>
-          product.name.toLowerCase().includes(searchTerm)
-        );
+        this.products;
       }
     },
   },

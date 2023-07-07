@@ -1,20 +1,20 @@
 <template>
   <div v-if="isLoading">
-    <dialog class="modal bg-gray-600 bg-opacity-90" :open="isLoading">
-      <form method="dialog" class="modal-box w-auto bg-opacity-100">
-        <div class="flex items-center justify-center">
+    <dialog class="modal bg-gray-600 bg-opacity-90 h-screen" :open="isLoading">
+      <div class="modal-box w-auto bg-opacity-100">
+        <div class="items-center justify-center">
           <LoadingBar />
         </div>
-      </form>
+      </div>
     </dialog>
   </div>
 
   <div v-else>
     <dialog
       :open="show"
-      class="modal modal-bottom sm:modal-middle bg-gray-600 bg-opacity-90 pt-5 pb-5"
+      class="modal modal-bottom sm:modal-middle bg-gray-600 bg-opacity-90"
     >
-      <div class="relative w-full max-w-2xl max-h-full overflow-y-auto">
+      <div class="w-screen max-w-fit max-h-full overflow-y-auto">
         <!-- Modal content -->
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
           <!-- Modal header -->
@@ -47,9 +47,10 @@
                   type="text"
                   class="input input-sm"
                   v-model="product.name"
+                  required
                 />
               </div>
-              <div class="flex justify-around">
+              <div class="flex justify-around w-auto gap-2">
                 <div class="form-control">
                   <label class="label">
                     <span class="label-text font-bold text-white text-lg"
@@ -58,8 +59,9 @@
                   </label>
                   <input
                     type="number"
-                    class="input input-sm w-min"
+                    class="input input-xs"
                     v-model="product.price"
+                    required
                   />
                 </div>
                 <div class="form-control">
@@ -70,8 +72,9 @@
                   </label>
                   <input
                     type="number"
-                    class="input input-sm w-min"
+                    class="input input-xs"
                     v-model="product.quantity"
+                    required
                   />
                 </div>
               </div>
@@ -85,6 +88,7 @@
                   type="text"
                   class="input input-sm"
                   v-model="product.description"
+                  required
                 />
               </div>
               <label class="label"
@@ -155,6 +159,7 @@
                       class="checkbox checkbox-primary"
                       v-model="product.subCategoryId"
                       :value="5"
+                      :checked="product.subCategoryId.includes(5)"
                       @change="handleCheckBoxSubCategory(5)"
                     />
                     <span class="label-text font-bold text-black">ALKON</span>
@@ -163,6 +168,7 @@
                       class="checkbox checkbox-primary"
                       v-model="product.subCategoryId"
                       :value="6"
+                      :checked="product.subCategoryId.includes(6)"
                       @change="handleCheckBoxSubCategory(6)"
                     />
                   </label>
@@ -212,6 +218,11 @@
                   Size: {{ selectedImage.size }} kb
                 </p>
               </div>
+              <div v-if="errorUpload">
+                <h1 class="text text-lg font-extrabold bg-red-600">
+                  {{ message }}
+                </h1>
+              </div>
             </div>
             <div
               class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600"
@@ -219,7 +230,7 @@
               <button
                 data-modal-hide="top-left-modal"
                 type="submit"
-                :disabled="isLoading"
+                :disabled="!selectedImage"
                 class="btn btn-primary"
               >
                 Submit
@@ -259,6 +270,7 @@ export default {
         status: "APPROVED",
       },
       message: "",
+      errorUpload: false,
       selectedImage: null,
       selectedCategory: "",
     };
@@ -311,6 +323,9 @@ export default {
         this.product.imageUrl = response.data.imageUrls[0];
       } catch (err) {
         console.log(err);
+        this.errorUpload = true;
+        this.message = "UKURAN FILE YANG DIUNGGAH MELEBIHI 1 MB";
+        this.selectedImage = null;
       } finally {
         this.isLoading = false;
       }

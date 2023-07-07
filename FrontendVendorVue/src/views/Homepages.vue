@@ -1,5 +1,8 @@
 <template>
-  <div class="container flex mx-auto justify-center pt-3 pb-3">
+  <div
+    class="container flex mx-auto justify-center pt-3 pb-3"
+    v-if="!isLoading"
+  >
     <div class="flex border-2 rounded">
       <button
         class="flex items-center justify-center"
@@ -14,66 +17,39 @@
       />
     </div>
   </div>
-  <div class="flex items-center justify-center">
-    <ul class="steps">
-      <li
-        class="step"
-        v-bind:class="{ ' step-primary': hasOrderStatus('ORDER') }"
-      >
-        ORDER
-      </li>
-      <li
-        class="step"
-        v-bind:class="{ ' step-primary': hasOrderStatus('NEGOTIATION') }"
-      >
-        NEGOTIATION
-      </li>
-      <li
-        class="step"
-        v-bind:class="{ ' step-primary': hasOrderStatus('VALIDATING') }"
-      >
-        VALIDATING
-      </li>
-      <li
-        class="step"
-        v-bind:class="{ ' step-primary': hasOrderStatus('SHIPPING') }"
-      >
-        SHIPPING
-      </li>
-      <li
-        class="step"
-        v-bind:class="{ ' step-primary': hasOrderStatus('CHECKING') }"
-      >
-        CHECKING
-      </li>
-      <li
-        class="step"
-        v-bind:class="{ ' step-primary': hasOrderStatus('PAYMENT') }"
-      >
-        PAYMENT
-      </li>
-      <li
-        class="step"
-        v-bind:class="{ ' step-primary': hasOrderStatus('COMPLETE') }"
-      >
-        COMPLETE
-      </li>
-    </ul>
+
+  <div class="flex justify-center items-center h-screen" v-if="isLoading">
+    <LoadingBar />
   </div>
+
+  <TimeStamp
+    :hasOrderStatus="hasOrderStatus"
+    :orderId="orderId"
+    :showShipping="showShipping"
+    @close="showShipping = false"
+  />
+  <Toast :message="infoMessage" :showToast="showToasts" />
 </template>
 
 <script>
 import { mapGetters } from "vuex";
+import TimeStamp from "../components/modals/TimeStamp.vue";
+import LoadingBar from "../components/molecules/LoadingBar.vue";
+import Toast from "../components/molecules/Toast.vue";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "Homepages",
-  components: { FontAwesomeIcon },
+  components: { FontAwesomeIcon, TimeStamp, Toast, LoadingBar },
   data() {
     return {
       dataShipping: [],
       orderId: "",
+      infoMessage: "",
+      showToasts: false,
+      showShipping: false,
+      isLoading: false,
     };
   },
   computed: {
@@ -83,24 +59,37 @@ export default {
         return this.dataShipping.some((data) => data.status === step);
       };
     },
-  },
-  created() {
-    this.getShipping();
+    shouldRenderTimeStamp() {
+      return this.dataShipping.length > 0;
+    },
   },
   methods: {
+    showToast() {
+      this.showToasts = true;
+      this.infoMessage = "ORDER ID TIDAK DITEMUKAN, MOHON PERIKSA KEMBALI.";
+      setTimeout(() => {
+        this.showToasts = false;
+      }, 3000);
+    },
     async getShipping() {
+      this.isLoading = true;
       try {
         const response = await axios.get(
-          `http://rsudsamrat.site:8990/order-status/status-entry/486`
+          `http://rsudsamrat.site:8990/order-status/status-entry/${this.orderId}`
         );
         console.log(response.data.statusList.status);
+        this.showShipping = true;
         this.dataShipping = response.data.statusList;
       } catch (err) {
         console.log(err);
+        this.showToast();
+      } finally {
+        this.isLoading = false;
       }
     },
     searchOrderId() {
       console.log(this.orderId);
+      this.getShipping();
     },
   },
 };
