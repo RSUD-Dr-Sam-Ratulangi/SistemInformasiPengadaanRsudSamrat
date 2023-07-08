@@ -1,7 +1,6 @@
 <template>
-  <p>Page For notifications</p>
   <div>
-    <table>
+    <table class="table table-zebra table-fixed">
       <thead>
         <tr>
           <th>id</th>
