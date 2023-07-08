@@ -12,7 +12,7 @@ import logo from "../assets/images/logo.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { logout } from "../config/auth/authSlice";
-import { updateNotifications } from "../config/notification/notificationSlice";
+import NotificationPanel from './NotificationPanel';
 
 const Navigation = () => {
   const location = useLocation();
@@ -21,23 +21,18 @@ const Navigation = () => {
 
   const id = useSelector((state) => state.auth.id);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const notifications = useSelector(
-    (state) => state.notification.notifications
-  );
 
   const [activeTab, setActiveTab] = useState(location.pathname);
   const [isOpen, setIsOpen] = useState(false);
-  const [notificationsCount, setNotificationsCount] = useState(1);
+  const [notifications, setNotifications] = useState(null);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(null);
+  const [showNotificationPanel, setShowNotificationPanel] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [comingSoonToolTip, setComingSoonToolTip] = useState("");
   const [comingSoonToolTipPosition, setComingSoonToolTipPosition] = useState({
     top: 0,
     left: 0,
   });
-
-  const handleNotificationClick = () => {
-    // setNotificationCount(0);
-  };
 
   const handleProfileClick = () => {
     // Tambahkan fungsi yang ingin dilakukan saat ikon profil diklik
@@ -68,7 +63,7 @@ const Navigation = () => {
   const isSignInPage = location.pathname === "/signIn";
 
   useEffect(() => {
-    getNotificationsCountFromBackEnd();
+    getNotifications();
 
     const handleScroll = () => {
       const sticky = window.pageYOffset > 0;
@@ -83,33 +78,27 @@ const Navigation = () => {
   }, []);
 
   useEffect(() => {
-    getNotificationsCount();
+    if (notifications) getUnreadNotificationsCount();
   }, [notifications]);
 
-  function getNotificationsCountFromBackEnd() {
+  function hideNotificationPanel() {
+    setShowNotificationPanel(false);
+  }
+
+  function getNotifications() {
     try {
       axios
         // .get(`http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/${id}`)
         .get(`http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/2`)
         .then((res) => {
-          const newNotificationCount = res.data.reduce(
-            (count, notification) => {
-              if (notification.notificationStatus === "UNREAD")
-                return count + 1;
-              return count;
-            },
-            0
-          );
-
-          setNotificationsCount(newNotificationCount);
-          dispatch(updateNotifications(res.data));
+          setNotifications(res.data);
         });
     } catch (e) {
       console.log("failed to get notifications. ", e);
     }
   }
 
-  function getNotificationsCount() {
+  function getUnreadNotificationsCount() {
     const newNotificationsCount = notifications.reduce(
       (count, notification) => {
         if (notification.notificationStatus === "UNREAD") return count + 1;
@@ -118,7 +107,7 @@ const Navigation = () => {
       0
     );
 
-    setNotificationsCount(newNotificationsCount);
+    setUnreadNotificationsCount(newNotificationsCount);
   }
 
   const handleTabClick = (path) => {
@@ -211,15 +200,22 @@ const Navigation = () => {
           <ul className="flex items-center justify-center gap-2 m-0">
             <li>
               <Link
-                to="/notifications"
+                // to="/notifications"
                 className="flex flex-row p-0 no-underline text-primary-1"
-                onClick={handleNotificationClick}
+                onClick={() => setShowNotificationPanel(!showNotificationPanel)}
               >
                 <MdNotifications className="text-2xl" />
-                {notificationsCount > 0 && (
-                  <span className="no-underline ">{notificationsCount}</span>
+                {unreadNotificationsCount > 0 && (
+                  <span className="no-underline ">{unreadNotificationsCount}</span>
                 )}
               </Link>
+              {showNotificationPanel && (
+                <NotificationPanel
+                  notifications={notifications}
+                  getNotifications={getNotifications}
+                  hideNotificationPanel={hideNotificationPanel}
+                />
+              )}
             </li>
             <li>
               <Link

@@ -358,8 +358,9 @@ const ModalOrderDetails = ({
       .then((response) => {
         console.log(response);
         if (response.data.length !== 0) {
-          // open link from new tab
-          window.open(response.data.fileUrls[0], '_blank');
+          // open link from new tab in https mode by cut the first 4 char from url (http) and replace with (https)
+          window.open(`https${response.data.fileUrls[0].slice(4)}`, '_blank');
+
           console.log(response.data.fileUrls[0]);
         } else {
         }
@@ -476,23 +477,28 @@ const ModalOrderDetails = ({
                 </a>
               </li>
               <hr />
-              {negotiable && (
+              {negotiable && selectedOrder.status !== 'CHECKING' ? (
                 <li>
                   <a onClick={() => handleOffer(orderItem.id)}>
                     <MdHandshake className='text-xl text-success' />
                     Negotiation
                   </a>
                 </li>
-              )}
+              ) : null}
               <hr />
-              {selectedOrder.status !== 'CHECKING' && (
+              {selectedOrder.status !== 'CHECKING' &&
+              selectedOrder.status !== 'COMPLETE' &&
+              selectedOrder.status !== 'PAYMENT' &&
+              selectedOrder.status !== 'VALIDATING' &&
+              selectedOrder.status !== 'SHIPPING' &&
+              selectedOrder.status !== 'CANCEL' ? (
                 <li>
                   <a onClick={() => handleDeleteOrderItem(orderItem.id)}>
                     <MdDelete className='text-xl text-red-500' />
                     Delete
                   </a>
                 </li>
-              )}
+              ) : null}
             </ul>
           </div>
         </td>
@@ -612,90 +618,103 @@ const ModalOrderDetails = ({
               ))}
             </div>
           )}
-          {allItemsChecked && (
+          {allItemsChecked &&
+          selectedOrder.status !== 'COMPLETE' &&
+          selectedOrder.status !== 'CANCEL' ? (
             <>
-              <div>
-                <input
-                  type='file'
-                  style={{ display: 'none' }}
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                />
-                <button
-                  onClick={() => {
-                    handleUploadClick();
-                    handlePrintBeritaAcara();
-                  }}
-                  className='text-white btn btn-warning'
-                  disabled={selectedFiles.length === 1}>
-                  Upload Berita Acara
-                </button>
-              </div>
-              <div>
-                <input
-                  type='file'
-                  style={{ display: 'none' }}
-                  ref={uploadGambarRef}
-                  onChange={handleUploadGambarChange}
-                />
-                <button
-                  onClick={() => {
-                    handleUploadGambar();
-                  }}
-                  className='text-white btn btn-warning'
-                  disabled={selectedFiles.length === 1}>
-                  Upload Gambar
-                </button>
-              </div>
-              <div>
-                <input
-                  type='file'
-                  style={{ display: 'none' }}
-                  ref={uploadNotaRef}
-                  onChange={(e) => handleNotaChange(e)}
-                />
-                <button
-                  onClick={() => {
-                    handleUploadNotaClick();
-                  }}
-                  className='text-white btn btn-warning'
-                  disabled={selectedFiles.length === 1}>
-                  Upload Nota
-                </button>
-              </div>
+              {selectedOrder.status !== 'PAYMENT' ? (
+                <div>
+                  <input
+                    type='file'
+                    style={{ display: 'none' }}
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                  />
+                  <button
+                    onClick={() => {
+                      handleUploadClick();
+                      handlePrintBeritaAcara();
+                    }}
+                    className='text-white btn btn-warning'
+                    disabled={selectedFiles.length === 1}>
+                    Upload Berita Acara
+                  </button>
+                </div>
+              ) : null}
+
+              {selectedOrder.status !== 'CHECKING' &&
+              selectedOrder.staus !== 'PAYMENT' ? (
+                <div>
+                  <input
+                    type='file'
+                    style={{ display: 'none' }}
+                    ref={uploadGambarRef}
+                    onChange={handleUploadGambarChange}
+                  />
+                  <button
+                    onClick={() => {
+                      handleUploadGambar();
+                    }}
+                    className='text-white btn btn-warning'
+                    disabled={selectedFiles.length === 1}>
+                    Upload Gambar
+                  </button>
+                </div>
+              ) : null}
+              {selectedOrder.status !== 'CHECKING' && (
+                <div>
+                  <input
+                    type='file'
+                    style={{ display: 'none' }}
+                    ref={uploadNotaRef}
+                    onChange={(e) => handleNotaChange(e)}
+                  />
+                  <button
+                    onClick={() => {
+                      handleUploadNotaClick();
+                    }}
+                    className='text-white btn btn-warning'
+                    disabled={selectedFiles.length === 1}>
+                    Upload Nota
+                  </button>
+                </div>
+              )}
             </>
-          )}
-          {selectedOrder.status !== 'ORDER' && (
+          ) : null}
+          {selectedOrder.status !== 'ORDER' &&
+          selectedOrder.status !== 'CHECKING' ? (
             <button
               onClick={handlePayoutDetail}
               className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'>
               Payout Details
             </button>
-          )}
-          {selectedOrder.status === 'SHIPPING' ||
-            (selectedOrder.status === 'PAYMENT' && (
-              <button
-                className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'
-                onClick={handleCheckFaktur}>
-                Check Faktur
-              </button>
-            ))}
-          {allItemsAccepted ||
-            selectedOrder.status === 'PAYMENT' ||
-            (selectedOrder.status === 'NEGOTIATION' && (
-              <button
-                type='button'
-                className='text-white btn btn-primary'
-                onClick={() => {
-                  printOrderItem(selectedOrder.orderItems, history);
-                }}>
-                Print
-              </button>
-            ))}
+          ) : null}
+          {(selectedOrder.status === 'SHIPPING' ||
+            selectedOrder.status === 'CHECKING' ||
+            selectedOrder.status === 'PAYMENT') &&
+          selectedOrder.status !== 'VALIDATING' ? (
+            <button
+              className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'
+              onClick={handleCheckFaktur}>
+              Cetak Faktur
+            </button>
+          ) : null}
+          {(selectedOrder.status === 'PAYMENT' && allItemsChecked) ||
+          (selectedOrder.status === 'NEGOTIATION' && allItemsAccepted) ||
+          selectedOrder.status === 'COMPLETE' ? (
+            <button
+              type='button'
+              className='text-white btn btn-primary'
+              onClick={() => {
+                printOrderItem(selectedOrder.orderItems, history);
+              }}>
+              Print Laporan Negosiasi
+            </button>
+          ) : null}
 
           {/* display if all the items status is CHECKED */}
-          {allItemsChecked && (
-            <>
+          <>
+            {allItemsChecked ? (
               <button
                 type='button'
                 className='text-white btn btn-secondary'
@@ -704,21 +723,23 @@ const ModalOrderDetails = ({
                 }}>
                 Print Berita Acara
               </button>
-
+            ) : null}
+            {allItemsChecked && selectedOrder.status !== 'CHECKING' ? (
               <button
                 className='text-white btn btn-primary'
                 onClick={handleCheckNota}>
                 Check Nota
               </button>
-            </>
-          )}
-          {selectedOrder.status !== 'ORDER' && (
+            ) : null}
+          </>
+          {selectedOrder.status !== 'ORDER' &&
+          selectedOrder.status !== 'CHECKING' ? (
             <button
               onClick={handleHistory}
               className='text-white btn btn-primary'>
               View History
             </button>
-          )}
+          ) : null}
         </div>
       </div>
     </dialog>
