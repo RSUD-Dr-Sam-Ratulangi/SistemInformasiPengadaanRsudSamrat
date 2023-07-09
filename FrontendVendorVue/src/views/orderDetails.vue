@@ -42,7 +42,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="datas in filteredData" :key="datas.id">
+          <tr v-for="datas in filteredData.slice().reverse()" :key="datas.id">
             <td>{{ datas.id }}</td>
             <td>{{ datas.orderDate }}</td>
             <td>{{ datas.status }}</td>

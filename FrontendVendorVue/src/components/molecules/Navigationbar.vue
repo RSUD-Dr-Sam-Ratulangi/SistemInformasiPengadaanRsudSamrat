@@ -23,22 +23,70 @@
         >
       </a>
       <!-- Login Button -->
-      <div>
-        <button
-          class="mr-2 btn btn-circle btn-sm md:btn-md"
-          @click="showmodalLogin = true"
-          v-if="!isLoggedIn"
-        >
-          <FontAwesomeIcon icon="fas fa-user" />
-        </button>
-        <button
-          class="mr-2 btn btn-circle btn-sm md:btn-md"
-          @click="logout"
-          v-else
-        >
-          <FontAwesomeIcon icon="fas fa-right-from-bracket" />
-        </button>
+      <div class="flex justify-end flex-1 px-2">
+        <div class="flex items-stretch">
+          <div class="dropdown dropdown-end h-auto">
+            <button @click="getNotif" v-if="isLoggedIn">
+              <label tabindex="0" class="btn btn-ghost rounded-btn"
+                ><FontAwesomeIcon icon="fas fa-bell" /><span>{{
+                  notif.length
+                }}</span></label
+              >
+            </button>
+            <div
+              class="menu grid dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box w-auto h-96 overflow-x-auto"
+            >
+              <div class="p-3">
+                <h1 class="text text-lg font-bold">Notifications</h1>
+
+                <p class="text text-xs">Read: {{ readNotificationCount }}</p>
+                <p class="text text-xs">
+                  Unread: {{ unreadNotificationCount }}
+                </p>
+              </div>
+              <table
+                class="table table-zebra"
+                v-for="notifikasi in notif.slice().reverse()"
+                :key="notifikasi.id"
+              >
+                <div class="border border-collapse border-t-4">
+                  <li>
+                    <a class="text text-sm font-bold">{{
+                      notifikasi.notificationStatus
+                    }}</a>
+                  </li>
+                  <li>
+                    <a>{{ notifikasi.createdAt }}</a>
+                  </li>
+                  <li>
+                    <a>{{ notifikasi.message }}</a>
+                  </li>
+                  <li>
+                    <a>Sender: {{ notifikasi.sender }}</a>
+                  </li>
+                </div>
+              </table>
+            </div>
+          </div>
+          <div>
+            <button
+              class="mr-2 btn btn-ghost btn-sm md:btn-md"
+              @click="showmodalLogin = true"
+              v-if="!isLoggedIn"
+            >
+              <FontAwesomeIcon icon="fas fa-user" />
+            </button>
+            <button
+              class="mr-2 btn btn-ghost btn-sm md:btn-md"
+              @click="logout"
+              v-else
+            >
+              <FontAwesomeIcon icon="fas fa-right-from-bracket" />
+            </button>
+          </div>
+        </div>
       </div>
+
       <!-- Toggles -->
       <div
         id="navbar-hamburger"
@@ -92,17 +140,25 @@ export default {
 
   data() {
     return {
-      notif: 0,
+      notif: [],
       showmodalLogin: false,
       toggleIsActive: false,
     };
   },
   computed: {
-    ...mapGetters(["isLoggedIn", "isLoggedOut"]),
+    ...mapGetters(["isLoggedIn", "isLoggedOut", "vendoruuid", "vendorid"]),
+    readNotificationCount() {
+      return this.notif.filter(
+        (notification) => notification.notificationStatus === "READ"
+      ).length;
+    },
+    unreadNotificationCount() {
+      return this.notif.filter(
+        (notification) => notification.notificationStatus === "UNREAD"
+      ).length;
+    },
   },
-  created() {
-    this.fetchData();
-  },
+
   mounted() {
     onClickOutside(this.$refs.toggleRef, this.closeToggle);
   },
@@ -117,6 +173,20 @@ export default {
       localStorage.removeItem("vendorId");
       alert("Berhasil Keluar");
       this.toggleIsActive = false;
+      location.reload();
+    },
+    getNotif() {
+      this.readNotificationCount;
+      this.unreadNotificationCount;
+      axios
+        .get(
+          `http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/${this.vendorid}`
+        )
+        .then((res) => {
+          console.log(res.data);
+          this.notif = res.data;
+        })
+        .catch((err) => console.log(err));
     },
     activeToggle() {
       this.toggleIsActive = !this.toggleIsActive;
@@ -124,16 +194,6 @@ export default {
     },
     closeToggle() {
       this.toggleIsActive = false;
-    },
-    async fetchData() {
-      try {
-        const response = await axios.get(
-          "http://rsudsamrat.site:8990/api/v1/notifikasi"
-        );
-        this.notif = response.data.content.length;
-      } catch (err) {
-        console.log(err);
-      }
     },
   },
 };

@@ -16,7 +16,7 @@
                 <th>Product Name</th>
                 <th>Quantity</th>
                 <th>Harga</th>
-                <th>Harga Penwaran</th>
+                <th>Harga Penawaran</th>
                 <th>status</th>
               </tr>
             </thead>
