@@ -63,6 +63,7 @@ const ModalOrderDetails = ({
       selectedOrder.orderItems.every((order) => order.status === 'CHECKED')
     ) {
       setNegotiable(false);
+      return;
     }
     if (
       selectedOrder.status === 'ORDER' ||
@@ -340,7 +341,19 @@ const ModalOrderDetails = ({
         receiverId: selectedOrder.orderItems[0].product.vendor.id,
         message: `Semua produk dalam order id ${selectedOrder.id} telah diterima. Berkas Telah dikirim.`
       })
-      .then((res) => console.log(res))
+      .then((res) => {
+        console.log(res);
+        setShowActionToast(true);
+        setActionToastHeader('Berhasil');
+        setActionToastBody(
+          'Berkas selesai diupload, klik tombol "Print Berita Acara" untuk mencetak berita acara.'
+        );
+        setTimeout(() => {
+          setShowActionToast(false);
+          setActionToastHeader('');
+          setActionToastBody('');
+        }, 3000);
+      })
       .catch((err) => console.log(err));
   };
 
@@ -633,7 +646,7 @@ const ModalOrderDetails = ({
                   <button
                     onClick={() => {
                       handleUploadClick();
-                      handlePrintBeritaAcara();
+                      // handlePrintBeritaAcara();
                     }}
                     className='text-white btn btn-warning'
                     disabled={selectedFiles.length === 1}>
@@ -691,6 +704,7 @@ const ModalOrderDetails = ({
           ) : null}
           {(selectedOrder.status === 'SHIPPING' ||
             selectedOrder.status === 'CHECKING' ||
+            selectedOrder.status === 'COMPLETE' ||
             selectedOrder.status === 'PAYMENT') &&
           selectedOrder.status !== 'VALIDATING' ? (
             <button
@@ -720,11 +734,12 @@ const ModalOrderDetails = ({
                 className='text-white btn btn-secondary'
                 onClick={() => {
                   PrintBeritaAcara(selectedOrder);
+                  handlePrintBeritaAcara();
                 }}>
                 Print Berita Acara
               </button>
             ) : null}
-            {allItemsChecked && selectedOrder.status !== 'CHECKING' ? (
+            {allItemsChecked && selectedOrder.status === 'COMPLETE' ? (
               <button
                 className='text-white btn btn-primary'
                 onClick={handleCheckNota}>

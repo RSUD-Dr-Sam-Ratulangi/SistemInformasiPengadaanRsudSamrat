@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import html2pdf from "html2pdf.js";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import html2pdf from 'html2pdf.js';
 
 import ModalHistory from '../components/orderPages/ModalHistory';
 import ModalOrderItem from '../components/orderPages/ModalOrderItem';
@@ -123,11 +123,11 @@ const Orderpages = () => {
         uniqueData = uniqueData.filter(
           (item) => item.status === 'SHIPPING' || item.status === 'CHECKING'
         );
-        if (role === 'KEU') {
-          uniqueData = uniqueData.filter(
-            (item) => item.status === 'PAYMENT' || item.status === 'COMPLETE'
-          );
-        }
+      }
+      if (role === 'KEU') {
+        uniqueData = uniqueData.filter(
+          (item) => item.status === 'PAYMENT' || item.status === 'COMPLETE'
+        );
       }
 
       setData(uniqueData);
@@ -135,7 +135,6 @@ const Orderpages = () => {
       console.log('order filter: ', uniqueData);
       console.log('order: ', response.data);
       setLoading(false);
-
     } catch (error) {
       console.error(error);
     }
