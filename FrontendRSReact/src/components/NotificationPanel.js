@@ -1,12 +1,12 @@
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { MdClose } from 'react-icons/md';
-import '../assets/css/notificationpanel.css';
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { MdClose } from "react-icons/md";
+import "../assets/css/notificationpanel.css";
 
 export default function NotificationPanel({
-  notifications=null,
+  notifications = null,
   getNotifications,
-  hideNotificationPanel
+  hideNotificationPanel,
 }) {
   const navigate = useNavigate();
 
@@ -15,65 +15,78 @@ export default function NotificationPanel({
   let filteredNotifications = null;
 
   if (notifications) {
-    unreadNotifications = notifications.filter(notification => notification.notificationStatus === 'UNREAD');
-    readNotifications= notifications.filter(notification => notification.notificationStatus === 'READ');
+    unreadNotifications = notifications.filter(
+      (notification) => notification.notificationStatus === "UNREAD"
+    );
+    readNotifications = notifications.filter(
+      (notification) => notification.notificationStatus === "READ"
+    );
     filteredNotifications = [...unreadNotifications, ...readNotifications];
   }
 
   function handleNotificationOnClick(notification) {
-    const orderId = notification.message.split(',')[0].trim();
-    
-    if (notification.notificationStatus === 'UNREAD') {
+    const orderId = notification.message.split(",")[0].trim();
+
+    if (notification.notificationStatus === "UNREAD") {
       changeNotificationStatusToRead(notification.id);
     }
 
     hideNotificationPanel();
 
     if (!isNaN(orderId)) navigate(`/orders/${orderId}`);
-    else navigate('/orders');
+    else navigate("/orders");
   }
 
   function changeNotificationStatusToRead(notificationId) {
     try {
-      axios.put(`http://rsudsamrat.site:8990/api/v1/notifikasi/${notificationId}`, {
-        notificationStatus: ['READ']
-      })
-      .then((res) =>{
-        if(res.status === 200) {
-          getNotifications();
-        }
-      });
-    }
-    catch (err) {
-      console.log('Unable to update notification status.', err.message);
+      axios
+        .put(
+          `http://rsudsamrat.site:8990/api/v1/notifikasi/${notificationId}`,
+          {
+            notificationStatus: ["READ"],
+          }
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            getNotifications();
+          }
+        });
+    } catch (err) {
+      console.log("Unable to update notification status.", err.message);
     }
   }
 
   return (
-    <div className='notification-panel'>
-      <div className='header'>
-        <div className='title'>Notifications</div>
-        <div className='close-button' onClick={hideNotificationPanel}><MdClose /></div>
+    <div className="notification-panel">
+      <div className="header">
+        <div className="title">Notifications</div>
+        <div className="close-button" onClick={hideNotificationPanel}>
+          <MdClose />
+        </div>
       </div>
 
       <div>Unread: {unreadNotifications.length}</div>
       <div>Read: {readNotifications.length}</div>
 
-      {(notifications === null)
-        ? <div className='body'>Loading notifications ...</div>
-        : (notifications.length === 0)
-          ? <div className='body'>Notification is empty</div>
-          : filteredNotifications.map((notification, index) => (
+      {notifications === null ? (
+        <div className="body">Loading notifications ...</div>
+      ) : notifications.length === 0 ? (
+        <div className="body">Notification is empty</div>
+      ) : (
+        filteredNotifications
+          .slice()
+          .reverse()
+          .map((notification, index) => (
             <div
               key={index}
-              className='item'
+              className="item"
               onClick={() => handleNotificationOnClick(notification)}
             >
-              <div className='title'>{notification.notificationStatus}</div>
-              <div className='body'>{notification.message}</div>
+              <div className="title">{notification.notificationStatus}</div>
+              <div className="body">{notification.message}</div>
             </div>
           ))
-      }
+      )}
     </div>
-  )
-};
+  );
+}

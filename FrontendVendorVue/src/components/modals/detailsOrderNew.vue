@@ -239,30 +239,6 @@ export default {
         .then((res) => {
           // File uploaded successfully
           console.log(res.data);
-
-          // Send notification to PP
-          axios
-            .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-              sender: this.username,
-              senderId: this.vendorid,
-              receiver: ppRole,
-              receiverId: ppIds,
-              message: `FAKTUR TELAH DIKIRIM BERSAMA FILE ${this.selectedFile[0].name}.`,
-            })
-            .then((res) => {
-              // Send notification to panpen
-              axios
-                .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-                  sender: this.username,
-                  senderId: this.vendorid,
-                  receiver: panpenRole,
-                  receiverId: panpenIds,
-                  message: `${panpenRole} mendapatkan notifikasi pemeriksaan barang, order id ${this.orders.id}.`,
-                })
-                .then((res) => console.log(res))
-                .catch((err) => console.log(err));
-            })
-            .catch((err) => console.log(err));
         })
         .catch((err) => console.log(err));
 
@@ -293,6 +269,31 @@ export default {
         .catch((err) => console.log(err));
       this.$emit("close");
       this.selectedFile = [];
+
+      // Send notification to PP
+      axios
+        .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+          sender: this.username,
+          senderId: this.vendorid,
+          receiver: ppRole,
+          receiverId: ppIds,
+          message: `${this.orders.id}, FAKTUR TELAH DITERIMA.}`,
+        })
+        .then((res) => {
+          // Send notification to panpen
+          console.log("Berhasil");
+        })
+        .catch((err) => console.log(err));
+      axios
+        .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
+          sender: this.username,
+          senderId: this.vendorid,
+          receiver: panpenRole,
+          receiverId: panpenIds,
+          message: `${panpenRole} mendapatkan notifikasi pemeriksaan barang, order id ${this.orders.id}.`,
+        })
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
     },
     async resendRefund() {
       const panpenRole = this.employee[3].role;
