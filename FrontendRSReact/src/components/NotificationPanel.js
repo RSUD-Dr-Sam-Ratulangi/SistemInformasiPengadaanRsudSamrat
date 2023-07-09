@@ -82,7 +82,10 @@ export default function NotificationPanel({
               className="item"
               onClick={() => handleNotificationOnClick(notification)}
             >
-              <div className="title">{notification.notificationStatus}</div>
+              <div style={{display: 'flex', flexDirection: 'row'}}>
+                <div className="title">{notification.notificationStatus}</div>
+                <div className="body" style={{marginLeft: '8px'}}>({notification.sender})</div>
+              </div>
               <div className="body">{notification.message}</div>
             </div>
           ))
