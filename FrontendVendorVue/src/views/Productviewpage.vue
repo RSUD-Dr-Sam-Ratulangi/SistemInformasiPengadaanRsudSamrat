@@ -19,7 +19,7 @@
       </div>
       <div>
         <button class="btn btn-sm btn-primary mr-10" @click="addProductModal">
-          Add Product
+          Tambah Produk
         </button>
       </div>
     </div>

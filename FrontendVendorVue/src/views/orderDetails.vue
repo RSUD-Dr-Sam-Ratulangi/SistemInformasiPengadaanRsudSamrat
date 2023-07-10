@@ -116,6 +116,17 @@ export default {
   },
   created() {
     this.isLoading = true;
+    // const paramsOrder = this.$route.params.orderId;
+    // if (paramsOrder) {
+    //   this.selectOrdersItem();
+    // } else {
+    //   this.showToast = true;
+    //   this.infoMessage = "OrderId not Found";
+    //   setTimeout(() => {
+    //     this.showToasts = false;
+    //   }, 3000);
+    // }
+
     axios
       .get(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${this.vendorid}/vendor`
@@ -143,10 +154,21 @@ export default {
     selectOrdersItem(order) {
       this.showmodalSeeDetails = true;
       this.selectedOrder = order;
+
+      if (order && order.id) {
+        this.$router.push({
+          name: "orderDetails",
+          params: { orderId: order.id },
+        });
+      } else {
+        // Redirect to a default route or display an error message
+        this.$router.push("/defaultRoute"); // Replace with your default route or error handling logic
+      }
     },
     handleModalClose() {
       this.showmodalSeeDetails = false;
       this.selectedOrder = null;
+      this.$router.push("/orderDetails");
     },
     searchBydate() {
       if (this.selectedDate) {

@@ -73,22 +73,21 @@ export default function NotificationPanel({
       ) : notifications.length === 0 ? (
         <div className="body">Notification is empty</div>
       ) : (
-        filteredNotifications
-          .slice()
-          .reverse()
-          .map((notification, index) => (
-            <div
-              key={index}
-              className="item"
-              onClick={() => handleNotificationOnClick(notification)}
-            >
-              <div style={{display: 'flex', flexDirection: 'row'}}>
-                <div className="title">{notification.notificationStatus}</div>
-                <div className="body" style={{marginLeft: '8px'}}>({notification.sender})</div>
+        filteredNotifications.map((notification, index) => (
+          <div
+            key={index}
+            className="item"
+            onClick={() => handleNotificationOnClick(notification)}
+          >
+            <div style={{ display: "flex", flexDirection: "row" }}>
+              <div className="title">{notification.notificationStatus}</div>
+              <div className="body" style={{ marginLeft: "8px" }}>
+                ({notification.sender})
               </div>
-              <div className="body">{notification.message}</div>
             </div>
-          ))
+            <div className="body">{notification.message}</div>
+          </div>
+        ))
       )}
     </div>
   );
