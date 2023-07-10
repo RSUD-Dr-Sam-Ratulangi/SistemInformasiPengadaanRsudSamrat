@@ -2,6 +2,8 @@ import html2pdf from "html2pdf.js";
 import logo from "../../assets/images/logo.jpg";
 
 export default function printOrderItems(selectedOrderItems, history) {
+  console.log('printOrderItems', 'selectedOrderItems', selectedOrderItems, 'history', history);
+
   console.log("from print", selectedOrderItems);
   if (selectedOrderItems && selectedOrderItems.length > 0) {
     const taxRate = 0.11; // 11% tax rate
@@ -25,11 +27,11 @@ export default function printOrderItems(selectedOrderItems, history) {
     let secondTableRows = "";
 
     selectedOrderItems.forEach((selectedOrderItem) => {
-      const { quantity, bidPrice } = selectedOrderItem;
+      const { product, totalAmount } = selectedOrderItem;
       const row = `
         <tr>
-        <td>${quantity}</td>
-          <td>Rp.${bidPrice}</td>
+        <td>${product.name}</td>
+          <td>Rp.${totalAmount}</td>
         </tr>
         `;
       secondTableRows += row;
@@ -152,6 +154,7 @@ export default function printOrderItems(selectedOrderItems, history) {
           <tr>
             <th>Nama</th>
             <th>Deskripsi</th>
+            <th>Harga per Item</th>
             <th>Harga</th>
             <th>Penawaran Akhir</th>
             <th>Jumlah Barang</th>
@@ -161,8 +164,8 @@ export default function printOrderItems(selectedOrderItems, history) {
 
         <table>
           <tr>
-            <th>Jumlah Barang</th>
-            <th>Harga Penawaran</th>
+            <th>Nama</th>
+            <th>Harga Akhir</th>
           </tr>
           ${secondTableRows}
         </table>
