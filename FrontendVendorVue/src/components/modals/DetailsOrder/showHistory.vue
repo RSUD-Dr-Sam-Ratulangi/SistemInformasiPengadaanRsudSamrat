@@ -9,6 +9,7 @@
         <table class="table table-xs">
           <thead>
             <tr>
+              <th>No</th>
               <th>Product Name</th>
               <th>Bid Price</th>
               <th>Price Change</th>
@@ -18,21 +19,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="histori in histories" :key="histori.id">
-              <td v-for="bidItem in histori.bidItems">
-                {{ bidItem.productName }}
-              </td>
-              <td v-for="bidItem in histori.bidItems">
-                {{ bidItem.bidPrice }}
-              </td>
-              <td v-for="bidItem in histori.bidItems">
-                {{ bidItem.bidPriceChange }}
-              </td>
-              <td>{{ histori.status }}</td>
-              <td v-for="bidItem in histori.bidItems">
-                {{ bidItem.messages }}
-              </td>
-              <td>{{ histori.orderDate }}</td>
+            <tr v-for="(e, i) in newHistories" :key="i">
+              <td>{{ i }}</td>
+              <td>{{ e.productName }}</td>
+              <td>{{ e.bidPrice }}</td>
+              <td>{{ e.bidPriceChange }}</td>
+              <td>{{ e.status }}</td>
+              <td>{{ e.message }}</td>
+              <td>{{ e.orderDate }}</td>
             </tr>
           </tbody>
         </table>
@@ -62,6 +56,7 @@ export default {
   data() {
     return {
       histories: [],
+      newHistories: [],
     };
   },
   methods: {
@@ -76,10 +71,25 @@ export default {
           );
           this.histories = response.data;
           console.log("History", response.data);
+
+          this.processHistory();
         }
       } catch (err) {
         console.log(err);
       }
+    },
+    processHistory() {
+      const newHistory = [];
+      this.histories.forEach((item) => {
+        item.bidItems.forEach((bidItem) => {
+          newHistory.push({
+            ...bidItem,
+            status: item.status,
+            orderDate: item.orderDate,
+          });
+        });
+      });
+      this.newHistories = newHistory;
     },
   },
   emits: ["close"],

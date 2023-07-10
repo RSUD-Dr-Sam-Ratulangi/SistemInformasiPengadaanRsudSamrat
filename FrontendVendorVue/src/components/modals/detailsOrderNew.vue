@@ -277,7 +277,7 @@ export default {
           senderId: this.vendorid,
           receiver: ppRole,
           receiverId: ppIds,
-          message: `${this.orders.id}, FAKTUR TELAH DITERIMA.}`,
+          message: `${this.orders.id}, FAKTUR TELAH DITERIMA.`,
         })
         .then((res) => {
           // Send notification to panpen

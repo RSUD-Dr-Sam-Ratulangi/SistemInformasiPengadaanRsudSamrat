@@ -28,9 +28,10 @@
           <div class="dropdown dropdown-end h-auto">
             <button @click="getNotif" v-if="isLoggedIn">
               <label tabindex="0" class="btn btn-ghost rounded-btn"
-                ><FontAwesomeIcon icon="fas fa-bell" /><span>{{
-                  notif.length
-                }}</span></label
+                ><FontAwesomeIcon icon="fas fa-bell" /><span
+                  v-show="unreadNotificationCount > 0"
+                  >{{ unreadNotificationCount }}</span
+                ></label
               >
             </button>
             <div
@@ -45,25 +46,28 @@
                 </p>
               </div>
               <table
-                class="table table-zebra"
+                class="table"
                 v-for="notifikasi in notif.slice().reverse()"
                 :key="notifikasi.id"
               >
                 <div class="border border-collapse border-t-4">
-                  <li>
-                    <a class="text text-sm font-bold">{{
-                      notifikasi.notificationStatus
-                    }}</a>
-                  </li>
-                  <li>
-                    <a>{{ notifikasi.createdAt }}</a>
-                  </li>
-                  <li>
-                    <a>{{ notifikasi.message }}</a>
-                  </li>
-                  <li>
-                    <a>Sender: {{ notifikasi.sender }}</a>
-                  </li>
+                  <button
+                    @click="openNotif(notifikasi.id, selectedNotif)"
+                    class="btn btn-ghost w-full text-lg font-bold"
+                  >
+                    {{ notifikasi.notificationStatus }}
+                  </button>
+                  <ul>
+                    <li>
+                      <p>{{ notifikasi.createdAt }}</p>
+                    </li>
+                    <li>
+                      <p>{{ notifikasi.message }}</p>
+                    </li>
+                    <li>
+                      <p>Sender: {{ notifikasi.sender }}</p>
+                    </li>
+                  </ul>
                 </div>
               </table>
             </div>
@@ -141,8 +145,12 @@ export default {
   data() {
     return {
       notif: [],
+      id: "",
+      selectedNotif: null,
+      notifId: "",
       showmodalLogin: false,
       toggleIsActive: false,
+      selectedNotif: null,
     };
   },
   computed: {
@@ -160,7 +168,7 @@ export default {
   },
 
   mounted() {
-    onClickOutside(this.$refs.toggleRef, this.closeToggle);
+    this.getNotif();
   },
   methods: {
     //login
@@ -176,8 +184,6 @@ export default {
       location.reload();
     },
     getNotif() {
-      this.readNotificationCount;
-      this.unreadNotificationCount;
       axios
         .get(
           `http://rsudsamrat.site:8990/api/v1/notifikasi/receiver/${this.vendorid}`
@@ -185,6 +191,28 @@ export default {
         .then((res) => {
           console.log(res.data);
           this.notif = res.data;
+        })
+        .catch((err) => console.log(err));
+    },
+    openNotif(notifikasiId) {
+      console.log(notifikasiId);
+      axios
+        .put(`http://rsudsamrat.site:8990/api/v1/notifikasi/${notifikasiId}`, {
+          notificationStatus: ["READ"],
+        })
+        .then((res) => {
+          console.log(res);
+          const regex = /(\d+),/;
+          if (res.data.message && typeof res.data.message === "string") {
+            const match = res.data.message.match(regex);
+            if (match) {
+              this.id = match[1];
+            }
+          }
+          this.$router.push({
+            name: "orderDetails",
+            params: { orderId: this.id },
+          });
         })
         .catch((err) => console.log(err));
     },

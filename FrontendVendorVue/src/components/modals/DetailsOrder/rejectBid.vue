@@ -12,6 +12,14 @@
       </button>
       <form @submit.prevent="rejectBid">
         <h3 class="font-bold text-sm">MENOLAK PENAWARAN</h3>
+        <div class="flex flex-shrink">
+          <p class="text text-sm">
+            Harga Yang ditawar:
+            <span class="font-bold" v-if="orderItems">{{
+              orderItems.bidPrice
+            }}</span>
+          </p>
+        </div>
         <label class="label font-bold">Harga :</label>
         <input
           type="number"
@@ -86,6 +94,7 @@ export default {
           this.$emit("close");
         })
         .catch((err) => console.log(err));
+      location.reload();
     },
     async getEmployee() {
       try {

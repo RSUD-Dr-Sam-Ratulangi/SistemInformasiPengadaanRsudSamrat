@@ -81,12 +81,12 @@ const ModalOffer = ({
 
         {/* Footer */}
         <div className="modal-action">
-          <button
+          {/* <button
             onClick={onAccept}
             className="btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
           >
             Accept
-          </button>
+          </button> */}
           <button
             onClick={onSubmit}
             className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"

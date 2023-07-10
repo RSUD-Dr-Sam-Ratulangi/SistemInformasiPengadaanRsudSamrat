@@ -2,7 +2,13 @@ import html2pdf from "html2pdf.js";
 import logo from "../../assets/images/logo.jpg";
 
 export default function printOrderItems(selectedOrderItems, history) {
-  console.log('printOrderItems', 'selectedOrderItems', selectedOrderItems, 'history', history);
+  console.log(
+    "printOrderItems",
+    "selectedOrderItems",
+    selectedOrderItems,
+    "history",
+    history
+  );
 
   console.log("from print", selectedOrderItems);
   if (selectedOrderItems && selectedOrderItems.length > 0) {
@@ -11,13 +17,13 @@ export default function printOrderItems(selectedOrderItems, history) {
     let tableRows = "";
 
     selectedOrderItems.forEach((selectedOrderItem) => {
-      const { product, quantity, bidPrice } = selectedOrderItem;
+      const { product, quantity, bidPrice, totalAmount } = selectedOrderItem;
       const row = `
         <tr>
           <td>${product.name}</td>
           <td>${product.description}</td>
           <td>Rp.${product.price}</td>
-          <td>Rp.${bidPrice}</td>
+          <td>Rp. ${totalAmount}</td>
           <td>${quantity}</td>
         </tr>
       `;
@@ -70,12 +76,12 @@ export default function printOrderItems(selectedOrderItems, history) {
     let thirdTableRows = "";
 
     const newHistory = [];
-    history.forEach(item => {
-      item.bidItems.forEach(bidItem => {
+    history.forEach((item) => {
+      item.bidItems.forEach((bidItem) => {
         newHistory.push({
           ...bidItem,
           status: item.status,
-          orderDate: item.orderDate
+          orderDate: item.orderDate,
         });
       });
     });
@@ -87,7 +93,7 @@ export default function printOrderItems(selectedOrderItems, history) {
         <td>${e.bidPrice}</td>
         <td>${e.bidPriceChange}</td>
         <td>${e.status}</td>
-        <td>${(e.message) ? e.message : ''}</td>
+        <td>${e.message ? e.message : ""}</td>
         <td>${timeAgo(e.orderDate)}</td>
       </tr>`;
       thirdTableRows += row;
@@ -155,19 +161,10 @@ export default function printOrderItems(selectedOrderItems, history) {
             <th>Nama</th>
             <th>Deskripsi</th>
             <th>Harga per Item</th>
-            <th>Harga</th>
-            <th>Penawaran Akhir</th>
+            <th>Harga Akhir</th>
             <th>Jumlah Barang</th>
           </tr>
           ${tableRows}
-        </table>
-
-        <table>
-          <tr>
-            <th>Nama</th>
-            <th>Harga Akhir</th>
-          </tr>
-          ${secondTableRows}
         </table>
 
         <table>

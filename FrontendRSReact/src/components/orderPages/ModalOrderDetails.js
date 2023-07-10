@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
   MdInventory,
   MdMenu,
@@ -7,12 +7,12 @@ import {
   MdDelete,
   MdSettingsBackupRestore,
   MdCheck,
-  MdLocalShipping
-} from 'react-icons/md';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
-import printOrderItem from './printOrderItem';
-import PrintBeritaAcara from './PrintBeritaAcara';
+  MdLocalShipping,
+} from "react-icons/md";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import printOrderItem from "./printOrderItem";
+import PrintBeritaAcara from "./PrintBeritaAcara";
 
 const ModalOrderDetails = ({
   onClose,
@@ -32,7 +32,7 @@ const ModalOrderDetails = ({
   setActionToastBody,
   fetchData,
   postShippingStatus,
-  history
+  history,
 }) => {
   const role = useSelector((state) => state.auth.role);
   const id = useSelector((state) => state.auth.id);
@@ -41,15 +41,15 @@ const ModalOrderDetails = ({
   const [selectedGambar, setSelectedGambar] = useState([]);
 
   const allItemsAccepted = selectedOrder.orderItems.every(
-    (orderItem) => orderItem.status === 'ACCEPTED'
+    (orderItem) => orderItem.status === "ACCEPTED"
   );
 
   const allItemsChecked = selectedOrder.orderItems.every(
-    (orderItem) => orderItem.status === 'CHECKED'
+    (orderItem) => orderItem.status === "CHECKED"
   );
 
   useEffect(() => {
-    console.log('modal order details', window.detailsModal.open);
+    console.log("modal order details", window.detailsModal.open);
     if (!window.detailsModal.open) {
       window.detailsModal.showModal();
     }
@@ -57,57 +57,57 @@ const ModalOrderDetails = ({
 
   useEffect(() => {
     if (
-      selectedOrder.orderItems.every((order) => order.status === 'OFFER') ||
-      selectedOrder.orderItems.every((order) => order.status === 'ACCEPTED') ||
-      selectedOrder.orderItems.every((order) => order.status === 'REFUND') ||
-      selectedOrder.orderItems.every((order) => order.status === 'CHECKED')
+      selectedOrder.orderItems.every((order) => order.status === "OFFER") ||
+      selectedOrder.orderItems.every((order) => order.status === "ACCEPTED") ||
+      selectedOrder.orderItems.every((order) => order.status === "REFUND") ||
+      selectedOrder.orderItems.every((order) => order.status === "CHECKED")
     ) {
       setNegotiable(false);
       return;
     }
     if (
-      selectedOrder.status === 'ORDER' ||
-      selectedOrder.status === 'NEGOTIATION'
+      selectedOrder.status === "ORDER" ||
+      selectedOrder.status === "NEGOTIATION"
     ) {
       setNegotiable(true);
     }
   }, [selectedOrder]);
 
-  console.log('selected order', selectedOrder.orderItems);
+  console.log("selected order", selectedOrder.orderItems);
 
   const handleDeleteOrderItem = (orderItemId) => {
     const confirmed = window.confirm(
-      'Apakah Anda yakin ingin menghapus produk ini?'
+      "Apakah Anda yakin ingin menghapus produk ini?"
     );
 
     if (confirmed) {
       fetch(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orderitems/${orderItemId}`,
         {
-          method: 'DELETE'
+          method: "DELETE",
         }
       )
         .then((response) => {
           setShowActionToast(true);
-          setActionToastHeader('Berhasil');
-          setActionToastBody('Data berhasil dihapus');
+          setActionToastHeader("Berhasil");
+          setActionToastBody("Data berhasil dihapus");
           setTimeout(() => {
             setShowActionToast(false);
-            setActionToastHeader('');
-            setActionToastBody('');
+            setActionToastHeader("");
+            setActionToastBody("");
           }, 3000);
 
           if (response.ok) {
             // Data berhasil dihapus, lakukan tindakan tambahan jika diperlukan
-            console.log('Data berhasil dihapus');
-            setActionToastHeader('Berhasil');
-            setActionToastBody('Data berhasil dihapus');
+            console.log("Data berhasil dihapus");
+            setActionToastHeader("Berhasil");
+            setActionToastBody("Data berhasil dihapus");
             fetchData();
           } else {
             // Gagal menghapus data, tangani kesalahan jika diperlukan
-            console.error('Gagal menghapus data');
-            setActionToastHeader('Gagal');
-            setActionToastBody('Gagal menghapus data');
+            console.error("Gagal menghapus data");
+            setActionToastHeader("Gagal");
+            setActionToastBody("Gagal menghapus data");
           }
 
           onClose();
@@ -115,13 +115,13 @@ const ModalOrderDetails = ({
         .catch((error) => {
           setShowActionToast(true);
           // Tangani kesalahan dalam permintaan
-          console.error('Terjadi kesalahan:', error);
-          setActionToastHeader('Gagal');
-          setActionToastBody('Terjadi Kesalahan');
+          console.error("Terjadi kesalahan:", error);
+          setActionToastHeader("Gagal");
+          setActionToastBody("Terjadi Kesalahan");
           setTimeout(() => {
             setShowActionToast(false);
-            setActionToastHeader('');
-            setActionToastBody('');
+            setActionToastHeader("");
+            setActionToastBody("");
           }, 3000);
           onClose();
         });
@@ -133,7 +133,7 @@ const ModalOrderDetails = ({
       .put(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
         {
-          status: status
+          status: status,
         }
       )
       .then((response) => {
@@ -148,7 +148,7 @@ const ModalOrderDetails = ({
       .put(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
         {
-          status: status
+          status: status,
         }
       )
       .then((response) => {
@@ -158,7 +158,7 @@ const ModalOrderDetails = ({
             senderId: id,
             receiver: selectedOrder.vendor.name,
             receiverId: selectedOrder.vendor.id,
-            message: `THIS ORDER IS CANCELED, BY ${role}`
+            message: `THIS ORDER IS CANCELED, BY ${role}`,
           })
           .catch((err) => console.log(err));
         console.log(response);
@@ -172,7 +172,7 @@ const ModalOrderDetails = ({
       .put(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
         {
-          status: status
+          status: status,
         }
       )
       .then((response) => {
@@ -182,7 +182,7 @@ const ModalOrderDetails = ({
             senderId: id,
             receiver: selectedOrder.orderItems.product.vendor.name,
             receiverId: selectedOrder.orderItems.product.vendor.id,
-            message: `ALL PRODUCT IN THIS ORDER IS ACCEPTED BY ${role}`
+            message: `ALL PRODUCT IN THIS ORDER IS ACCEPTED BY ${role}`,
           })
           .catch((err) => console.log(err));
         console.log(response);
@@ -197,11 +197,11 @@ const ModalOrderDetails = ({
       .put(
         `http://rsudsamrat.site:8080/pengadaan/dev/v1/orders/${selectedOrder.id}/status`,
         {
-          status: 'PAYMENT'
+          status: "PAYMENT",
         }
       )
       .then((response) => {
-        postShippingStatus('PAYMENT', selectedOrder.id);
+        postShippingStatus("PAYMENT", selectedOrder.id);
         axios
           .get(`http://rsudsamrat.site:8080/employee`)
           .then((response) => {
@@ -219,10 +219,10 @@ const ModalOrderDetails = ({
                 senderId: id,
                 receiver: employeeNameList,
                 receiverId: employeeList,
-                message: `THIS ORDER IS PAYMENT, BY ${role}`
+                message: `THIS ORDER IS PAYMENT, BY ${role}`,
               })
               .then((response) => {
-                console.log('berhasil mengirim notifikasi ke KEUANGAN');
+                console.log("berhasil mengirim notifikasi ke KEUANGAN");
               })
               .catch((err) => console.log(err));
           })
@@ -257,12 +257,12 @@ const ModalOrderDetails = ({
     setSelectedFiles([...selectedFiles, selectedFile]);
 
     setShowActionToast(true);
-    setActionToastHeader('Berhasil');
-    setActionToastBody('File siap untuk diupload.');
+    setActionToastHeader("Berhasil");
+    setActionToastBody("File siap untuk diupload.");
     setTimeout(() => {
       setShowActionToast(false);
-      setActionToastHeader('');
-      setActionToastBody('');
+      setActionToastHeader("");
+      setActionToastBody("");
     }, 3000);
 
     // Reset the input value to allow selecting the same file again
@@ -270,31 +270,31 @@ const ModalOrderDetails = ({
   };
 
   const handleNotaChange = (event) => {
-    console.log('event.target.files[0]', event.target.files[0]);
+    console.log("event.target.files[0]", event.target.files[0]);
     const selectedNota = event.target.files[0];
 
     const formData = new FormData();
-    formData.append('orderId', selectedOrder.id);
-    formData.append('files', selectedNota);
+    formData.append("orderId", selectedOrder.id);
+    formData.append("files", selectedNota);
 
     axios
-      .post('http://rsudsamrat.site:8990/notas', formData)
+      .post("http://rsudsamrat.site:8990/notas", formData)
       .then((res) => {
         console.log(res);
       })
       .catch((err) => {
         console.log(err);
-        handleSetStatusNego('COMPLETE');
-        postShippingStatus('COMPLETE', selectedOrder.id);
+        handleSetStatusNego("COMPLETE");
+        postShippingStatus("COMPLETE", selectedOrder.id);
       });
 
     setShowActionToast(true);
-    setActionToastHeader('Berhasil');
-    setActionToastBody('Nota selesai diupload');
+    setActionToastHeader("Berhasil");
+    setActionToastBody("Nota selesai diupload");
     setTimeout(() => {
       setShowActionToast(false);
-      setActionToastHeader('');
-      setActionToastBody('');
+      setActionToastHeader("");
+      setActionToastBody("");
     }, 3000);
 
     // Reset the input value to allow selecting the same file again
@@ -303,8 +303,8 @@ const ModalOrderDetails = ({
 
   const handleUploadGambarPost = () => {
     axios
-      .post('http://rsudsamrat.site:8990/', {
-        files: selectedGambar
+      .post("http://rsudsamrat.site:8990/", {
+        files: selectedGambar,
       })
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
@@ -317,15 +317,15 @@ const ModalOrderDetails = ({
     setSelectedGambar([...selectedGambar, selectedGambar]);
 
     handleUploadGambarPost();
-    postShippingStatus('COMPLETE', selectedOrder.id);
+    postShippingStatus("COMPLETE", selectedOrder.id);
 
     setShowActionToast(true);
-    setActionToastHeader('Berhasil');
-    setActionToastBody('Gambar siap untuk diupload.');
+    setActionToastHeader("Berhasil");
+    setActionToastBody("Gambar siap untuk diupload.");
     setTimeout(() => {
       setShowActionToast(false);
-      setActionToastHeader('');
-      setActionToastBody('');
+      setActionToastHeader("");
+      setActionToastBody("");
     }, 3000);
 
     // Reset the input value to allow selecting the same file again
@@ -334,24 +334,24 @@ const ModalOrderDetails = ({
 
   const handleUploadFile = () => {
     axios
-      .post('http://rsudsamrat.site:8990/api/v1/notifikasi', {
+      .post("http://rsudsamrat.site:8990/api/v1/notifikasi", {
         sender: role,
         senderId: id,
         receiver: selectedOrder.orderItems[0].product.vendor.name,
         receiverId: selectedOrder.orderItems[0].product.vendor.id,
-        message: `Semua produk dalam order id ${selectedOrder.id} telah diterima. Berkas Telah dikirim.`
+        message: `Semua produk dalam order id ${selectedOrder.id} telah diterima. Berkas Telah dikirim.`,
       })
       .then((res) => {
         console.log(res);
         setShowActionToast(true);
-        setActionToastHeader('Berhasil');
+        setActionToastHeader("Berhasil");
         setActionToastBody(
           'Berkas selesai diupload, klik tombol "Print Berita Acara" untuk mencetak berita acara.'
         );
         setTimeout(() => {
           setShowActionToast(false);
-          setActionToastHeader('');
-          setActionToastBody('');
+          setActionToastHeader("");
+          setActionToastBody("");
         }, 3000);
       })
       .catch((err) => console.log(err));
@@ -372,7 +372,7 @@ const ModalOrderDetails = ({
         console.log(response);
         if (response.data.length !== 0) {
           // open link from new tab in https mode by cut the first 4 char from url (http) and replace with (https)
-          window.open(`https${response.data.fileUrls[0].slice(4)}`, '_blank');
+          window.open(`https${response.data.fileUrls[0].slice(4)}`, "_blank");
 
           console.log(response.data.fileUrls[0]);
         } else {
@@ -381,12 +381,12 @@ const ModalOrderDetails = ({
       .catch((err) => {
         console.log(err);
         setShowActionToast(true);
-        setActionToastHeader('Gagal');
-        setActionToastBody('Faktur belum diupload.');
+        setActionToastHeader("Gagal");
+        setActionToastBody("Faktur belum diupload.");
         setTimeout(() => {
           setShowActionToast(false);
-          setActionToastHeader('');
-          setActionToastBody('');
+          setActionToastHeader("");
+          setActionToastBody("");
         }, 3000);
       });
   };
@@ -398,25 +398,25 @@ const ModalOrderDetails = ({
         console.log(response);
         if (response.data.length !== 0) {
           // open link from new tab
-          window.open(response.data.fileUrls[0], '_blank');
+          window.open(response.data.fileUrls[0], "_blank");
           console.log(response.data.fileUrls[0]);
         }
       })
       .catch((err) => {
         console.log(err);
         setShowActionToast(true);
-        setActionToastHeader('Gagal');
-        setActionToastBody('Nota belum diupload.');
+        setActionToastHeader("Gagal");
+        setActionToastBody("Nota belum diupload.");
         setTimeout(() => {
           setShowActionToast(false);
-          setActionToastHeader('');
-          setActionToastBody('');
+          setActionToastHeader("");
+          setActionToastBody("");
         }, 3000);
       });
   };
 
   const ProductItem = ({ orderItem }) => {
-    console.log('--productItem--', orderItem);
+    console.log("--productItem--", orderItem);
 
     const calculateTotalPrice = () => {
       // get total price by multiplying quantity with price
@@ -426,54 +426,56 @@ const ModalOrderDetails = ({
 
     return (
       <tr>
-        <td className='font-bold'>{orderItem.id}</td>
-        <td className='font-bold'>
-          <img src={orderItem.product.imageUrl} alt='product-img' width={64} />
+        <td className="font-bold">{orderItem.id}</td>
+        <td className="font-bold">
+          <img src={orderItem.product.imageUrl} alt="product-img" width={64} />
         </td>
-        <td className='font-medium text-primary-1'>
-          {orderItem.product.name}{' '}
-          <span className='text-sm text-black'>x{orderItem.quantity}</span>
+        <td className="font-medium text-primary-1">
+          {orderItem.product.name}{" "}
+          <span className="text-sm text-black">x{orderItem.quantity}</span>
         </td>
         <td>
           Rp <span>{orderItem.totalAmount}</span>
         </td>
-        <td className='font-semibold transition-all duration-300 ease-in-out cursor-pointer hover:text-primary-1'>
+        <td className="font-semibold transition-all duration-300 ease-in-out cursor-pointer hover:text-primary-1">
           {orderItem.status}
         </td>
         <td>
-          <div className='dropdown dropdown-bottom dropdown-end'>
+          <div className="dropdown dropdown-bottom dropdown-end">
             <label
               tabIndex={0}
-              className='text-xl text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'>
+              className="text-xl text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+            >
               <MdMenu />
             </label>
             <ul
               tabIndex={0}
-              className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52'>
-              {selectedOrder.status === 'ORDER' ||
-                (selectedOrder.status === 'NEGOTIATION' && (
+              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              {selectedOrder.status === "ORDER" ||
+                (selectedOrder.status === "NEGOTIATION" && (
                   <li>
                     <a onClick={() => handleOfferAccepted(orderItem.id)}>
-                      <MdCheck className='text-xl text-success' />
+                      <MdCheck className="text-xl text-success" />
                       Accept Order
                     </a>
                   </li>
                 ))}
-              {(orderItem.status === 'ACCEPTED' ||
-                orderItem.status === 'RESEND') &&
-                (selectedOrder.status === 'SHIPPING' ||
-                  selectedOrder.status === 'CHECKING') && (
+              {(orderItem.status === "ACCEPTED" ||
+                orderItem.status === "RESEND") &&
+                (selectedOrder.status === "SHIPPING" ||
+                  selectedOrder.status === "CHECKING") && (
                   <>
                     <li>
                       <a onClick={() => handleConfirm(orderItem.id)}>
-                        <MdCheck className='text-xl text-success' />
+                        <MdCheck className="text-xl text-success" />
                         Confirm
                       </a>
                     </li>
                     <hr />
                     <li>
                       <a onClick={() => handleRefund(orderItem.id)}>
-                        <MdSettingsBackupRestore className='text-xl text-slate-500' />
+                        <MdSettingsBackupRestore className="text-xl text-slate-500" />
                         Refund
                       </a>
                     </li>
@@ -484,30 +486,31 @@ const ModalOrderDetails = ({
                 <a
                   onClick={() =>
                     handleDetailProduct(orderItem.product.productuuid)
-                  }>
-                  <MdInfo className='text-xl text-slate-500' />
+                  }
+                >
+                  <MdInfo className="text-xl text-slate-500" />
                   Info
                 </a>
               </li>
               <hr />
-              {negotiable && selectedOrder.status !== 'CHECKING' ? (
+              {negotiable && selectedOrder.status !== "CHECKING" ? (
                 <li>
                   <a onClick={() => handleOffer(orderItem.id)}>
-                    <MdHandshake className='text-xl text-success' />
+                    <MdHandshake className="text-xl text-success" />
                     Negotiation
                   </a>
                 </li>
               ) : null}
               <hr />
-              {selectedOrder.status !== 'CHECKING' &&
-              selectedOrder.status !== 'COMPLETE' &&
-              selectedOrder.status !== 'PAYMENT' &&
-              selectedOrder.status !== 'VALIDATING' &&
-              selectedOrder.status !== 'SHIPPING' &&
-              selectedOrder.status !== 'CANCEL' ? (
+              {selectedOrder.status !== "CHECKING" &&
+              selectedOrder.status !== "COMPLETE" &&
+              selectedOrder.status !== "PAYMENT" &&
+              selectedOrder.status !== "VALIDATING" &&
+              selectedOrder.status !== "SHIPPING" &&
+              selectedOrder.status !== "CANCEL" ? (
                 <li>
                   <a onClick={() => handleDeleteOrderItem(orderItem.id)}>
-                    <MdDelete className='text-xl text-red-500' />
+                    <MdDelete className="text-xl text-red-500" />
                     Delete
                   </a>
                 </li>
@@ -534,10 +537,10 @@ const ModalOrderDetails = ({
 
     return [...vendorItemsMap].map(([vendorName, orderItems], index) => (
       <React.Fragment key={index}>
-        <div className='flex flex-col gap-2 '>
-          <h2 className='text-xl font-medium text-slate-600'>Best Vendor</h2>
+        <div className="flex flex-col gap-2 ">
+          <h2 className="text-xl font-medium text-slate-600">Best Vendor</h2>
           <hr />
-          <table className='table table-pin-rows'>
+          <table className="table table-pin-rows">
             {/* head */}
             <thead>
               <tr>
@@ -558,34 +561,37 @@ const ModalOrderDetails = ({
             </tbody>
           </table>
         </div>
-        <div className='flex gap-2 my-2'>
-          {orderItems.every((orderItem) => orderItem.status === 'ACCEPTED') &&
-            selectedOrder.status === 'NEGOTIATION' && (
+        <div className="flex gap-2 my-2">
+          {orderItems.every((orderItem) => orderItem.status === "ACCEPTED") &&
+            selectedOrder.status === "NEGOTIATION" && (
               <button
-                className='text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'
+                className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
                 onClick={() => {
-                  handleSetStatusValidating('VALIDATING');
-                  postShippingStatus('VALIDATING', selectedOrder.id);
-                }}>
+                  handleSetStatusValidating("VALIDATING");
+                  postShippingStatus("VALIDATING", selectedOrder.id);
+                }}
+              >
                 Change Status
               </button>
             )}
-          {role === 'PPKOM' && selectedOrder.status === 'VALIDATING' && (
+          {role === "PPKOM" && selectedOrder.status === "VALIDATING" && (
             <>
               <button
-                className='text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'
+                className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
                 onClick={() => {
-                  handleSetStatusNego('NEGOTIATION');
-                  postShippingStatus('NEGOTIATION', selectedOrder.id);
-                }}>
+                  handleSetStatusNego("NEGOTIATION");
+                  postShippingStatus("NEGOTIATION", selectedOrder.id);
+                }}
+              >
                 Cancel Negotiation
               </button>
               <button
-                className='text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'
+                className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
                 onClick={() => {
-                  handleSetStatusCancel('CANCEL');
-                  postShippingStatus('CANCEL', selectedOrder.id);
-                }}>
+                  handleSetStatusCancel("CANCEL");
+                  postShippingStatus("CANCEL", selectedOrder.id);
+                }}
+              >
                 Cancel Order
               </button>
             </>
@@ -597,16 +603,18 @@ const ModalOrderDetails = ({
   };
 
   return (
-    <dialog id='detailsModal' className='modal'>
-      <div className='max-w-5xl modal-box'>
-        <form method='dialog'>
+    <dialog id="detailsModal" className="modal">
+      <div className="max-w-5xl modal-box">
+        <form method="dialog">
           {/* Header */}
-          <div className='flex items-center justify-between mb-3'>
-            <div className='flex items-center gap-2'>
-              <MdInventory className='text-2xl text-primary-1' />
-              <h3 className='text-xl font-bold'>Order Details</h3>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <MdInventory className="text-2xl text-primary-1" />
+              <h3 className="text-xl font-bold">
+                Order Details ({selectedOrder.status})
+              </h3>
             </div>
-            <button className='absolute btn btn-sm btn-circle btn-ghost right-2 top-2'>
+            <button className="absolute btn btn-sm btn-circle btn-ghost right-2 top-2">
               ✕
             </button>
           </div>
@@ -616,15 +624,19 @@ const ModalOrderDetails = ({
         </form>
 
         {/* Footer */}
-        <div className='flex flex-wrap gap-2 mt-12 modal-action'>
+        <div className="flex flex-wrap gap-2 mt-12 modal-action">
           {selectedFiles && (
             <div>
               {selectedFiles.map((file, index) => (
-                <div style={{ display: 'flex' }} key={index}>
+                <div style={{ display: "flex" }} key={index}>
                   <p key={index}>{file.name}</p>
                   <button
-                    className='text-white btn btn-warning'
-                    onClick={handleUploadFile}>
+                    className="text-white btn btn-warning"
+                    onClick={() => {
+                      handleUploadFile();
+                      handlePrintBeritaAcara();
+                    }}
+                  >
                     Upload
                   </button>
                 </div>
@@ -632,35 +644,35 @@ const ModalOrderDetails = ({
             </div>
           )}
           {allItemsChecked &&
-          selectedOrder.status !== 'COMPLETE' &&
-          selectedOrder.status !== 'CANCEL' ? (
+          selectedOrder.status !== "COMPLETE" &&
+          selectedOrder.status !== "CANCEL" ? (
             <>
-              {selectedOrder.status !== 'PAYMENT' ? (
+              {selectedOrder.status !== "PAYMENT" ? (
                 <div>
                   <input
-                    type='file'
-                    style={{ display: 'none' }}
+                    type="file"
+                    style={{ display: "none" }}
                     ref={fileInputRef}
                     onChange={handleFileChange}
                   />
                   <button
                     onClick={() => {
                       handleUploadClick();
-                      // handlePrintBeritaAcara();
                     }}
-                    className='text-white btn btn-warning'
-                    disabled={selectedFiles.length === 1}>
+                    className="text-white btn btn-warning"
+                    disabled={selectedFiles.length === 1}
+                  >
                     Upload Berita Acara
                   </button>
                 </div>
               ) : null}
 
-              {selectedOrder.status !== 'CHECKING' &&
-              selectedOrder.staus !== 'PAYMENT' ? (
+              {selectedOrder.status !== "CHECKING" &&
+              selectedOrder.staus !== "PAYMENT" ? (
                 <div>
                   <input
-                    type='file'
-                    style={{ display: 'none' }}
+                    type="file"
+                    style={{ display: "none" }}
                     ref={uploadGambarRef}
                     onChange={handleUploadGambarChange}
                   />
@@ -668,17 +680,18 @@ const ModalOrderDetails = ({
                     onClick={() => {
                       handleUploadGambar();
                     }}
-                    className='text-white btn btn-warning'
-                    disabled={selectedFiles.length === 1}>
+                    className="text-white btn btn-warning"
+                    disabled={selectedFiles.length === 1}
+                  >
                     Upload Gambar
                   </button>
                 </div>
               ) : null}
-              {selectedOrder.status !== 'CHECKING' && (
+              {selectedOrder.status !== "CHECKING" && (
                 <div>
                   <input
-                    type='file'
-                    style={{ display: 'none' }}
+                    type="file"
+                    style={{ display: "none" }}
                     ref={uploadNotaRef}
                     onChange={(e) => handleNotaChange(e)}
                   />
@@ -686,42 +699,46 @@ const ModalOrderDetails = ({
                     onClick={() => {
                       handleUploadNotaClick();
                     }}
-                    className='text-white btn btn-warning'
-                    disabled={selectedFiles.length === 1}>
+                    className="text-white btn btn-warning"
+                    disabled={selectedFiles.length === 1}
+                  >
                     Upload Nota
                   </button>
                 </div>
               )}
             </>
           ) : null}
-          {selectedOrder.status !== 'ORDER' &&
-          selectedOrder.status !== 'CHECKING' ? (
+          {selectedOrder.status !== "ORDER" &&
+          selectedOrder.status !== "CHECKING" ? (
             <button
               onClick={handlePayoutDetail}
-              className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'>
+              className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+            >
               Payout Details
             </button>
           ) : null}
-          {(selectedOrder.status === 'SHIPPING' ||
-            selectedOrder.status === 'CHECKING' ||
-            selectedOrder.status === 'COMPLETE' ||
-            selectedOrder.status === 'PAYMENT') &&
-          selectedOrder.status !== 'VALIDATING' ? (
+          {(selectedOrder.status === "SHIPPING" ||
+            selectedOrder.status === "CHECKING" ||
+            selectedOrder.status === "COMPLETE" ||
+            selectedOrder.status === "PAYMENT") &&
+          selectedOrder.status !== "VALIDATING" ? (
             <button
-              className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'
-              onClick={handleCheckFaktur}>
+              className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={handleCheckFaktur}
+            >
               Cetak Faktur
             </button>
           ) : null}
-          {(selectedOrder.status === 'PAYMENT' && allItemsChecked) ||
-          (selectedOrder.status === 'NEGOTIATION' && allItemsAccepted) ||
-          selectedOrder.status === 'COMPLETE' ? (
+          {(selectedOrder.status === "PAYMENT" && allItemsChecked) ||
+          (selectedOrder.status === "NEGOTIATION" && allItemsAccepted) ||
+          selectedOrder.status === "COMPLETE" ? (
             <button
-              type='button'
-              className='text-white btn btn-primary'
+              type="button"
+              className="text-white btn btn-primary"
               onClick={() => {
                 printOrderItem(selectedOrder.orderItems, history);
-              }}>
+              }}
+            >
               Print Laporan Negosiasi
             </button>
           ) : null}
@@ -730,28 +747,31 @@ const ModalOrderDetails = ({
           <>
             {allItemsChecked ? (
               <button
-                type='button'
-                className='text-white btn btn-secondary'
+                type="button"
+                className="text-white btn btn-secondary"
                 onClick={() => {
                   PrintBeritaAcara(selectedOrder);
-                  handlePrintBeritaAcara();
-                }}>
+                  // handlePrintBeritaAcara();
+                }}
+              >
                 Print Berita Acara
               </button>
             ) : null}
-            {allItemsChecked && selectedOrder.status === 'COMPLETE' ? (
+            {allItemsChecked && selectedOrder.status === "COMPLETE" ? (
               <button
-                className='text-white btn btn-primary'
-                onClick={handleCheckNota}>
+                className="text-white btn btn-primary"
+                onClick={handleCheckNota}
+              >
                 Check Nota
               </button>
             ) : null}
           </>
-          {selectedOrder.status !== 'ORDER' &&
-          selectedOrder.status !== 'CHECKING' ? (
+          {selectedOrder.status !== "ORDER" &&
+          selectedOrder.status !== "CHECKING" ? (
             <button
               onClick={handleHistory}
-              className='text-white btn btn-primary'>
+              className="text-white btn btn-primary"
+            >
               View History
             </button>
           ) : null}
