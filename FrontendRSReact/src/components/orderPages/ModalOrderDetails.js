@@ -251,6 +251,12 @@ const ModalOrderDetails = ({
     uploadGambarRef.current.click();
   };
 
+  const uploadNegotiationReportRef = useRef(null);
+
+  const handleUploadNegotiationReportOnClick = () => {
+    uploadNegotiationReportRef.current.click();
+  };
+
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     // Save the selected file to array
@@ -327,6 +333,18 @@ const ModalOrderDetails = ({
       setActionToastHeader("");
       setActionToastBody("");
     }, 3000);
+
+    // Reset the input value to allow selecting the same file again
+    event.target.value = null;
+  };
+
+  const handleNegotiationReportOnChange = (event) => {
+    console.log("event.target.files[0]", event.target.files[0]);
+    const selectedNegotiationReport = event.target.files[0];
+
+    const formData = new FormData();
+    formData.append("orderId", selectedOrder.id);
+    formData.append("files", selectedNegotiationReport);
 
     // Reset the input value to allow selecting the same file again
     event.target.value = null;
@@ -710,6 +728,25 @@ const ModalOrderDetails = ({
               )}
             </>
           ) : null}
+          {selectedOrder.status === 'NEGOTIATION' && (
+            <div>
+              <input
+                type="file"
+                style={{ display: "none" }}
+                ref={uploadNegotiationReportRef}
+                onChange={(e) => handleNegotiationReportOnChange(e)}
+              />
+              <button
+                onClick={() => {
+                  handleUploadNegotiationReportOnClick();
+                }}
+                className="text-white btn btn-warning"
+                disabled={selectedFiles.length === 1}
+              >
+                Upload Laporan Negosiasi
+              </button>
+            </div>
+          )}
           {selectedOrder.status !== "ORDER" &&
           selectedOrder.status !== "CHECKING" ? (
             <button
