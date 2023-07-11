@@ -670,7 +670,7 @@ const ModalOrderDetails = ({
               ) : null}
 
               {selectedOrder.status !== "CHECKING" &&
-              selectedOrder.staus !== "PAYMENT" ? (
+              selectedOrder.status !== "PAYMENT" ? (
                 <div>
                   <input
                     type="file"
