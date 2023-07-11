@@ -427,7 +427,7 @@ export default function ProductPages() {
             <span className="w-6">
               <MdInventory />
             </span>
-            <span className="text-primary-1">{product.quantity}</span>
+            <span>Stok <span className="text-primary-1">{product.quantity}</span></span>
           </div>
           <span className="font-medium">{product.vendor.name}</span>
         </div>
