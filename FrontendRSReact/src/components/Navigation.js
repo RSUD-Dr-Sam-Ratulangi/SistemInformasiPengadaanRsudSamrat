@@ -178,7 +178,7 @@ const Navigation = () => {
           {role !== 'PANPEN' && role !== 'KEU'
             ? navLink('Request', 'vendor')
             : null}
-          {role !== 'PANPEN'
+          {role !== 'PANPEN' && role !== 'KEU'
             ? navLink('Products', 'products')
             : null}
           {navLink('Orders', 'orders')}
