@@ -598,7 +598,7 @@ const ModalOrderDetails = ({
                 Change Status
               </button>
             )}
-          {role === "PPKOM" && selectedOrder.status === "VALIDATING" && (
+          {((role === "PPKOM" || role === "PP") && selectedOrder.status === "VALIDATING") && (
             <>
               <button
                 className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
@@ -617,6 +617,14 @@ const ModalOrderDetails = ({
                 }}
               >
                 Cancel Order
+              </button>
+              <button
+                className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={() => {
+                  console.log("cancel vendor onClick");
+                }}
+              >
+                Cancel Vendor
               </button>
             </>
           )}
