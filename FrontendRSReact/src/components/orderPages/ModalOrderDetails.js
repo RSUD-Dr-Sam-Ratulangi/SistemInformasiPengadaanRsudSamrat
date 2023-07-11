@@ -454,12 +454,14 @@ const ModalOrderDetails = ({
             >
               {selectedOrder.status === "ORDER" ||
                 (selectedOrder.status === "NEGOTIATION" && (
-                  <li>
-                    <a onClick={() => handleOfferAccepted(orderItem.id)}>
-                      <MdCheck className="text-xl text-success" />
-                      Accept Order
-                    </a>
-                  </li>
+                  selectedOrder.status === "ACCEPTED" && (
+                    <li>
+                      <a onClick={() => handleOfferAccepted(orderItem.id)}>
+                        <MdCheck className="text-xl text-success" />
+                        Accept Order
+                      </a>
+                    </li>
+                  )
                 ))}
               {(orderItem.status === "ACCEPTED" ||
                 orderItem.status === "RESEND") &&
