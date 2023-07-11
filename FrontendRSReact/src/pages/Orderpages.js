@@ -879,7 +879,7 @@ const Orderpages = () => {
                   Payment
                 </button>
               ) : null}
-              {role === "PPKOM" ? (
+              {role === "PPKOM" || role === 'PP' ? (
                 <button
                   className="flex-1 text-dark btn btn-outline border-primary-1 hover:bg-primary-2 hover:border-primary-2"
                   onClick={() => handleFilterStatus("CANCEL")}
