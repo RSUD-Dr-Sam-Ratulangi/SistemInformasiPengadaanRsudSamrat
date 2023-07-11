@@ -74,15 +74,12 @@ export default function ProductPages() {
     if (vendors.length > 0) {
       if (carts) {
         if (compareCurrentVendorWithLocalStorageCartsVendor()) {
-          console.log("one");
           localStorage.setItem("carts", JSON.stringify(carts));
         } else {
-          console.log("two");
           setCarts(cartsInitialValues());
           localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
         }
       } else {
-        console.log("three");
         setCarts(cartsInitialValues());
         localStorage.setItem("carts", JSON.stringify(cartsInitialValues()));
       }
@@ -218,7 +215,6 @@ export default function ProductPages() {
   }
 
   function handleSeePendingProductsOnClick() {
-    console.log("handleSeePendingProductsOnClick");
     setFilteredProducts(
       filterProducts({
         statusList: ["PENDING"],
@@ -767,6 +763,14 @@ export default function ProductPages() {
                 </li>
               </ul>
             </div>
+            <button
+              className="flex-1 text-lg text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              onClick={() =>
+                handleSelectedCategoriesAndSelectedSubCategoryChange("MAKANAN")
+              }
+            >
+              Makanan
+            </button>
           </div>
 
           {/* Product List */}
