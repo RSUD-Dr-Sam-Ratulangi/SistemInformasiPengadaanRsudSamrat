@@ -433,6 +433,10 @@ const ModalOrderDetails = ({
       });
   };
 
+  const handleDiterimaOnClick = () => {
+    console.log("handleDiterimaOnClick");
+  };
+
   const ProductItem = ({ orderItem }) => {
     console.log("--productItem--", orderItem);
 
@@ -728,7 +732,7 @@ const ModalOrderDetails = ({
               )}
             </>
           ) : null}
-          {selectedOrder.status === 'NEGOTIATION' && (
+          {selectedOrder.status === "NEGOTIATION" && (
             <div>
               <input
                 type="file"
@@ -747,6 +751,16 @@ const ModalOrderDetails = ({
               </button>
             </div>
           )}
+          {
+            selectedOrder.status === "VALIDATING" && (
+              <button
+                onClick={handleDiterimaOnClick}
+                className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              >
+                DITERIMA
+              </button>
+            )
+          }
           {selectedOrder.status !== "ORDER" &&
           selectedOrder.status !== "CHECKING" ? (
             <button
