@@ -5,7 +5,6 @@ const ModalHistory = ({ history, onClose }) => {
   const [newHistory, setNewHistory] = useState(null);
 
   useEffect(() => {
-    console.log('ModalHistory - history', history);
     const newNewHistory = [];
     history.forEach(item => {
       item.bidItems.forEach(bidItem => {
@@ -16,14 +15,24 @@ const ModalHistory = ({ history, onClose }) => {
         });
       });
     });
-    console.log('newNewHistory', newNewHistory);
-    setNewHistory(newNewHistory);
+
+    const removedDuplicates = removeHistoryDuplicateValue(newNewHistory);
+
+    setNewHistory(removedDuplicates);
 
     console.log("modal history", window.historyModal.open);
     if (!window.historyModal.open) {
       window.historyModal.showModal();
     }
   }, [history]);
+
+  function removeHistoryDuplicateValue(arrayOfHistory) {
+    return arrayOfHistory.filter((obj, index, self) => {
+      return index === self.findIndex(o => 
+        o.id === obj.id 
+      );
+    });
+  }
 
   // convert this time "2023-06-28T20:14:53" to text "2 hours ago"
   const timeAgo = (time) => {
@@ -88,7 +97,7 @@ const ModalHistory = ({ history, onClose }) => {
             <tbody>
               {newHistory && newHistory.map((e, i) => (
                 <tr key={i}>
-                  <td>{i}</td>
+                  <td>{i+1}</td>
                   <td>{e.productName}</td>
                   <td>{e.bidPrice}</td>
                   <td>{e.bidPriceChange}</td>

@@ -251,6 +251,12 @@ const ModalOrderDetails = ({
     uploadGambarRef.current.click();
   };
 
+  const uploadNegotiationReportRef = useRef(null);
+
+  const handleUploadNegotiationReportOnClick = () => {
+    uploadNegotiationReportRef.current.click();
+  };
+
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     // Save the selected file to array
@@ -327,6 +333,18 @@ const ModalOrderDetails = ({
       setActionToastHeader("");
       setActionToastBody("");
     }, 3000);
+
+    // Reset the input value to allow selecting the same file again
+    event.target.value = null;
+  };
+
+  const handleNegotiationReportOnChange = (event) => {
+    console.log("event.target.files[0]", event.target.files[0]);
+    const selectedNegotiationReport = event.target.files[0];
+
+    const formData = new FormData();
+    formData.append("orderId", selectedOrder.id);
+    formData.append("files", selectedNegotiationReport);
 
     // Reset the input value to allow selecting the same file again
     event.target.value = null;
@@ -415,6 +433,10 @@ const ModalOrderDetails = ({
       });
   };
 
+  const handleDiterimaOnClick = () => {
+    console.log("handleDiterimaOnClick");
+  };
+
   const ProductItem = ({ orderItem }) => {
     console.log("--productItem--", orderItem);
 
@@ -454,12 +476,14 @@ const ModalOrderDetails = ({
             >
               {selectedOrder.status === "ORDER" ||
                 (selectedOrder.status === "NEGOTIATION" && (
-                  <li>
-                    <a onClick={() => handleOfferAccepted(orderItem.id)}>
-                      <MdCheck className="text-xl text-success" />
-                      Accept Order
-                    </a>
-                  </li>
+                  selectedOrder.status === "ACCEPTED" && (
+                    <li>
+                      <a onClick={() => handleOfferAccepted(orderItem.id)}>
+                        <MdCheck className="text-xl text-success" />
+                        Accept Order
+                      </a>
+                    </li>
+                  )
                 ))}
               {(orderItem.status === "ACCEPTED" ||
                 orderItem.status === "RESEND") &&
@@ -574,7 +598,7 @@ const ModalOrderDetails = ({
                 Change Status
               </button>
             )}
-          {role === "PPKOM" && selectedOrder.status === "VALIDATING" && (
+          {((role === "PPKOM" || role === "PP") && selectedOrder.status === "VALIDATING") && (
             <>
               <button
                 className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
@@ -593,6 +617,14 @@ const ModalOrderDetails = ({
                 }}
               >
                 Cancel Order
+              </button>
+              <button
+                className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                onClick={() => {
+                  console.log("cancel vendor onClick");
+                }}
+              >
+                Cancel Vendor
               </button>
             </>
           )}
@@ -668,7 +700,7 @@ const ModalOrderDetails = ({
               ) : null}
 
               {selectedOrder.status !== "CHECKING" &&
-              selectedOrder.staus !== "PAYMENT" ? (
+              selectedOrder.status !== "PAYMENT" ? (
                 <div>
                   <input
                     type="file"
@@ -708,6 +740,35 @@ const ModalOrderDetails = ({
               )}
             </>
           ) : null}
+          {selectedOrder.status === "NEGOTIATION" && (
+            <div>
+              <input
+                type="file"
+                style={{ display: "none" }}
+                ref={uploadNegotiationReportRef}
+                onChange={(e) => handleNegotiationReportOnChange(e)}
+              />
+              <button
+                onClick={() => {
+                  handleUploadNegotiationReportOnClick();
+                }}
+                className="text-white btn btn-warning"
+                disabled={selectedFiles.length === 1}
+              >
+                Upload Laporan Negosiasi
+              </button>
+            </div>
+          )}
+          {
+            selectedOrder.status === "VALIDATING" && (
+              <button
+                onClick={handleDiterimaOnClick}
+                className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+              >
+                DITERIMA
+              </button>
+            )
+          }
           {selectedOrder.status !== "ORDER" &&
           selectedOrder.status !== "CHECKING" ? (
             <button

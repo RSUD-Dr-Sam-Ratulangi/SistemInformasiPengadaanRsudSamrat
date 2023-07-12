@@ -65,6 +65,7 @@ const Navigation = () => {
   const isSignInPage = location.pathname === '/signIn';
 
   useEffect(() => {
+    console.log('role', role);
     getNotifications();
 
     const handleScroll = () => {
@@ -177,7 +178,9 @@ const Navigation = () => {
           {role !== 'PANPEN' && role !== 'KEU'
             ? navLink('Request', 'vendor')
             : null}
-          {navLink('Products', 'products')}
+          {role !== 'PANPEN' && role !== 'KEU'
+            ? navLink('Products', 'products')
+            : null}
           {navLink('Orders', 'orders')}
           {role !== 'PANPEN' && role !== 'KEU'
             ? navLink('Vendor', 'vendor')

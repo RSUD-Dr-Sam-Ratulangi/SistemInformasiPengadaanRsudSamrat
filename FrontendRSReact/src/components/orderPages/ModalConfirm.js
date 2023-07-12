@@ -52,6 +52,24 @@ const ModalConfirm = ({
     fileInputRef.current.click();
   };
 
+  const uploadGambarRef = useRef(null);
+
+  const handleUploadGambarOnClick = () => {
+    uploadGambarRef.current.click();
+  };
+
+  const handleGambarOnChange = (event) => {
+    console.log("event.target.files[0]", event.target.files[0]);
+    const selectedGambar = event.target.files[0];
+
+    const formData = new FormData();
+    formData.append("orderId", selectedOrder.id);
+    formData.append("files", selectedGambar);
+
+    // Reset the input value to allow selecting the same file again
+    event.target.value = null;
+  };
+
   return (
     <dialog id='confirmModal' className='modal'>
       <div className='modal-box max-w-3xl'>
@@ -122,6 +140,23 @@ const ModalConfirm = ({
 
         {/* Footer */}
         <div className='modal-action'>
+          <div>
+            <input
+              type="file"
+              style={{ display: "none" }}
+              ref={uploadGambarRef}
+              onChange={(e) => handleGambarOnChange(e)}
+            />
+            <button
+              onClick={() => {
+                handleUploadGambarOnClick();
+              }}
+              className="text-white btn btn-warning"
+              disabled={selectedFiles.length === 1}
+            >
+              Upload Gambar
+            </button>
+          </div>
           <button
             onClick={onSubmit}
             className='text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2'>
