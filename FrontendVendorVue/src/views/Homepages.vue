@@ -26,6 +26,7 @@
     :hasOrderStatus="hasOrderStatus"
     :orderId="orderId"
     :showShipping="showShipping"
+    :data="dataShipping"
     @close="showShipping = false"
   />
   <Toast :message="infoMessage" :showToast="showToasts" />
@@ -77,7 +78,7 @@ export default {
         const response = await axios.get(
           `http://rsudsamrat.site:8990/order-status/status-entry/${this.orderId}`
         );
-        console.log(response.data.statusList.status);
+        console.log(response.data.statusList);
         this.showShipping = true;
         this.dataShipping = response.data.statusList;
       } catch (err) {

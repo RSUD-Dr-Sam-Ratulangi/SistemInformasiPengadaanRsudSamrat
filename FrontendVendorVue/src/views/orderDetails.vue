@@ -62,7 +62,6 @@
 
   <div class="flex justify-center items-center h-screen" v-if="isLoading">
     <LoadingBar />
-    <h1 class="text text-lg font-extrabold">Loading ...</h1>
   </div>
 
   <!-- <modal

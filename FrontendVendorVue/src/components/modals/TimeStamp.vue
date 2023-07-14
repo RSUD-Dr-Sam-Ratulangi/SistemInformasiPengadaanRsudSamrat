@@ -1,10 +1,12 @@
 <template>
   <!-- Open the modal using ID.showModal() method -->
   <dialog :open="showShipping" class="modal bg-gray-600 bg-opacity-90">
-    <div method="dialog" class="modal-box w-11/12 max-w-3xl">
+    <div method="dialog" class="modal-box w-11/12 max-w-3xl h-full">
       <h3 class="font-bold text-lg">{{ orderId }}</h3>
       <div class="">
-        <ul class="steps">
+        <ul
+          class="steps steps-vertical sm:steps-vertical lg:steps-horizontal xl:steps-horizontal"
+        >
           <li
             class="step"
             v-bind:class="{ ' step-primary': hasOrderStatus('ORDER') }"
@@ -59,6 +61,11 @@
 
 <script>
 export default {
+  data() {
+    return {
+      test: [],
+    };
+  },
   props: {
     showShipping: {
       type: Boolean,
@@ -70,6 +77,15 @@ export default {
     hasOrderStatus: {
       type: Function,
       required: true,
+    },
+    data: {
+      type: Object,
+      required: true,
+    },
+  },
+  computed: {
+    testData() {
+      data.mapGetters;
     },
   },
   methods: {

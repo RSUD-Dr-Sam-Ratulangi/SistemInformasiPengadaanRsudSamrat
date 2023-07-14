@@ -1,14 +1,10 @@
 <template>
-  <dialog
-    :open="show"
-    v-if="orders"
-    class="modal sm:modal-middle bg-gray-600 bg-opacity-90"
-  >
-    <div method="dialog" class="modal-box w-11/12 max-w-5xl">
+  <dialog :open="show" v-if="orders" class="modal bg-gray-600 bg-opacity-90">
+    <div method="dialog" class="modal-box w-11/12 max-w-4xl">
       <h3 class="font-bold text-sm">Order Id: {{ orders.id }}</h3>
 
       <div class="mt-3 mb-2">
-        <table class="table table-xs">
+        <table class="table table-sm">
           <thead>
             <tr>
               <th>id</th>
@@ -55,7 +51,7 @@
                     </div>
                     <div v-if="orderItem.status === 'REFUND'">
                       <li>
-                        <button class="btn btn-xs" @click="resendRefund()">
+                        <button class="btn btn-xs" @click="showModalResend">
                           RESEND
                         </button>
                       </li>
@@ -68,7 +64,7 @@
         </table>
       </div>
 
-      <div class="modal-action">
+      <div class="modal-action justify-end items-end">
         <!-- if there is a button, it will close the modal -->
         <div
           class="max-w-md bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl"
@@ -109,6 +105,15 @@
     @cancel="closeAllModals"
   />
 
+  <resendBid
+    :showRsBid="showResendModal"
+    :orderItems="selectedItem"
+    :employee="employee"
+    :orders="orders"
+    @close="showResendModal = false"
+    @open="showResendModal = true"
+  />
+
   <showHistory
     :showHistory="showHistoryModal"
     :orders="orders"
@@ -120,21 +125,23 @@
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import axios from "axios";
 import rejectBid from "./DetailsOrder/rejectBid.vue";
-import { mapGetters } from "vuex";
+import resendBid from "./DetailsOrder/resendBid.vue";
 import Toast from "../molecules/Toast.vue";
 import showHistory from "./DetailsOrder/showHistory.vue";
+import { mapGetters } from "vuex";
 export default {
-  components: { FontAwesomeIcon, rejectBid, showHistory, Toast },
+  components: { FontAwesomeIcon, rejectBid, showHistory, Toast, resendBid },
   props: {
     show: Boolean,
     orders: Object,
   },
-  emits: ["close"],
+  emits: ["close", "open"],
   data() {
     return {
       employee: [],
       selectedItem: null,
       showRejectModal: false,
+      showResendModal: false,
       showHistoryModal: false,
       accepted: "ACCEPTED",
       rejected: "REJECTED",
@@ -295,35 +302,6 @@ export default {
         .then((res) => console.log(res))
         .catch((err) => console.log(err));
     },
-    async resendRefund() {
-      const panpenRole = this.employee[3].role;
-      const panpenIds = this.employee[3].id;
-      try {
-        const res = axios.put(
-          `http://rsudsamrat.site:8080/pengadaan/dev/v1/orderitems/${this.selectedItem.id}/status`,
-          {
-            orderItemId: this.selectedItem.id,
-            status: "RESEND",
-          }
-        );
-      } catch (err) {
-        console.log(err);
-      }
-      //Send Notif to panpen
-      axios
-        .post(`http://rsudsamrat.site:8990/api/v1/notifikasi`, {
-          sender: this.username,
-          senderId: this.vendorid,
-          receiver: panpenRole,
-          receiverId: panpenIds,
-          message: `${panpenRole} mendapatkan notifikasi orderItem sudah di kirim lagi, order id ${this.orders.id}. `,
-        })
-        .then((res) => {
-          console.log("notif dikirim", res);
-        })
-        .catch((err) => console.log(err));
-      this.$emit("close");
-    },
     showToast() {
       this.showToasts = true;
       this.infoMessage = "ORDER ID TIDAK DITEMUKAN, MOHON PERIKSA KEMBALI.";
@@ -337,8 +315,16 @@ export default {
     showModalHistory() {
       this.showHistoryModal = true;
     },
+    showModalResend() {
+      if (this.showResendModal) {
+        this.showResendModal = false;
+      } else {
+        this.showResendModal = true;
+      }
+    },
     closeAllModals() {
       this.showRejectModal = false; // Close the child modal
+      this.showResendModal = false;
       // Additional code to close the parent modal if needed
       this.$emit("close"); // Emit "close" event to close the parent modal
     },

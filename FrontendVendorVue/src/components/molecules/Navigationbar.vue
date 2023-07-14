@@ -18,14 +18,13 @@
         </button>
         <img src="../img/logo.jpg" class="h-8 ml-3" alt="Flowbite Logo" />
         <span
-          class="self-center text-xs ml-3 font-semibold dark:text-black md:text-lg"
-          >SMART SAMRAT PROCUREMENT</span
+          class="self-center grid text-xs ml-2 font-semibold dark:text-black md:text-lg"
+          >SMART SAMRAT<span>PROCUREMENT </span></span
         >
       </a>
-      <!-- Login Button -->
       <div class="flex justify-end flex-1 px-2">
         <div class="flex items-stretch">
-          <div class="dropdown dropdown-end h-auto">
+          <div class="dropdown dropdown-end relative block rounded-md">
             <button @click="getNotif" v-if="isLoggedIn">
               <label tabindex="0" class="btn btn-ghost rounded-btn"
                 ><FontAwesomeIcon icon="fas fa-bell" /><span
@@ -35,11 +34,10 @@
               >
             </button>
             <div
-              class="menu grid dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box w-auto h-96 overflow-x-auto"
+              class="menu grid w-80 lg:w-auto dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box h-80 mt-2 overflow-x-auto"
             >
               <div class="p-3">
                 <h1 class="text text-lg font-bold">Notifications</h1>
-
                 <p class="text text-xs">Read: {{ readNotificationCount }}</p>
                 <p class="text text-xs">
                   Unread: {{ unreadNotificationCount }}
@@ -53,19 +51,23 @@
                 <div class="border border-collapse border-t-4">
                   <button
                     @click="openNotif(notifikasi.id, selectedNotif)"
-                    class="btn btn-ghost w-full text-lg font-bold"
+                    class="btn btn-ghost text-sm font-bold"
                   >
                     {{ notifikasi.notificationStatus }}
                   </button>
                   <ul>
                     <li>
-                      <p>{{ notifikasi.createdAt }}</p>
+                      <p class="text text-xs">
+                        {{ notifikasi.createdAt }}
+                      </p>
                     </li>
                     <li>
-                      <p>{{ notifikasi.message }}</p>
+                      <p class="text text-xs">{{ notifikasi.message }}</p>
                     </li>
                     <li>
-                      <p>Sender: {{ notifikasi.sender }}</p>
+                      <p class="text text-xs">
+                        Sender: {{ notifikasi.sender }}
+                      </p>
                     </li>
                   </ul>
                 </div>
@@ -74,17 +76,13 @@
           </div>
           <div>
             <button
-              class="mr-2 btn btn-ghost btn-sm md:btn-md"
+              class="btn btn-ghost"
               @click="showmodalLogin = true"
               v-if="!isLoggedIn"
             >
               <FontAwesomeIcon icon="fas fa-user" />
             </button>
-            <button
-              class="mr-2 btn btn-ghost btn-sm md:btn-md"
-              @click="logout"
-              v-else
-            >
+            <button class="btn btn-ghost" @click="logout" v-else>
               <FontAwesomeIcon icon="fas fa-right-from-bracket" />
             </button>
           </div>
