@@ -1,38 +1,39 @@
 <template>
   <!-- Filter/AddProduct -->
   <div v-if="!isLoading">
-    <div class="flex flex-wrap justify-between items-end">
-      <div class="ml-10">
+    <div class="flex sm:flex-wrap justify-between items-end">
+      <div class="">
         <select
-          class="select select-bordered select-sm max-w-xs mt-4"
+          class="select select-bordered select-xs w-20 bg-neutral text text-white mt-4 ml-2"
           v-model="selectedCategory"
         >
           <option disabled selected>Filter Produk</option>
-          <option value="SEMUA PRODUK">SEMUA PRODUK</option>
+          <option value="SEMUA PRODUK">FILTER</option>
           <option>BM</option>
           <option>JASA</option>
           <option>BPH</option>
         </select>
       </div>
       <div>
-        <h1 class="text text-3xl font-extrabold">PRODUK {{ username }}</h1>
+        <h1 class="text text-lg font-extrabold">PRODUK</h1>
       </div>
       <div>
-        <button class="btn btn-sm btn-primary mr-10" @click="addProductModal">
+        <button
+          class="btn sm:btn-sm btn-xs text-xs btn-neutral sm:w-auto mr-2"
+          @click="addProductModal"
+        >
           Tambah Produk
         </button>
       </div>
     </div>
     <!-- Product Card -->
-    <div
-      class="flex flex-wrap justify-center items-center overflow-x-auto mt-5"
-    >
+    <div class="flex flex-wrap justify-center overflow-x-auto mt-3">
       <div
         v-for="product in filteredProducts"
         :key="product.id"
-        class="px-2 mb-4"
+        class="px-2 mb-4 sm:w-1/2 md:w-1/3 lg:w-1/4"
       >
-        <div class="card card-normal bg-base-500 shadow-xl">
+        <div class="card sm:card-normal card-bordered bg-base-500 shadow-xl">
           <figure>
             <div class="border border-gray">
               <img
@@ -54,21 +55,21 @@
               <div class="badge badge-primary">{{ product.vendor.name }}</div>
             </h2>
             <h1 class="text text-xs">{{ product.description }}</h1>
-            <div class="card-actions justify-end">
+            <div class="card-actions justify-end flex-wrap">
               <div
-                class="badge badge-outline"
+                class="badge badge-outline mb-2"
                 v-if="product.categories && product.categories.length > 0"
               >
                 {{ product.categories[0].name }}
               </div>
               <div
-                class="badge badge-outline"
+                class="badge badge-outline mb-2"
                 v-if="product.subcategories && product.subcategories.length > 0"
               >
                 {{ product.subcategories[0].name }}
               </div>
               <button
-                class="btn badger badge-outline btn-xs"
+                class="btn badger badge-outline btn-xs self-end"
                 @click="deleteProduct(product.productuuid, product.name)"
               >
                 Delete
@@ -82,7 +83,6 @@
 
   <div class="flex justify-center items-center h-screen" v-if="isLoading">
     <LoadingBar />
-    <h1 class="text text-lg font-extrabold">Loading Produk ...</h1>
   </div>
 
   <Teleport to="body">
