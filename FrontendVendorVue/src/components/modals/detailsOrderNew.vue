@@ -89,9 +89,22 @@
           History
         </button>
       </div>
-      <p v-if="selectedFile && selectedFile.length > 0">
-        {{ selectedFile[0].name }}
-      </p>
+      <div v-if="selectedFile && selectedFile.length > 0">
+        <div class="flex items-center">
+          <button
+            class="btn btn-ghost text-red-600 w-0 h-0"
+            @click="removerSelectedFile"
+          >
+            X
+          </button>
+          <p>
+            {{ selectedFile[0].name }}
+          </p>
+        </div>
+        <span class="font-bold"
+          >FAKTUR AKAN DIKIRIMKAN DAN AKAN DILIHAT OLEH RUMAH SAKIT</span
+        >
+      </div>
     </div>
   </dialog>
 
@@ -301,6 +314,9 @@ export default {
         })
         .then((res) => console.log(res))
         .catch((err) => console.log(err));
+    },
+    removerSelectedFile() {
+      this.selectedFile = [];
     },
     showToast() {
       this.showToasts = true;

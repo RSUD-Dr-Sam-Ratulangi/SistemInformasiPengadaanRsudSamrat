@@ -9,7 +9,7 @@
         @click="searchOrderId"
       ></button>
       <input
-        type="text"
+        type="number"
         class="px-4 py-2 w-80"
         placeholder="Search..."
         v-model="orderId"

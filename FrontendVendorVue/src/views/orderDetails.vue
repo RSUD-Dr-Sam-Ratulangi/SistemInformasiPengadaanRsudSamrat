@@ -115,16 +115,6 @@ export default {
   },
   created() {
     this.isLoading = true;
-    // const paramsOrder = this.$route.params.orderId;
-    // if (paramsOrder) {
-    //   this.selectOrdersItem();
-    // } else {
-    //   this.showToast = true;
-    //   this.infoMessage = "OrderId not Found";
-    //   setTimeout(() => {
-    //     this.showToasts = false;
-    //   }, 3000);
-    // }
 
     axios
       .get(
@@ -160,8 +150,7 @@ export default {
           params: { orderId: order.id },
         });
       } else {
-        // Redirect to a default route or display an error message
-        this.$router.push("/defaultRoute"); // Replace with your default route or error handling logic
+        this.$router.push("/defaultRoute");
       }
     },
     handleModalClose() {
