@@ -39,6 +39,7 @@ const ModalOrderDetails = ({
   const [negotiable, setNegotiable] = useState(true);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectedGambar, setSelectedGambar] = useState([]);
+  const [laporanNego, setlaporanNego] = useState(null);
 
   const allItemsAccepted = selectedOrder.orderItems.every(
     (orderItem) => orderItem.status === "ACCEPTED"
@@ -182,7 +183,7 @@ const ModalOrderDetails = ({
             senderId: id,
             receiver: selectedOrder.orderItems.product.vendor.name,
             receiverId: selectedOrder.orderItems.product.vendor.id,
-            message: `ALL PRODUCT IN THIS ORDER IS ACCEPTED BY ${role}`,
+            message: `${selectedOrder.id}, ALL PRODUCT IN THIS ORDER ${selectedOrder.id} IS ACCEPTED`,
           })
           .catch((err) => console.log(err));
         console.log(response);
@@ -342,9 +343,11 @@ const ModalOrderDetails = ({
     console.log("event.target.files[0]", event.target.files[0]);
     const selectedNegotiationReport = event.target.files[0];
 
-    const formData = new FormData();
-    formData.append("orderId", selectedOrder.id);
-    formData.append("files", selectedNegotiationReport);
+    setlaporanNego(selectedNegotiationReport);
+
+    // const formData = new FormData();
+    // formData.append("orderId", selectedOrder.id);
+    // formData.append("files", selectedNegotiationReport);
 
     // Reset the input value to allow selecting the same file again
     event.target.value = null;
@@ -474,17 +477,16 @@ const ModalOrderDetails = ({
               tabIndex={0}
               className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
             >
-              {selectedOrder.status === "ORDER" ||
-                (selectedOrder.status === "NEGOTIATION" && (
-                  selectedOrder.status === "ACCEPTED" && (
-                    <li>
-                      <a onClick={() => handleOfferAccepted(orderItem.id)}>
-                        <MdCheck className="text-xl text-success" />
-                        Accept Order
-                      </a>
-                    </li>
-                  )
-                ))}
+              {selectedOrder.status === "NEGOTIATION" &&
+                orderItem.status !== "ACCEPTED" &&
+                orderItem.status !== "OFFER" && (
+                  <li>
+                    <a onClick={() => handleOfferAccepted(orderItem.id)}>
+                      <MdCheck className="text-xl text-success" />
+                      Accept Order
+                    </a>
+                  </li>
+                )}
               {(orderItem.status === "ACCEPTED" ||
                 orderItem.status === "RESEND") &&
                 (selectedOrder.status === "SHIPPING" ||
@@ -517,14 +519,23 @@ const ModalOrderDetails = ({
                 </a>
               </li>
               <hr />
-              {negotiable && selectedOrder.status !== "CHECKING" ? (
+              {(orderItem.status === "PENDING" ||
+                orderItem.status === "REJECTED") && (
                 <li>
                   <a onClick={() => handleOffer(orderItem.id)}>
                     <MdHandshake className="text-xl text-success" />
                     Negotiation
                   </a>
                 </li>
-              ) : null}
+              )}
+              {/* {negotiable && selectedOrder.status !== "CHECKING" ? (
+                <li>
+                  <a onClick={() => handleOffer(orderItem.id)}>
+                    <MdHandshake className="text-xl text-success" />
+                    Negotiation
+                  </a>
+                </li>
+              ) : null} */}
               <hr />
               {selectedOrder.status !== "CHECKING" &&
               selectedOrder.status !== "COMPLETE" &&
@@ -586,48 +597,52 @@ const ModalOrderDetails = ({
           </table>
         </div>
         <div className="flex gap-2 my-2">
-          {orderItems.every((orderItem) => orderItem.status === "ACCEPTED") &&
-            selectedOrder.status === "NEGOTIATION" && (
-              <button
-                className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                onClick={() => {
-                  handleSetStatusValidating("VALIDATING");
-                  postShippingStatus("VALIDATING", selectedOrder.id);
-                }}
-              >
-                Change Status
-              </button>
+          {laporanNego ? (
+            <div className="flex gap-5">
+              <div>
+                {orderItems.every(
+                  (orderItem) => orderItem.status === "ACCEPTED"
+                ) &&
+                  selectedOrder.status === "NEGOTIATION" && (
+                    <button
+                      className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                      onClick={() => {
+                        handleSetStatusValidating("VALIDATING");
+                        postShippingStatus("VALIDATING", selectedOrder.id);
+                      }}
+                    >
+                      Upload
+                    </button>
+                  )}
+              </div>
+              <div className=" justify-end">
+                <p>Selected File: {laporanNego.name}</p>
+              </div>
+            </div>
+          ) : null}
+          {(role === "PPKOM" || role === "PP") &&
+            selectedOrder.status === "VALIDATING" && (
+              <>
+                <button
+                  className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  onClick={() => {
+                    handleSetStatusNego("NEGOTIATION");
+                    postShippingStatus("NEGOTIATION", selectedOrder.id);
+                  }}
+                >
+                  Negosiasi Kembali
+                </button>
+                <button
+                  className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+                  onClick={() => {
+                    handleSetStatusCancel("CANCEL");
+                    postShippingStatus("CANCEL", selectedOrder.id);
+                  }}
+                >
+                  Batalkan Orderan
+                </button>
+              </>
             )}
-          {((role === "PPKOM" || role === "PP") && selectedOrder.status === "VALIDATING") && (
-            <>
-              <button
-                className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                onClick={() => {
-                  handleSetStatusNego("NEGOTIATION");
-                  postShippingStatus("NEGOTIATION", selectedOrder.id);
-                }}
-              >
-                Cancel Negotiation
-              </button>
-              <button
-                className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                onClick={() => {
-                  handleSetStatusCancel("CANCEL");
-                  postShippingStatus("CANCEL", selectedOrder.id);
-                }}
-              >
-                Cancel Order
-              </button>
-              <button
-                className="text-white btn btn-sm border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-                onClick={() => {
-                  console.log("cancel vendor onClick");
-                }}
-              >
-                Cancel Vendor
-              </button>
-            </>
-          )}
         </div>
         <hr />
       </React.Fragment>
@@ -740,7 +755,7 @@ const ModalOrderDetails = ({
               )}
             </>
           ) : null}
-          {selectedOrder.status === "NEGOTIATION" && (
+          {selectedOrder.status === "NEGOTIATION" && allItemsAccepted && (
             <div>
               <input
                 type="file"
@@ -753,29 +768,27 @@ const ModalOrderDetails = ({
                   handleUploadNegotiationReportOnClick();
                 }}
                 className="text-white btn btn-warning"
-                disabled={selectedFiles.length === 1}
+                disabled={laporanNego !== null}
               >
                 Upload Laporan Negosiasi
               </button>
             </div>
           )}
-          {
-            selectedOrder.status === "VALIDATING" && (
-              <button
-                onClick={handleDiterimaOnClick}
-                className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
-              >
-                DITERIMA
-              </button>
-            )
-          }
+          {selectedOrder.status === "VALIDATING" && (
+            <button
+              onClick={handleDiterimaOnClick}
+              className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
+            >
+              DITERIMA
+            </button>
+          )}
           {selectedOrder.status !== "ORDER" &&
           selectedOrder.status !== "CHECKING" ? (
             <button
               onClick={handlePayoutDetail}
               className="text-white btn border-primary-1 bg-primary-1 hover:bg-primary-2 hover:border-primary-2"
             >
-              Payout Details
+              Rincian Pembayaran
             </button>
           ) : null}
           {(selectedOrder.status === "SHIPPING" ||
@@ -833,7 +846,7 @@ const ModalOrderDetails = ({
               onClick={handleHistory}
               className="text-white btn btn-primary"
             >
-              View History
+              Histori Negosiasi
             </button>
           ) : null}
         </div>
