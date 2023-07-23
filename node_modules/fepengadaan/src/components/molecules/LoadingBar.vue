@@ -1,5 +1,5 @@
 <template>
-  <span class="loading loading-spinner loading-lg"></span>
+  <span class="loading loading-dots loading-lg"></span>
 </template>
 
 <script>

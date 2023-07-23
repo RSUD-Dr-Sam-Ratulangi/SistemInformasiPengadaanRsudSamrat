@@ -27,6 +27,12 @@ public class NotaServiceImpl implements NotaService {
 
     @Override
     public NotaResponseDTO createNota(NotaRequestDTO requestDTO) throws IOException {
+        // Check if the orderId already exists
+        NotaModel existingNota = notaRepository.findByOrderId(requestDTO.getOrderId());
+        if (existingNota != null) {
+            throw new EntityAlreadyExistsException("Nota already exists for orderId: " + requestDTO.getOrderId());
+        }
+
         // Convert MultipartFiles to Binaries
         List<Binary> binaries = convertMultipartFilesToBinaries(requestDTO.getFiles());
 
@@ -49,6 +55,7 @@ public class NotaServiceImpl implements NotaService {
 
         return responseDTO;
     }
+
 
     @Override
     public NotaResponseDTO getByOrderId(String orderId) {

@@ -1,6 +1,6 @@
 package com.example.pengadaanrsudsamrat.order;
 
-import com.example.pengadaanrsudsamrat.orderitem.OrderItemModel;
+import  com.example.pengadaanrsudsamrat.orderitem.OrderItemModel;
 import com.example.pengadaanrsudsamrat.payment.PaymentModel;
 import com.example.pengadaanrsudsamrat.vendor.VendorModel;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -15,9 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * The type Order model.
- */
+
 @Entity
 @Table(name = "orders")
 @Data
@@ -32,7 +30,8 @@ public class OrderModel {
         CHECKING,
         PAYMENT,
         CANCEL,
-        SHIPPING
+        SHIPPING,
+        COMPLETE
     }
 
     @Id

@@ -70,6 +70,20 @@ const Footer = () => {
         </a>
       </div>
       <hr />
+        <div className="w-full pt-3 pb-3 border-t">
+          <p className="text-white text-center"><b>About us</b></p>
+          <p className="text-white text-center mt-2">Pengembang:</p>
+          <div className="opacity-40">
+            <p className="text-white text-center">Victor Maukar</p>
+            <p className="text-white text-center">Kennie Mandolang, S.T</p>
+            <p className="text-white text-center">Zusana Korompis, S.Kom, ACP</p>
+            <p className="text-white text-center">Leonard Polandos, S.Kom, LDA</p>
+            <p className="text-white text-center">Nariva Wagey, S.Kom, ACP</p>
+            <p className="text-white text-center">Gilby Koloay, S.Kom</p>
+            <p className="text-white text-center">Yehezkiel Ombuh</p>
+          </div>
+        </div>
+      <hr />
       <div className="flex items-center justify-center w-full pt-3 border-t opacity-40">
         <p className="text-white">
           © 2023 UPTI RSUD DR SAM RATULANGI TONDANO. Hak Cipta Dilindungi
